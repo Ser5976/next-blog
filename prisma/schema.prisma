@@ -10,56 +10,129 @@ datasource db {
 }
 
 model User {
-  id          String     @id @default(cuid())
-  clerkUserId String     @unique
-  email       String     @unique
-  name        String
-  imageUrl    String?
-  role        Role       @default(User)
-  articles    Articles[]
-  comments    Comment[]
-  likes       Like[]
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  password  String
+  role      Role      @default(USER)
+  posts     Post[]
+  comments  Comment[]
+  ratings   Rating[]
+  likes     Like[]
+  dislikes  Dislike[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("users")
 }
 
-enum Role {
-  User
-  ADMIN
-}
-
-model Articles {
+model Post {
   id            String    @id @default(cuid())
   title         String
+  slug          String    @unique
   content       String
-  category      String
-  featuredImage String
-  author        User      @relation(fields: [authorId], references: [id])
+  excerpt       String?
+  coverImage    String?
+  published     Boolean   @default(false)
+  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId      String
+  category      Category? @relation(fields: [categoryId], references: [id])
+  categoryId    Int?
+  tags          Tag[]     @relation("PostToTag")
   comments      Comment[]
-  likes         Like[]
+  ratings       Rating[]
+  viewCount     Int       @default(0)
+  averageRating Float?    @default(0)
+  ratingCount   Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  publishedAt   DateTime?
+
+  @@index([slug])
+  @@index([published, publishedAt])
+  @@index([averageRating])
+  @@map("posts")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  slug        String   @unique
+  description String?
+  posts       Post[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  posts     Post[]   @relation("PostToTag")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tags")
 }
 
 model Comment {
-  id        String   @id @default(cuid())
-  body      String
-  articleId String
-  article   Articles @relation(fields: [articleId], references: [id])
+  id        String    @id @default(cuid())
+  content   String
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  likes     Like[]
+  dislikes  Dislike[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([postId])
+  @@map("comments")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  value     Int // 1-5
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId, postId])
+  @@map("ratings")
 }
 
 model Like {
   id        String   @id @default(cuid())
-  isLiked   Boolean  @default(false)
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  article   Articles @relation(fields: [articleId], references: [id])
-  articleId String
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@unique([userId, articleId])
+  @@unique([userId, commentId])
+  @@map("likes")
+}
+
+model Dislike {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?
+  createdAt DateTime @default(now())
+
+  @@unique([userId, commentId])
+  @@map("dislikes")
+}
+
+enum Role {
+  USER
+  EDITOR
+  ADMIN
 }
