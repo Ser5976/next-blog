@@ -1,4 +1,4 @@
-// jest.setup.ts
+/* // jest.setup.ts
 import '@testing-library/jest-dom';
 
 import { TextDecoder, TextEncoder } from 'util';
@@ -28,3 +28,4 @@ const fetchWithExtras = fetch as typeof fetch & {
   fetchModule.Response;
 (global as unknown as { Headers: typeof fetchModule.Headers }).Headers =
   fetchModule.Headers;
+ */

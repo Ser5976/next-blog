@@ -1,6 +1,7 @@
 /**
  * @jest-environment node
  */
+// это специальная деректива тест выполняется на node
 import { Theme } from '../model/types';
 import { getInitialTheme } from './get-initial-theme';
 
