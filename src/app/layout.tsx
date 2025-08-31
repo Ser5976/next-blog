@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import './globals.css';
 
+import { getInitThemeScript } from '@/widgets/theme-toggle';
 import Providers from './providers';
 
 const geistSans = Geist({
@@ -27,6 +28,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: getInitThemeScript({
+              storageKey: 'my-app-theme',
+              defaultTheme: 'system', // или "light/dark"
+              attribute: 'class',
+              enableSystem: true,
+            }),
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
