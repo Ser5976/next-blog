@@ -54,7 +54,7 @@ describe('getInitialTheme', () => {
     }));
   });
 
-  test('should return stored theme from localStorage when available', () => {
+  it('should return stored theme from localStorage when available', () => {
     // Мокируем что в localStorage есть сохраненная тема
     const storedTheme: Theme = 'dark';
     localStorageMock.getItem.mockReturnValue(storedTheme);
@@ -69,7 +69,7 @@ describe('getInitialTheme', () => {
     expect(result).toBe(storedTheme);
   });
 
-  test('should return system dark theme when enableSystem is true and no stored theme', () => {
+  it('should return system dark theme when enableSystem is true and no stored theme', () => {
     // Мокируем что в localStorage нет темы
     localStorageMock.getItem.mockReturnValue(null);
 
@@ -100,7 +100,7 @@ describe('getInitialTheme', () => {
     expect(result).toBe('dark');
   });
 
-  test('should return system light theme when enableSystem is true and no stored theme', () => {
+  it('should return system light theme when enableSystem is true and no stored theme', () => {
     // Мокируем что в localStorage нет темы
     localStorageMock.getItem.mockReturnValue(null);
 
@@ -123,7 +123,7 @@ describe('getInitialTheme', () => {
     expect(result).toBe('light');
   });
 
-  test('should return default theme when enableSystem is false and no stored theme', () => {
+  it('should return default theme when enableSystem is false and no stored theme', () => {
     // Мокируем что в localStorage нет темы
     localStorageMock.getItem.mockReturnValue(null);
 
@@ -137,7 +137,7 @@ describe('getInitialTheme', () => {
     expect(result).toBe(defaultTheme);
   });
 
-  test('should return default theme when localStorage throws error', () => {
+  it('should return default theme when localStorage throws error', () => {
     // Мокируем ошибку в localStorage
     localStorageMock.getItem.mockImplementation(() => {
       throw new Error('Storage unavailable');
@@ -162,7 +162,7 @@ describe('getInitialTheme', () => {
     consoleWarnSpy.mockRestore();
   });
 
-  test('should return default theme when localStorage returns empty string', () => {
+  it('should return default theme when localStorage returns empty string', () => {
     // Мокируем пустую строку в localStorage
     localStorageMock.getItem.mockReturnValue('');
 
@@ -173,7 +173,7 @@ describe('getInitialTheme', () => {
     expect(result).toBe(defaultTheme);
   });
 
-  test('should return invalid theme as-is when from localStorage', () => {
+  it('should return invalid theme as-is when from localStorage', () => {
     // Мокируем невалидное значение темы
     const invalidTheme = 'invalid-theme';
     localStorageMock.getItem.mockReturnValue(invalidTheme);
@@ -186,7 +186,7 @@ describe('getInitialTheme', () => {
     expect(result).toBe(invalidTheme);
   });
 
-  test('should use system theme when localStorage returns empty string and system enabled', () => {
+  it('should use system theme when localStorage returns empty string and system enabled', () => {
     // Мокируем пустую строку в localStorage
     localStorageMock.getItem.mockReturnValue('');
 

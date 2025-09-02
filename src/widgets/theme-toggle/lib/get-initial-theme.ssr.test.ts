@@ -9,7 +9,7 @@ describe('getInitialTheme (SSR)', () => {
   const storageKey = 'theme-preference';
   const defaultTheme: Theme = 'light';
 
-  test('returns default theme when window is undefined (SSR)', () => {
+  it('returns default theme when window is undefined (SSR)', () => {
     // Здесь реально нет window, потому что окружение node
     expect(typeof window).toBe('undefined');
 
