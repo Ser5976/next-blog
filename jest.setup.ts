@@ -1,11 +1,11 @@
 // jest.setup.ts
 import '@testing-library/jest-dom';
 
-import { TextDecoder, TextEncoder } from 'util';
+//import { TextDecoder, TextEncoder } from 'util';
 // import fetch, * as fetchModule from 'node-fetch';
 
-global.TextEncoder = TextEncoder;
-global.TextDecoder = TextDecoder as typeof global.TextDecoder;
+//global.TextEncoder = TextEncoder;
+//global.TextDecoder = TextDecoder as typeof global.TextDecoder;
 
 // Объединяем типы функции fetch и дополнительных свойств node-fetch
 // const fetchWithExtras = fetch as typeof fetch & {
@@ -28,4 +28,3 @@ global.TextDecoder = TextDecoder as typeof global.TextDecoder;
 //   fetchModule.Response;
 // (global as unknown as { Headers: typeof fetchModule.Headers }).Headers =
 //   fetchModule.Headers;
-
