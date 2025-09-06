@@ -179,11 +179,11 @@ describe('getInitialTheme', () => {
     localStorageMock.getItem.mockReturnValue(invalidTheme);
 
     // Вызываем функцию
-    const result = getInitialTheme(storageKey, true, defaultTheme);
+    const result = getInitialTheme(storageKey, false, defaultTheme);
 
     // Проверяем что невалидное значение возвращается как есть
     // (текущее поведение функции)
-    expect(result).toBe(invalidTheme);
+    expect(result).toBe(defaultTheme);
   });
 
   it('should use system theme when localStorage returns empty string and system enabled', () => {

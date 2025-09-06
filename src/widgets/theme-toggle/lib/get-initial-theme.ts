@@ -10,8 +10,9 @@ export function getInitialTheme(
   }
 
   try {
-    const stored = localStorage.getItem(storageKey) as Theme;
-    if (stored) return stored;
+    const stored = localStorage.getItem(storageKey);
+    if (stored === 'light' || stored === 'dark' || stored === 'system')
+      return stored as Theme;
 
     if (enableSystem) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches
