@@ -1,10 +1,7 @@
-import { ThemeToggle } from '@/widgets/theme-toggle';
-
 export default async function Home() {
   return (
-    <div>
-      привет!
-      <ThemeToggle />
+    <div className=" flex gap-4">
+      <div className="">Привет,Home!!!</div>
     </div>
   );
 }

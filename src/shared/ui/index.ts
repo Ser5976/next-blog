@@ -16,3 +16,15 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from './dropdown-menu';
+export { Input } from './input';
+export { Avatar, AvatarImage, AvatarFallback } from './avatar';
+export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+} from './sheet';
