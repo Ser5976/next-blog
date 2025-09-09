@@ -1,6 +1,6 @@
 'use client';
 
-import { ThemeProvider } from '@/widgets/theme-toggle';
+import { ThemeProvider } from '@/features/theme-toggle';
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (

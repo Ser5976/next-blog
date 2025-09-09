@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Menu, Search, User } from 'lucide-react';
 
+import { ThemeToggle } from '@/features/theme-toggle';
 import { cn } from '@/shared/lib';
 import {
   Button,
@@ -15,7 +16,6 @@ import {
   SheetTrigger,
 } from '@/shared/ui';
 import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
-import { ThemeToggle } from '@/widgets/theme-toggle';
 
 const categories = [
   { name: 'Fitness', href: '/fitness' },
