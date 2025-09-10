@@ -37,7 +37,7 @@ model Post {
   author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId      String
   category      Category? @relation(fields: [categoryId], references: [id])
-  categoryId    Int?
+  categoryId    String?
   tags          Tag[]     @relation("PostToTag")
   comments      Comment[]
   ratings       Rating[]
@@ -55,7 +55,7 @@ model Post {
 }
 
 model Category {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(cuid())
   name        String
   slug        String   @unique
   description String?

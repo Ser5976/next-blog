@@ -1,8 +1,7 @@
-'use client';
-
 import Link from 'next/link';
 import { Menu, Search, User } from 'lucide-react';
 
+import { CategoriesMenu } from '@/features/categories-menu';
 import { ThemeToggle } from '@/features/theme-toggle';
 import { cn } from '@/shared/lib';
 import {
@@ -45,17 +44,7 @@ export const Header = () => {
         </Link>
 
         {/* Десктоп-навигация */}
-        <nav className="hidden md:flex gap-6">
-          {categories.map((c) => (
-            <Link
-              key={c.name}
-              href={c.href}
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase"
-            >
-              {c.name}
-            </Link>
-          ))}
-        </nav>
+        <CategoriesMenu />
 
         {/* Actions */}
         <div className="flex items-center gap-2">

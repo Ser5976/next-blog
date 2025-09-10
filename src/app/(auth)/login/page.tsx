@@ -1,4 +1,4 @@
-import { ThemeToggle } from '@/widgets/theme-toggle';
+import { ThemeToggle } from '@/features/theme-toggle';
 
 export default async function Auth() {
   return (
