@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Menu, Search, User } from 'lucide-react';
 
 import { CategoriesMenu } from '@/features/categories-menu';
+import { SearchForm } from '@/features/search';
 import { ThemeToggle } from '@/features/theme-toggle';
 import { cn } from '@/shared/lib';
 import {
@@ -49,13 +50,7 @@ export const Header = () => {
         {/* Actions */}
         <div className="flex items-center gap-2">
           {/* Поиск (на планшете/десктопе) */}
-          <div className="hidden md:flex items-center gap-2 bg-muted/20 dark:bg-muted/10 rounded-full px-2 py-1">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Поиск..."
-              className="h-8 w-48 bg-transparent border-0 focus:ring-0 placeholder:opacity-80"
-            />
-          </div>
+          <SearchForm />
 
           {/* Переключатель темы */}
           <ThemeToggle />
