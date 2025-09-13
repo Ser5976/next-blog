@@ -3,15 +3,14 @@
 import Link from 'next/link';
 import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 
+import { Category, CategoryLink } from '@/entities/category';
 import { cn } from '@/shared/lib';
 
-const categories = [
-  { name: 'Fitness', href: '/fitness' },
-  { name: 'Nutrition', href: '/nutrition' },
-  { name: 'Health', href: '/mental' },
-];
+interface HeaderProps {
+  categories: Category[] | undefined;
+}
 
-export const Footer = () => {
+export const Footer = ({ categories }: HeaderProps) => {
   return (
     <footer
       className={cn('border-t border-border bg-background/70 backdrop-blur')}
@@ -36,16 +35,24 @@ export const Footer = () => {
         {/* Блок 2 — Навигация */}
         <div>
           <h4 className="font-semibold mb-3">Sections</h4>
-          <nav className="flex flex-col gap-2">
-            {categories.map((c) => (
-              <Link
-                key={c.name}
-                href={c.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors uppercase"
-              >
-                {c.name}
-              </Link>
-            ))}
+          <nav aria-label="categories">
+            <ul className="flex flex-col gap-2" role="list">
+              {!categories ? (
+                <li className="text-sm text-muted-foreground">
+                  ⚠️ What went wrong
+                </li>
+              ) : categories.length === 0 ? (
+                <li className="text-sm text-muted-foreground">
+                  No data available
+                </li>
+              ) : (
+                categories.map((category) => (
+                  <li key={category.id}>
+                    <CategoryLink category={category} />
+                  </li>
+                ))
+              )}
+            </ul>
           </nav>
         </div>
 

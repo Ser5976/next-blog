@@ -1,20 +1,12 @@
-import { CategoryLink, getCategories } from '@/entities/category';
+import { Category, CategoryLink } from '@/entities/category';
 
-export const CategoriesMenu = async () => {
-  const categories = await getCategories();
+interface HeaderProps {
+  categories: Category[] | undefined;
+}
 
-  if (!categories) {
-    return (
-      <nav aria-label="Categories">
-        <ul className="flex gap-4" role="list">
-          <li className="text-sm text-muted-foreground">⚠️ What went wrong</li>
-        </ul>
-      </nav>
-    );
-  }
-
+export const CategoriesMenu = ({ categories }: HeaderProps) => {
   return (
-    <nav aria-label="Categories" className="hidden md:flex gap-6">
+    <nav aria-label="categories" className="hidden md:flex gap-6">
       <ul className="flex gap-4" role="list">
         {!categories ? (
           <li className="text-sm text-muted-foreground">⚠️ What went wrong</li>
@@ -22,7 +14,9 @@ export const CategoriesMenu = async () => {
           <li className="text-sm text-muted-foreground">No data available</li>
         ) : (
           categories.map((category) => (
-            <CategoryLink key={category.id} category={category} />
+            <li key={category.id}>
+              <CategoryLink category={category} />
+            </li>
           ))
         )}
       </ul>
