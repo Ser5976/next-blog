@@ -24,6 +24,7 @@ export const SearchForm = ({ variant = 'desktop', onClose }: Props) => {
     router.push(`/search?query=${encodeURIComponent(trimmed)}`);
     setValue('');
   };
+
   return (
     <form
       onSubmit={handleSubmit}
@@ -32,6 +33,8 @@ export const SearchForm = ({ variant = 'desktop', onClose }: Props) => {
         variant === 'desktop' && 'hidden md:flex px-2 py-1',
         variant === 'mobile' && 'flex py-1'
       )}
+      role="search"
+      aria-label="Site search"
     >
       <Button
         type="submit"
@@ -41,7 +44,7 @@ export const SearchForm = ({ variant = 'desktop', onClose }: Props) => {
           'rounded-full hover:bg-muted cursor-pointer',
           variant === 'mobile' && 'h-10 w-10'
         )}
-        aria-label="Search"
+        aria-label="Submit search"
       >
         <Search
           className={cn(
@@ -49,6 +52,7 @@ export const SearchForm = ({ variant = 'desktop', onClose }: Props) => {
             variant === 'desktop' && 'h-4 w-4',
             variant === 'mobile' && 'h-5 w-5'
           )}
+          aria-hidden="true"
         />
       </Button>
 
@@ -64,8 +68,15 @@ export const SearchForm = ({ variant = 'desktop', onClose }: Props) => {
           variant === 'desktop' && 'h-8 w-48',
           variant === 'mobile' && 'h-8 w-full'
         )}
-        aria-label="Search by posts"
+        aria-label="Search query"
+        aria-required="true"
+        aria-describedby="search-instructions"
       />
+
+      {/* Hidden instructions for screen readers */}
+      <span id="search-instructions" className="sr-only">
+        Enter your search terms and press enter to search blog posts
+      </span>
     </form>
   );
 };

@@ -23,7 +23,7 @@ interface HeaderProps {
 
 export const MobileMenu = ({ categories }: HeaderProps) => {
   const [open, setOpen] = useState(false);
-  const isAuth = false; // Заглушка авторизации
+  const isAuth = false; // Authentication stub
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -32,30 +32,57 @@ export const MobileMenu = ({ categories }: HeaderProps) => {
           variant="ghost"
           size="icon"
           className="md:hidden"
-          aria-label="Open menu"
+          aria-label="Open mobile menu"
+          aria-haspopup="dialog"
+          aria-expanded={open}
         >
-          <Menu className="h-6 w-6" />
+          <Menu className="h-6 w-6" aria-hidden="true" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[75%] sm:w-[400px]">
+      <SheetContent
+        side="right"
+        className="w-[75%] sm:w-[400px]"
+        aria-label="Mobile navigation menu"
+        role="dialog"
+        aria-modal="true"
+      >
         <SheetHeader>
-          <SheetTitle></SheetTitle>
+          <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
         </SheetHeader>
 
-        <nav className="mt-6 px-3 flex flex-col gap-4">
+        <nav
+          className="mt-6 px-3 flex flex-col gap-4"
+          aria-label="Mobile navigation"
+        >
           <SearchForm variant="mobile" onClose={() => setOpen(false)} />
-          <ul className="flex px-2  flex-col gap-4" role="list">
+          <ul
+            className="flex px-2 flex-col gap-4"
+            role="list"
+            aria-label="Categories list"
+          >
             {!categories ? (
-              <li className="text-sm text-muted-foreground">
+              <li
+                className="text-sm text-muted-foreground"
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 ⚠️ What went wrong
               </li>
             ) : categories.length === 0 ? (
-              <li className="text-sm text-muted-foreground">
+              <li
+                className="text-sm text-muted-foreground"
+                aria-live="polite"
+                aria-atomic="true"
+              >
                 No data available
               </li>
             ) : (
               categories.map((category) => (
-                <li key={category.id} onClick={() => setOpen(false)}>
+                <li
+                  key={category.id}
+                  onClick={() => setOpen(false)}
+                  role="listitem"
+                >
                   <CategoryLink category={category} />
                 </li>
               ))
@@ -68,21 +95,34 @@ export const MobileMenu = ({ categories }: HeaderProps) => {
               <>
                 <Avatar>
                   <AvatarImage src="/avatar.png" alt="User avatar" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarFallback aria-label="User initials">U</AvatarFallback>
                 </Avatar>
                 <div>
-                  <div className="font-medium">Имя пользователя</div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="font-medium" aria-label="Username">
+                    User name
+                  </div>
+                  <div
+                    className="text-sm text-muted-foreground"
+                    aria-label="User email"
+                  >
                     user@example.com
                   </div>
                 </div>
               </>
             ) : (
               <div className="flex items-center gap-3 pb-4">
-                <Button variant="ghost" size="icon">
-                  <User className="h-15 w-15 text-muted-foreground" />
+                <Button variant="ghost" size="icon" aria-label="Guest user">
+                  <User
+                    className="h-15 w-15 text-muted-foreground"
+                    aria-hidden="true"
+                  />
                 </Button>
-                <div className="text-sm text-muted-foreground">Гость</div>
+                <div
+                  className="text-sm text-muted-foreground"
+                  aria-label="Guest status"
+                >
+                  Guest
+                </div>
               </div>
             )}
           </div>

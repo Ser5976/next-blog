@@ -12,6 +12,7 @@ const mockSetTheme = jest.fn();
 beforeEach(() => {
   (useTheme as jest.Mock).mockReturnValue({
     setTheme: mockSetTheme,
+    theme: 'light', // Добавляем theme для aria-checked
   });
 });
 
@@ -28,7 +29,9 @@ describe('ThemeToggle', () => {
     const triggerButton = screen.getByRole('button', { name: /toggle theme/i });
     await user.click(triggerButton);
 
-    const lightItem = await screen.findByRole('menuitem', { name: /light/i });
+    const lightItem = await screen.findByRole('menuitemradio', {
+      name: /light/i,
+    });
     await user.click(lightItem);
 
     expect(mockSetTheme).toHaveBeenCalledWith('light');
@@ -41,7 +44,9 @@ describe('ThemeToggle', () => {
     const triggerButton = screen.getByRole('button', { name: /toggle theme/i });
     await user.click(triggerButton);
 
-    const darkItem = await screen.findByRole('menuitem', { name: /dark/i });
+    const darkItem = await screen.findByRole('menuitemradio', {
+      name: /dark/i,
+    });
     await user.click(darkItem);
 
     expect(mockSetTheme).toHaveBeenCalledWith('dark');
@@ -54,7 +59,9 @@ describe('ThemeToggle', () => {
     const triggerButton = screen.getByRole('button', { name: /toggle theme/i });
     await user.click(triggerButton);
 
-    const systemItem = await screen.findByRole('menuitem', { name: /system/i });
+    const systemItem = await screen.findByRole('menuitemradio', {
+      name: /system/i,
+    });
     await user.click(systemItem);
 
     expect(mockSetTheme).toHaveBeenCalledWith('system');

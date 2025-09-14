@@ -15,7 +15,7 @@ interface HeaderProps {
 }
 
 export const Header = ({ categories }: HeaderProps) => {
-  const isAuth = false; // Заглушка авторизации
+  const isAuth = false; // Authentication stub
 
   return (
     <header
@@ -23,11 +23,20 @@ export const Header = ({ categories }: HeaderProps) => {
         'sticky top-0 z-50 w-full border-b border-border',
         'bg-background/70 backdrop-blur'
       )}
+      role="banner"
+      aria-label="Site header"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Логотип */}
-        <Link href="/" className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-md bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold shadow">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="flex items-center gap-3"
+          aria-label="Createx Blog - Home page"
+        >
+          <div
+            className="h-9 w-9 rounded-md bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold shadow"
+            aria-hidden="true"
+          >
             CX
           </div>
           <span className="font-semibold text-2xl">
@@ -35,18 +44,18 @@ export const Header = ({ categories }: HeaderProps) => {
           </span>
         </Link>
 
-        {/* Десктоп-навигация */}
+        {/* Desktop navigation */}
         <CategoriesMenu categories={categories} />
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Поиск (на планшете/десктопе) */}
+          {/* Search (tablet/desktop) */}
           <SearchForm />
 
-          {/* Переключатель темы */}
+          {/* Theme toggle */}
           <ThemeToggle />
 
-          {/* Аватар / иконка пользователя */}
+          {/* Avatar / user icon */}
           <div className="hidden sm:block">
             {isAuth ? (
               <Avatar>
@@ -57,15 +66,15 @@ export const Header = ({ categories }: HeaderProps) => {
               <Button
                 variant="ghost"
                 size="icon"
-                aria-label="Аккаунт"
-                className=" cursor-pointer"
+                aria-label="User account"
+                className="cursor-pointer"
               >
-                <User className="h-5 w-5" />
+                <User className="h-5 w-5" aria-hidden="true" />
               </Button>
             )}
           </div>
 
-          {/* Мобильное меню  */}
+          {/* Mobile menu */}
           <MobileMenu categories={categories} />
         </div>
       </div>

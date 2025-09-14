@@ -17,7 +17,9 @@ export const CategoryLink = ({ category }: { category: Category }) => {
         'text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase',
         isActive ? 'text-foreground' : 'text-muted-foreground'
       )}
-      aria-label={`Go to category ${category.name}`}
+      aria-label={`View posts in ${category.name} category`}
+      aria-current={isActive ? 'page' : undefined}
+      role="link"
     >
       {category.name}
     </Link>
