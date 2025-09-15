@@ -132,6 +132,6 @@ model Dislike {
 
 enum Role {
   USER
-  EDITOR
+  AUTHOR
   ADMIN
 }
