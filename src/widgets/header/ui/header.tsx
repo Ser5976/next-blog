@@ -1,13 +1,14 @@
 import Link from 'next/link';
+import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
 import { User } from 'lucide-react';
 
+import ClientUserButton from '@/client-user-button';
 import { Category } from '@/entities/category';
 import { CategoriesMenu } from '@/features/categories-menu';
 import { SearchForm } from '@/features/search';
 import { ThemeToggle } from '@/features/theme-toggle';
 import { cn } from '@/shared/lib';
 import { Button } from '@/shared/ui';
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar';
 import { MobileMenu } from '@/widgets/mobile-menu';
 
 interface HeaderProps {
@@ -15,8 +16,6 @@ interface HeaderProps {
 }
 
 export const Header = ({ categories }: HeaderProps) => {
-  const isAuth = false; // Authentication stub
-
   return (
     <header
       className={cn(
@@ -56,22 +55,29 @@ export const Header = ({ categories }: HeaderProps) => {
           <ThemeToggle />
 
           {/* Avatar / user icon */}
-          <div className="hidden sm:block">
-            {isAuth ? (
-              <Avatar>
-                <AvatarImage src="/avatar.png" alt="User avatar" />
-                <AvatarFallback>U</AvatarFallback>
-              </Avatar>
-            ) : (
+          <div className="hidden sm:flex items-center justify-between">
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  aria-label="User account"
+                  className="cursor-pointer "
+                >
+                  <User className="h-5 w-5" aria-hidden="true" />
+                </Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
               <Button
                 variant="ghost"
                 size="icon"
                 aria-label="User account"
-                className="cursor-pointer"
+                className="cursor-pointer "
               >
-                <User className="h-5 w-5" aria-hidden="true" />
+                <ClientUserButton />
               </Button>
-            )}
+            </SignedIn>
           </div>
 
           {/* Mobile menu */}
