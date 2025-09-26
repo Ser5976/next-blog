@@ -57,7 +57,7 @@ export const Header = ({ categories }: HeaderProps) => {
           {/* Avatar / user icon */}
           <div className="hidden sm:flex items-center justify-between">
             <SignedOut>
-              <SignInButton mode="modal">
+              <SignInButton>
                 <Button
                   variant="secondary"
                   size="icon"

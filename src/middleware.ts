@@ -3,9 +3,12 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isProtectedRoute = createRouteMatcher(['/categories(.*)']);
 const isAdminRoute = createRouteMatcher(['/dashboard(.*)']);
+const isOnboardingRoute = createRouteMatcher(['/onboarding']);
 
 export default clerkMiddleware(async (auth, req) => {
+  if (isOnboardingRoute(req)) await auth.protect();
   if (isProtectedRoute(req)) await auth.protect();
+
   if (
     isAdminRoute(req) &&
     (await auth()).sessionClaims?.metadata.role !== 'admin'
