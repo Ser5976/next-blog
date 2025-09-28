@@ -1,6 +1,7 @@
 'use client';
 
 import { ClerkProvider } from '@clerk/nextjs';
+import { Toaster } from 'sonner';
 
 import { ThemeProvider } from '@/features/theme-toggle';
 
@@ -14,6 +15,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
         disableTransitionOnChange={true}
         storageKey="my-app-theme"
       >
+        <Toaster />
         {children}
       </ThemeProvider>
     </ClerkProvider>

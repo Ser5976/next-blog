@@ -3,7 +3,10 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import './globals.css';
 
+import { Suspense } from 'react';
+
 import { getInitThemeScript } from '@/features/theme-toggle';
+import { WelcomeBanner } from '@/features/welcome-banner';
 import Providers from './providers';
 
 const geistSans = Geist({
@@ -43,7 +46,12 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Providers>{children}</Providers>
+        <Providers>
+          <Suspense fallback={<div>Loading banner...</div>}>
+            <WelcomeBanner />
+          </Suspense>
+          {children}
+        </Providers>
       </body>
     </html>
   );

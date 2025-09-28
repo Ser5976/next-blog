@@ -2,9 +2,29 @@ import { prisma } from '@/shared/api/prisma';
 import type { CreateUserInput, UpdateUserInput, User } from '../model/types';
 
 export class UserService {
-  // Создание пользователя (для Custom Onboarding)
+  // Создание пользователя(для базы данных)
   static async createUser(data: CreateUserInput): Promise<User> {
     try {
+      const existingUserByEmail = await prisma.user.findUnique({
+        where: {
+          email: data.email,
+        },
+      });
+
+      if (existingUserByEmail) {
+        throw new Error('email_exists');
+      }
+
+      const existingUserByClerkId = await prisma.user.findUnique({
+        where: {
+          clerkId: data.clerkId,
+        },
+      });
+
+      if (existingUserByClerkId) {
+        return existingUserByClerkId;
+      }
+
       const user = await prisma.user.create({
         data: {
           clerkId: data.clerkId,
@@ -18,8 +38,11 @@ export class UserService {
 
       return user;
     } catch (error) {
-      console.error('Error creating user:', error);
-      throw new Error('Failed to create user');
+      if (error instanceof Error && error.message === 'email_exists') {
+        throw error;
+      } else {
+        throw new Error('sync_failed');
+      }
     }
   }
 
