@@ -1,14 +1,11 @@
 import Link from 'next/link';
-import { SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
-import { User } from 'lucide-react';
 
-import ClientUserButton from '@/client-user-button';
 import { Category } from '@/entities/category';
+import { AuthButton } from '@/features/auth';
 import { CategoriesMenu } from '@/features/categories-menu';
 import { SearchForm } from '@/features/search';
 import { ThemeToggle } from '@/features/theme-toggle';
 import { cn } from '@/shared/lib';
-import { Button } from '@/shared/ui';
 import { MobileMenu } from '@/widgets/mobile-menu';
 
 interface HeaderProps {
@@ -33,7 +30,7 @@ export const Header = ({ categories }: HeaderProps) => {
           aria-label="Createx Blog - Home page"
         >
           <div
-            className="h-9 w-9 rounded-md bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold shadow"
+            className="h-9 w-9 rounded-md bg-muted-foreground flex items-center justify-center text-white font-bold shadow"
             aria-hidden="true"
           >
             CX
@@ -56,28 +53,7 @@ export const Header = ({ categories }: HeaderProps) => {
 
           {/* Avatar / user icon */}
           <div className="hidden sm:flex items-center justify-between">
-            <SignedOut>
-              <SignInButton>
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  aria-label="User account"
-                  className="cursor-pointer "
-                >
-                  <User className="h-5 w-5" aria-hidden="true" />
-                </Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="User account"
-                className="cursor-pointer "
-              >
-                <ClientUserButton />
-              </Button>
-            </SignedIn>
+            <AuthButton />
           </div>
 
           {/* Mobile menu */}

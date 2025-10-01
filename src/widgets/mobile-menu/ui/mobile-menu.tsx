@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Menu, User } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 import { Category, CategoryLink } from '@/entities/category';
+import { AuthButton } from '@/features/auth';
 import { SearchForm } from '@/features/search';
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
   Button,
   Sheet,
   SheetContent,
@@ -23,7 +21,6 @@ interface HeaderProps {
 
 export const MobileMenu = ({ categories }: HeaderProps) => {
   const [open, setOpen] = useState(false);
-  const isAuth = false; // Authentication stub
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -89,42 +86,9 @@ export const MobileMenu = ({ categories }: HeaderProps) => {
             )}
           </ul>
         </nav>
-        <div className="mt-auto pt-4 border-t border-border">
+        <div className="mt-auto p-4 border-t border-border">
           <div className="flex items-center gap-3">
-            {isAuth ? (
-              <>
-                <Avatar>
-                  <AvatarImage src="/avatar.png" alt="User avatar" />
-                  <AvatarFallback aria-label="User initials">U</AvatarFallback>
-                </Avatar>
-                <div>
-                  <div className="font-medium" aria-label="Username">
-                    User name
-                  </div>
-                  <div
-                    className="text-sm text-muted-foreground"
-                    aria-label="User email"
-                  >
-                    user@example.com
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="flex items-center gap-3 pb-4">
-                <Button variant="ghost" size="icon" aria-label="Guest user">
-                  <User
-                    className="h-15 w-15 text-muted-foreground"
-                    aria-hidden="true"
-                  />
-                </Button>
-                <div
-                  className="text-sm text-muted-foreground"
-                  aria-label="Guest status"
-                >
-                  Guest
-                </div>
-              </div>
-            )}
+            <AuthButton />
           </div>
         </div>
       </SheetContent>

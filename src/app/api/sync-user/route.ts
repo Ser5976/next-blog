@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
-import { CreateUserInput, UserService } from '@/entities/user';
+import { CreateUserInput, SyncUserService } from '@/features/sync-user';
 
 export async function GET(request: NextRequest) {
   let clerkUserId: string | null = null;
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
         'USER',
     };
 
-    await UserService.createUser(userData);
+    await SyncUserService.createUser(userData);
 
     console.log('User synced successfully, redirecting to:', redirectUrl);
     const successUrl = new URL(redirectUrl, request.url);
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // 🔴 ОТКАТ: Удаляем пользователя из Clerk при ошибках
+    //  ОТКАТ: Удаляем пользователя из Clerk при ошибках
     if (clerkUserId && errorType !== 'email_exists') {
       // Для email_exists не удаляем - пусть пользователь сам разбирается
       try {
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Редирект на страницу ошибки с правильным параметром
-    const errorUrl = new URL('/auth-error', request.url);
+    const errorUrl = new URL('/sync-user-error', request.url);
     errorUrl.searchParams.set('error', errorType); //  errorType вместо error.massege
 
     return NextResponse.redirect(errorUrl);

@@ -1,7 +1,7 @@
 import { prisma } from '@/shared/api/prisma';
-import type { CreateUserInput, UpdateUserInput, User } from '../model/types';
+import type { CreateUserInput, UpdateUserInput, User } from '../model';
 
-export class UserService {
+export class SyncUserService {
   // Создание пользователя(для базы данных)
   static async createUser(data: CreateUserInput): Promise<User> {
     try {
@@ -46,34 +46,6 @@ export class UserService {
     }
   }
 
-  // Получение пользователя по clerkId
-  static async getUserByClerkId(clerkId: string): Promise<User | null> {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { clerkId },
-      });
-
-      return user;
-    } catch (error) {
-      console.error('Error getting user by clerkId:', error);
-      throw new Error('Failed to get user');
-    }
-  }
-
-  // Проверка существования пользователя
-  static async userExists(clerkId: string): Promise<boolean> {
-    try {
-      const user = await prisma.user.findUnique({
-        where: { clerkId },
-        select: { id: true },
-      });
-
-      return !!user;
-    } catch (error) {
-      console.error('Error checking user existence:', error);
-      return false;
-    }
-  }
   // Обновление пользователя (для webhook'ов)
   static async updateUser(
     clerkId: string,
