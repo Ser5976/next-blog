@@ -70,10 +70,6 @@ export function WelcomeBanner({
               >
                 Welcome aboard! 🎉
               </h3>
-              <p className={cn('text-sm leading-relaxed', currentVariant.text)}>
-                Your account has been successfully created and youre all set to
-                start exploring.
-              </p>
             </div>
           </div>
 
