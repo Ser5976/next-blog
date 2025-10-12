@@ -83,7 +83,7 @@ async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
         firstName: first_name || null,
         lastName: last_name || null,
         imageUrl: image_url || null,
-        role,
+        role: 'AUTHOR',
       },
       create: {
         clerkId: id,
