@@ -13,6 +13,7 @@ interface ClerkUserWebhookEvent {
     first_name?: string;
     last_name?: string;
     image_url?: string;
+    public_metadata: { role: string };
   };
   object: string;
   type: string;
@@ -66,13 +67,22 @@ export async function POST(request: NextRequest) {
 
 async function handleUserUpdated(userData: ClerkUserWebhookEvent['data']) {
   console.log('handleUserUpdated:', userData);
-  const { id, email_addresses, first_name, last_name, image_url } = userData;
+  const {
+    id,
+    email_addresses,
+    first_name,
+    last_name,
+    image_url,
+    public_metadata,
+  } = userData;
   const email = email_addresses[0]?.email_address;
+  const role = public_metadata.role;
 
   if (!email) {
     throw new Error('No email found for user');
   }
-
+  // Преобразуем роль в формат Prisma
+  const prismaRole = getRoleFromMetadata(role);
   try {
     const user = await prisma.user.upsert({
       where: { clerkId: id },
@@ -81,6 +91,7 @@ async function handleUserUpdated(userData: ClerkUserWebhookEvent['data']) {
         firstName: first_name || null,
         lastName: last_name || null,
         imageUrl: image_url || null,
+        role: prismaRole,
       },
       create: {
         clerkId: id,
