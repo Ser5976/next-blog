@@ -55,22 +55,10 @@ export async function GET(request: NextRequest) {
     console.error('Sync user error:', error);
 
     //  ПРАВИЛЬНОЕ определение типа ошибки
-    let errorType = 'sync_failed'; // значение по умолчанию
-
-    if (error instanceof Error) {
-      if (error.message === 'email_exists') {
-        errorType = 'email_exists';
-      } else if (
-        error.message.includes('email') ||
-        error.message.includes('unique')
-      ) {
-        errorType = 'email_exists';
-      }
-    }
+    const errorType = 'sync_failed'; // значение по умолчанию
 
     //  ОТКАТ: Удаляем пользователя из Clerk при ошибках
-    if (clerkUserId && errorType !== 'email_exists') {
-      // Для email_exists не удаляем - пусть пользователь сам разбирается
+    if (clerkUserId && errorType === 'sync_failed') {
       try {
         console.log(
           'Attempting rollback: deleting user from Clerk',

@@ -5,16 +5,6 @@ export class SyncUserService {
   // Создание пользователя(для базы данных)
   static async createUser(data: CreateUserInput): Promise<User> {
     try {
-      const existingUserByEmail = await prisma.user.findUnique({
-        where: {
-          email: data.email,
-        },
-      });
-
-      if (existingUserByEmail) {
-        throw new Error('email_exists');
-      }
-
       const existingUserByClerkId = await prisma.user.findUnique({
         where: {
           clerkId: data.clerkId,
@@ -38,11 +28,8 @@ export class SyncUserService {
 
       return user;
     } catch (error) {
-      if (error instanceof Error && error.message === 'email_exists') {
-        throw error;
-      } else {
-        throw new Error('sync_failed');
-      }
+      console.log('user-create-error:', error);
+      throw new Error('sync_failed');
     }
   }
 

@@ -7,7 +7,7 @@ import { ERROR_CONFIGS, ErrorType } from '../lib/error-config';
 
 /**
  * Хук анализирует searchParams и возвращает соответствующую конфигурацию ошибки.
- * Поддерживаемые типы ошибок: 'email_exists', 'sync_failed', 'default'
+ * Поддерживаемые типы ошибок: 'sync_failed', 'default'
  */
 export const useSyncError = () => {
   const searchParams = useSearchParams();
@@ -16,9 +16,7 @@ export const useSyncError = () => {
   const errorData = useMemo(() => {
     // Определяем тип ошибки на основе параметра URL
     const errorType: ErrorType =
-      errorParam === 'email_exists' || errorParam === 'sync_failed'
-        ? errorParam
-        : 'default';
+      errorParam === 'sync_failed' ? errorParam : 'default';
 
     // Получаем конфигурацию для данного типа ошибки
     const config = ERROR_CONFIGS[errorType];
