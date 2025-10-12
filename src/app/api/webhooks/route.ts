@@ -4,7 +4,7 @@ import { verifyWebhook } from '@clerk/nextjs/webhooks';
 
 import { prisma } from '@/shared/api';
 
-interface ClerkWebhookEvent {
+interface ClerkUserWebhookEvent {
   data: {
     id: string;
     email_addresses: Array<{
@@ -13,14 +13,20 @@ interface ClerkWebhookEvent {
     first_name?: string;
     last_name?: string;
     image_url?: string;
-    unsafe_metadata?: {
-      onboardingComplete?: boolean;
-      role?: string;
-    };
   };
   object: string;
   type: string;
 }
+
+interface ClerkRoleWebhookEvent {
+  data: {
+    id: string;
+    object: string;
+  };
+  object: string;
+  type: string;
+}
+type ClerkWebhookEvent = ClerkUserWebhookEvent | ClerkRoleWebhookEvent;
 
 export async function POST(request: NextRequest) {
   console.log('request:', request);
@@ -31,14 +37,14 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'user.updated':
         console.log('User updated:', event.data.id);
-        await handleUserUpdated(event.data);
+        await handleUserUpdated((event as ClerkUserWebhookEvent).data);
         break;
       case 'role.updated':
-        await handleRoleUpdated();
+        await handleRoleUpdated((event as ClerkRoleWebhookEvent).data);
         break;
       case 'user.deleted':
         console.log('User deleted:', event.data.id);
-        await handleUserDeleted(event.data);
+        await handleUserDeleted((event as ClerkUserWebhookEvent).data);
         break;
       default:
         console.log(`Unhandled event type: ${event.type}`);
@@ -54,15 +60,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
-  const {
-    id,
-    email_addresses,
-    first_name,
-    last_name,
-    image_url,
-    unsafe_metadata,
-  } = userData;
+async function handleUserUpdated(userData: ClerkUserWebhookEvent['data']) {
+  const { id, email_addresses, first_name, last_name, image_url } = userData;
   const email = email_addresses[0]?.email_address;
 
   if (!email) {
@@ -70,12 +69,6 @@ async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
   }
 
   try {
-    const roleFromMetadata = unsafe_metadata?.role as string;
-    let role: 'USER' | 'AUTHOR' | 'ADMIN' = 'USER';
-
-    if (roleFromMetadata === 'admin') role = 'ADMIN';
-    else if (roleFromMetadata === 'author') role = 'AUTHOR';
-
     const user = await prisma.user.upsert({
       where: { clerkId: id },
       update: {
@@ -83,7 +76,6 @@ async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
         firstName: first_name || null,
         lastName: last_name || null,
         imageUrl: image_url || null,
-        role: 'AUTHOR',
       },
       create: {
         clerkId: id,
@@ -91,7 +83,6 @@ async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
         firstName: first_name || null,
         lastName: last_name || null,
         imageUrl: image_url || null,
-        role,
       },
     });
 
@@ -102,8 +93,34 @@ async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
   }
 }
 
-async function handleRoleUpdated() {
-  console.log(`Role updated for user $`);
+async function handleRoleUpdated(roleData: ClerkRoleWebhookEvent['data']) {
+  const { id, object } = roleData;
+
+  try {
+    // Преобразуем роль в формат Prisma
+    const prismaRole = getRoleFromMetadata(object);
+
+    // Обновляем роль пользователя в базе данных
+    const updatedUser = await prisma.user.update({
+      where: { clerkId: id },
+      data: { role: prismaRole },
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error('Failed to update user role in database:', error);
+
+    // Если пользователь не найден, логируем но не прерываем выполнение
+    if (
+      error instanceof Error &&
+      error.message.includes('Record to update does not exist')
+    ) {
+      console.log('User not found in database, skipping role update:', id);
+      return;
+    }
+
+    throw error;
+  }
 }
 
 async function handleUserDeleted(userData: ClerkWebhookEvent['data']) {
@@ -127,4 +144,12 @@ async function handleUserDeleted(userData: ClerkWebhookEvent['data']) {
 
     throw error;
   }
+}
+// Вспомогательные функции для преобразования ролей
+function getRoleFromMetadata(
+  roleFromMetadata?: string
+): 'USER' | 'AUTHOR' | 'ADMIN' {
+  if (roleFromMetadata === 'admin') return 'ADMIN';
+  if (roleFromMetadata === 'author') return 'AUTHOR';
+  return 'USER';
 }
