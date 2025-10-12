@@ -40,6 +40,10 @@ export async function POST(request: NextRequest) {
         await handleUserUpdated((event as ClerkUserWebhookEvent).data);
         break;
       case 'role.updated':
+        console.log(
+          'role update:',
+          (event as ClerkRoleWebhookEvent).data.object
+        );
         await handleRoleUpdated((event as ClerkRoleWebhookEvent).data);
         break;
       case 'user.deleted':
@@ -61,6 +65,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleUserUpdated(userData: ClerkUserWebhookEvent['data']) {
+  console.log('handleUserUpdated:', userData);
   const { id, email_addresses, first_name, last_name, image_url } = userData;
   const email = email_addresses[0]?.email_address;
 
@@ -94,6 +99,7 @@ async function handleUserUpdated(userData: ClerkUserWebhookEvent['data']) {
 }
 
 async function handleRoleUpdated(roleData: ClerkRoleWebhookEvent['data']) {
+  console.log('handleRoleUpdated:', roleData.object);
   const { id, object } = roleData;
 
   try {
