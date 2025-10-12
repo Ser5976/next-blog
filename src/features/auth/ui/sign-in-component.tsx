@@ -5,7 +5,6 @@ import { SignIn } from '@clerk/nextjs';
 
 import { useClientSearchParams } from '../model';
 import { ClientOnly } from './client-only';
-import { LoadingSpinner } from './loading-spinner';
 
 export const SignInComponent = () => {
   const { get } = useClientSearchParams();
@@ -18,7 +17,7 @@ export const SignInComponent = () => {
         <Link href="/">← Home</Link>
       </div>
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <ClientOnly fallback={<LoadingSpinner />}>
+        <ClientOnly>
           <SignIn signUpForceRedirectUrl={syncUrl} />
         </ClientOnly>
       </div>
