@@ -23,6 +23,7 @@ interface ClerkWebhookEvent {
 }
 
 export async function POST(request: NextRequest) {
+  console.log('request:', request);
   try {
     const event = (await verifyWebhook(request)) as ClerkWebhookEvent;
 
@@ -31,6 +32,9 @@ export async function POST(request: NextRequest) {
       case 'user.updated':
         console.log('User updated:', event.data.id);
         await handleUserUpdated(event.data);
+        break;
+      case 'role.updated':
+        await handleRoleUpdated();
         break;
       case 'user.deleted':
         console.log('User deleted:', event.data.id);
@@ -96,6 +100,10 @@ async function handleUserUpdated(userData: ClerkWebhookEvent['data']) {
     console.error('Failed to sync user in database:', error);
     throw error;
   }
+}
+
+async function handleRoleUpdated() {
+  console.log(`Role updated for user $`);
 }
 
 async function handleUserDeleted(userData: ClerkWebhookEvent['data']) {
