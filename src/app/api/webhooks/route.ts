@@ -36,24 +36,36 @@ export async function POST(request: NextRequest) {
     // Логируем основную ошибку (возможно, сбой при верификации webhook или при удалении)
     console.error('❌ Webhook processing failed:', error);
 
-    // Если ошибка связана с отсутствием записи (P2025) — это не фатально
-    if (
-      error instanceof PrismaClientKnownRequestError &&
-      error.code === 'P2025'
-    ) {
-      console.warn('⚠️  User already deleted in database, skipping.');
+    // Проверяем, что это "record not found" (P2025)
+    const isRecordMissing =
+      (error instanceof PrismaClientKnownRequestError &&
+        error.code === 'P2025') ||
+      (error instanceof Error &&
+        error.message.includes('Record to delete does not exist'));
+
+    if (isRecordMissing) {
+      console.warn('⚠️  User already deleted in database, skipping log.');
       return NextResponse.json(
         { message: 'User already deleted' },
         { status: 200 }
       );
     }
-    // Записываем  неудачу в базу
-    await prisma.failedUserDeletion.create({
-      data: {
-        clerkId: event.data.id,
-        error: (error as Error).message,
-      },
-    });
+
+    // Записываем только "реальные" ошибки
+    try {
+      await prisma.failedUserDeletion.create({
+        data: {
+          clerkId: event.data.id,
+          error: error instanceof Error ? error.message : String(error),
+        },
+      });
+      console.log(
+        '⚠️  Logged failed deletion for admin review:',
+        event.data.id
+      );
+    } catch (logError) {
+      console.error('❌ Failed to record failed deletion:', logError);
+    }
 
     // Возвращаем 200, потому что мы сохранили ошибку и хотим, чтобы админ вручную сделал действие.
     // Если хочешь, чтобы Clerk сам повторил — возвращай 500 здесь.
