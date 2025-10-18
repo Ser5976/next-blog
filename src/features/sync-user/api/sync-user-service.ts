@@ -31,6 +31,7 @@ export class SyncUserService {
   // Удаление пользователя (для webhook'ов)
   static async deleteUser(clerkId: string): Promise<void> {
     try {
+      throw new Error('хихихи');
       const deletedUser = await prisma.user.delete({
         where: { clerkId },
       });
