@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhook } from '@clerk/nextjs/webhooks';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 import { SyncUserService } from '@/features/sync-user';
 import { prisma } from '@/shared/api';
@@ -36,22 +35,7 @@ export async function POST(request: NextRequest) {
     // Логируем основную ошибку (возможно, сбой при верификации webhook или при удалении)
     console.error('❌ Webhook processing failed:', error);
 
-    // Проверяем, что это "record not found" (P2025)
-    const isRecordMissing =
-      (error instanceof PrismaClientKnownRequestError &&
-        error.code === 'P2025') ||
-      (error instanceof Error &&
-        error.message.includes('Record to delete does not exist'));
-
-    if (isRecordMissing) {
-      console.warn('⚠️  User already deleted in database, skipping log.');
-      return NextResponse.json(
-        { message: 'User already deleted' },
-        { status: 200 }
-      );
-    }
-
-    // Записываем только "реальные" ошибки
+    // Записываем  ошибки
     try {
       await prisma.failedUserDeletion.create({
         data: {

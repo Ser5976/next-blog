@@ -31,10 +31,10 @@ export class SyncUserService {
   // Удаление пользователя (для webhook'ов)
   static async deleteUser(clerkId: string): Promise<void> {
     try {
-      const deletedUser = await prisma.user.delete({
+      await prisma.user.deleteMany({
         where: { clerkId },
       });
-      console.log(`✅ User deleted from database: ${deletedUser.id}`);
+      console.log(`✅ User deleted from database`);
     } catch (error) {
       // Если запись не найдена — выбросим P2025, которая отловится выше
       console.error(`❌ Failed to delete user with clerkId=${clerkId}:`, error);
