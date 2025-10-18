@@ -1,5 +1,5 @@
 import { prisma } from '@/shared/api/prisma';
-import type { CreateUserInput, UpdateUserInput, User } from '../model';
+import type { CreateUserInput, User } from '../model';
 
 export class SyncUserService {
   // Создание пользователя(для базы данных)
@@ -18,11 +18,6 @@ export class SyncUserService {
       const user = await prisma.user.create({
         data: {
           clerkId: data.clerkId,
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          imageUrl: data.imageUrl,
-          role: data.role || 'USER',
         },
       });
 
@@ -33,34 +28,17 @@ export class SyncUserService {
     }
   }
 
-  // Обновление пользователя (для webhook'ов)
-  static async updateUser(
-    clerkId: string,
-    data: UpdateUserInput
-  ): Promise<User> {
-    try {
-      const user = await prisma.user.update({
-        where: { clerkId },
-        data: {
-          ...data,
-        },
-      });
-
-      return user;
-    } catch (error) {
-      console.error('Error updating user:', error);
-      throw new Error('Failed to update user');
-    }
-  }
   // Удаление пользователя (для webhook'ов)
   static async deleteUser(clerkId: string): Promise<void> {
     try {
-      await prisma.user.delete({
+      const deletedUser = await prisma.user.delete({
         where: { clerkId },
       });
+      console.log(`✅ User deleted from database: ${deletedUser.id}`);
     } catch (error) {
-      console.error('Error deleting user:', error);
-      throw new Error('Failed to delete user');
+      // Если запись не найдена — выбросим P2025, которая отловится выше
+      console.error(`❌ Failed to delete user with clerkId=${clerkId}:`, error);
+      throw error;
     }
   }
 }

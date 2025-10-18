@@ -34,13 +34,6 @@ export async function GET(request: NextRequest) {
     // Создаем пользователя в нашей БД
     const userData: CreateUserInput = {
       clerkId: clerkUser.id,
-      email: userEmail,
-      firstName: clerkUser.firstName || '',
-      lastName: clerkUser.lastName || '',
-      imageUrl: clerkUser.imageUrl,
-      role:
-        (clerkUser.publicMetadata?.role as 'USER' | 'AUTHOR' | 'ADMIN') ||
-        'USER',
     };
 
     await SyncUserService.createUser(userData);

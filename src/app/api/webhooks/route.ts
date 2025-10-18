@@ -1,125 +1,65 @@
-// app/api/webhooks/clerk/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhook } from '@clerk/nextjs/webhooks';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
+import { SyncUserService } from '@/features/sync-user';
 import { prisma } from '@/shared/api';
 
+/**
+ * Тип данных события Clerk webhook
+ */
 interface ClerkUserWebhookEvent {
   data: {
     id: string;
-    email_addresses: Array<{
-      email_address: string;
-    }>;
-    first_name?: string;
-    last_name?: string;
-    image_url?: string;
-    public_metadata: { role?: string };
   };
   object: string;
-  type: string;
+  type: 'user.deleted' | string;
 }
 
+/**
+ * Обработка webhook от Clerk
+ */
 export async function POST(request: NextRequest) {
-  console.log('request:', request);
+  const event = (await verifyWebhook(request)) as ClerkUserWebhookEvent;
   try {
-    const event = (await verifyWebhook(request)) as ClerkUserWebhookEvent;
-
-    // Обрабатываем события
-    switch (event.type) {
-      case 'user.updated':
-        console.log('User updated:', event.data.id);
-        await handleUserUpdated(event.data);
-        break;
-      case 'user.deleted':
-        console.log('User deleted:', event.data.id);
-        await handleUserDeleted(event.data);
-        break;
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
+    if (event.type !== 'user.deleted') {
+      console.log(`Unhandled Clerk webhook type: ${event.type}`);
+      return NextResponse.json({ message: 'Event ignored' }, { status: 200 });
     }
 
-    return NextResponse.json({ success: true });
+    console.log(`➡️  Clerk user.deleted received for ID: ${event.data.id}`);
+
+    await SyncUserService.deleteUser(event.data.id);
+
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('Webhook error:', error);
+    // Логируем основную ошибку (возможно, сбой при верификации webhook или при удалении)
+    console.error('❌ Webhook processing failed:', error);
+
+    // Если ошибка связана с отсутствием записи (P2025) — это не фатально
+    if (
+      error instanceof PrismaClientKnownRequestError &&
+      error.code === 'P2025'
+    ) {
+      console.warn('⚠️  User already deleted in database, skipping.');
+      return NextResponse.json(
+        { message: 'User already deleted' },
+        { status: 200 }
+      );
+    }
+    // Записываем  неудачу в базу
+    await prisma.failedUserDeletion.create({
+      data: {
+        clerkId: event.data.id,
+        error: (error as Error).message,
+      },
+    });
+
+    // Возвращаем 200, потому что мы сохранили ошибку и хотим, чтобы админ вручную сделал действие.
+    // Если хочешь, чтобы Clerk сам повторил — возвращай 500 здесь.
     return NextResponse.json(
-      { error: 'Webhook processing failed' },
-      { status: 500 }
+      { message: 'Deletion failed, admin will handle manually' },
+      { status: 200 }
     );
   }
-}
-
-async function handleUserUpdated(userData: ClerkUserWebhookEvent['data']) {
-  console.log('handleUserUpdated:', userData);
-  const {
-    id,
-    email_addresses,
-    first_name,
-    last_name,
-    image_url,
-    public_metadata,
-  } = userData;
-  const email = email_addresses[0]?.email_address;
-  const role = public_metadata.role;
-
-  if (!email) {
-    throw new Error('No email found for user');
-  }
-  // Преобразуем роль в формат Prisma
-  const prismaRole = getRoleFromMetadata(role);
-  try {
-    const user = await prisma.user.upsert({
-      where: { clerkId: id },
-      update: {
-        email,
-        firstName: first_name || null,
-        lastName: last_name || null,
-        imageUrl: image_url || null,
-        role: prismaRole,
-      },
-      create: {
-        clerkId: id,
-        email,
-        firstName: first_name || null,
-        lastName: last_name || null,
-        imageUrl: image_url || null,
-        role: prismaRole,
-      },
-    });
-
-    console.log('User synchronized in database:', user.id);
-  } catch (error) {
-    console.error('Failed to sync user in database:', error);
-    throw error;
-  }
-}
-
-async function handleUserDeleted(userData: ClerkUserWebhookEvent['data']) {
-  const { id } = userData;
-
-  try {
-    await prisma.user.delete({
-      where: { clerkId: id },
-    });
-    console.log('User deleted from database:', id);
-  } catch (error) {
-    console.error('Failed to delete user from database:', error);
-
-    if (
-      error instanceof Error &&
-      error.message.includes('Record to delete does not exist')
-    ) {
-      console.log('User already deleted from database:', id);
-      return;
-    }
-
-    throw error;
-  }
-}
-// Вспомогательные функции для преобразования ролей
-function getRoleFromMetadata(
-  roleFromMetadata?: string
-): 'USER' | 'AUTHOR' | 'ADMIN' {
-  if (roleFromMetadata === 'admin') return 'ADMIN';
-  if (roleFromMetadata === 'author') return 'AUTHOR';
-  return 'USER';
 }
