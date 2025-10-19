@@ -29,7 +29,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/shared/ui/table';
-import { getUsersWithRoles, updateUserRole } from '@/user-actions';
+import {
+  getUsersWithRoles,
+  updateUserRole,
+} from '@/widgets/dashboard/model/user-actions';
 
 interface User {
   id: string;
