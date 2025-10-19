@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { SignUp } from '@clerk/nextjs';
 
 import { useClientSearchParams } from '../model';
 import { ClientOnly } from './client-only';
+import { HomeLink } from './home-link';
 import { LoadingSpinner } from './loading-spinner';
 
 export const SignUpComponent = () => {
@@ -14,10 +14,12 @@ export const SignUpComponent = () => {
 
   return (
     <>
-      <div className="m-4">
-        <Link href="/">← Home</Link>
-      </div>
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <HomeLink className=" m-4" />
+      <div
+        className="flex flex-col items-center justify-center min-h-screen"
+        role="main"
+        aria-label="Registration page"
+      >
         <ClientOnly fallback={<LoadingSpinner />}>
           <SignUp forceRedirectUrl={syncUrl} />
         </ClientOnly>

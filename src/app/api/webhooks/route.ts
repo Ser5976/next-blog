@@ -2,18 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhook } from '@clerk/nextjs/webhooks';
 
 import { SyncUserService } from '@/features/sync-user';
+import { ClerkUserWebhookEvent } from '@/features/sync-user/model';
 import { prisma } from '@/shared/api';
-
-/**
- * Тип данных события Clerk webhook
- */
-interface ClerkUserWebhookEvent {
-  data: {
-    id: string;
-  };
-  object: string;
-  type: 'user.deleted' | string;
-}
 
 /**
  * Обработка webhook от Clerk

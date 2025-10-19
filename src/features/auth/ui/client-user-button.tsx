@@ -10,9 +10,20 @@ export default function ClientUserButton() {
   }, []);
 
   if (!isMounted) {
-    // Заглушка пока компонент не смонтирован на клиенте
-    return <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />;
+    // Placeholder while component is not mounted on client
+    return (
+      <div
+        className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"
+        role="status"
+        aria-label="Loading user menu"
+        aria-live="polite"
+      />
+    );
   }
 
-  return <UserButton />;
+  return (
+    <div role="navigation" aria-label="User account menu">
+      <UserButton />
+    </div>
+  );
 }

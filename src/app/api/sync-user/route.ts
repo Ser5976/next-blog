@@ -47,10 +47,10 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Sync user error:', error);
 
-    //  ПРАВИЛЬНОЕ определение типа ошибки
+    //   Определение типа ошибки
     const errorType = 'sync_failed'; // значение по умолчанию
 
-    //  ОТКАТ: Удаляем пользователя из Clerk при ошибках
+    //   Удаляем пользователя из Clerk при ошибках
     if (clerkUserId && errorType === 'sync_failed') {
       try {
         console.log(
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
 
     // Редирект на страницу ошибки с правильным параметром
     const errorUrl = new URL('/sync-user-error', request.url);
-    errorUrl.searchParams.set('error', errorType); //  errorType вместо error.massege
+    errorUrl.searchParams.set('error', errorType);
 
     return NextResponse.redirect(errorUrl);
   }

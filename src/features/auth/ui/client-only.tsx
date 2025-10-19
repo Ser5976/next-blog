@@ -15,8 +15,16 @@ export const ClientOnly = ({ children, fallback = null }: ClientOnlyProps) => {
   }, []);
 
   if (!isClient) {
-    return <>{fallback}</>;
+    return (
+      <div role="status" aria-live="polite" aria-label="Content is loading">
+        {fallback}
+      </div>
+    );
   }
 
-  return <>{children}</>;
+  return (
+    <div aria-live="polite" aria-label="Content has loaded">
+      {children}
+    </div>
+  );
 };

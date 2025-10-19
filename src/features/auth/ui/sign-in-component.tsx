@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
 import { SignIn } from '@clerk/nextjs';
 
 import { useClientSearchParams } from '../model';
 import { ClientOnly } from './client-only';
+import { HomeLink } from './home-link';
 
 export const SignInComponent = () => {
   const { get } = useClientSearchParams();
@@ -13,10 +13,12 @@ export const SignInComponent = () => {
 
   return (
     <>
-      <div className="m-4">
-        <Link href="/">← Home</Link>
-      </div>
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <HomeLink className=" m-4" />
+      <div
+        className="flex flex-col items-center justify-center min-h-screen"
+        role="main"
+        aria-label="Registration page"
+      >
         <ClientOnly>
           <SignIn signUpForceRedirectUrl={syncUrl} />
         </ClientOnly>
