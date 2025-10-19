@@ -28,3 +28,4 @@ export {
   SheetTitle,
   SheetDescription,
 } from './sheet';
+export { LoadingSpinner } from './loading-spinner';

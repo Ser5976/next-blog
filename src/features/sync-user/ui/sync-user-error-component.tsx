@@ -14,7 +14,6 @@ export const SyncUserErrorComponent = () => {
     >
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
         <div className="text-center">
-          {/* Icon with ARIA attributes */}
           <div
             className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4"
             role="img"
@@ -25,7 +24,6 @@ export const SyncUserErrorComponent = () => {
             </span>
           </div>
 
-          {/* Title */}
           <h1
             id="error-title"
             className="text-2xl font-bold text-gray-900 mb-2"
@@ -33,12 +31,10 @@ export const SyncUserErrorComponent = () => {
             {errorTitle}
           </h1>
 
-          {/* Error description */}
           <p id="error-description" className="text-gray-600 mb-6">
             {errorMessage}
           </p>
 
-          {/* Action buttons */}
           <div
             className="space-y-3"
             role="group"
@@ -47,7 +43,6 @@ export const SyncUserErrorComponent = () => {
             {errorActions}
           </div>
 
-          {/* Support text */}
           <p className="text-xs text-gray-500 mt-6" aria-live="polite">
             If the problem persists, please contact support.
           </p>

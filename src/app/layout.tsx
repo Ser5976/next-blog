@@ -47,7 +47,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <Suspense fallback={<div>Loading banner...</div>}>
+          <Suspense>
             <WelcomeBanner />
           </Suspense>
           {children}

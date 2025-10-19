@@ -1,6 +1,6 @@
 export const LoadingSpinner = () => (
   <div
-    className="flex justify-center items-center"
+    className="flex justify-center items-center min-h-screen"
     role="status"
     aria-live="polite"
     aria-label="Loading content"

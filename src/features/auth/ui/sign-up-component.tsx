@@ -2,10 +2,10 @@
 
 import { SignUp } from '@clerk/nextjs';
 
+import { LoadingSpinner } from '@/shared/ui';
 import { useClientSearchParams } from '../model';
 import { ClientOnly } from './client-only';
 import { HomeLink } from './home-link';
-import { LoadingSpinner } from './loading-spinner';
 
 export const SignUpComponent = () => {
   const { get } = useClientSearchParams();
