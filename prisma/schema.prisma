@@ -1,7 +1,6 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
-  //previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -31,9 +30,9 @@ model Post {
   excerpt       String?
   coverImage    String?
   published     Boolean   @default(false)
-  author        User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId      String
-  category      Category? @relation(fields: [categoryId], references: [id])
+  author        User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId      String?
+  category      Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categoryId    String?
   tags          Tag[]     @relation("PostToTag")
   comments      Comment[]
@@ -76,8 +75,8 @@ model Tag {
 model Comment {
   id        String    @id @default(cuid())
   content   String
-  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String
+  author    User?     @relation(fields: [authorId], references: [id], onDelete: SetNull)
+  authorId  String?
   post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
   likes     Like[]
@@ -91,7 +90,7 @@ model Comment {
 
 model Rating {
   id        String   @id @default(cuid())
-  value     Int // 1-5
+  value     Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
