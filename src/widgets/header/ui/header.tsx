@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 
 import { Category } from '@/entities/category';
@@ -52,8 +53,20 @@ export const Header = ({ categories }: HeaderProps) => {
           <ThemeToggle />
 
           {/* Avatar / user icon */}
+
           <div className="hidden sm:flex items-center justify-between">
-            <AuthButton />
+            <Suspense
+              fallback={
+                <div
+                  className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"
+                  role="status"
+                  aria-label="Loading user menu"
+                  aria-live="polite"
+                />
+              }
+            >
+              <AuthButton />
+            </Suspense>
           </div>
 
           {/* Mobile menu */}

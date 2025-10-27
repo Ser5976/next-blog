@@ -2,7 +2,6 @@
 
 import { SignUp } from '@clerk/nextjs';
 
-import { LoadingSpinner } from '@/shared/ui';
 import { useClientSearchParams } from '../model';
 import { ClientOnly } from './client-only';
 import { HomeLink } from './home-link';
@@ -20,7 +19,7 @@ export const SignUpComponent = () => {
         role="main"
         aria-label="Registration page"
       >
-        <ClientOnly fallback={<LoadingSpinner />}>
+        <ClientOnly>
           <SignUp forceRedirectUrl={syncUrl} />
         </ClientOnly>
       </div>
