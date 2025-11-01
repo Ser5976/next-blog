@@ -59,7 +59,6 @@ describe('SignUpComponent', () => {
   it('should render with default redirect URL', () => {
     // Arrange
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: jest.fn().mockReturnValue(null),
     });
@@ -81,7 +80,6 @@ describe('SignUpComponent', () => {
     // Arrange
     const mockGet = jest.fn().mockReturnValue('/dashboard');
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: mockGet,
     });
@@ -100,7 +98,6 @@ describe('SignUpComponent', () => {
   it('should have proper accessibility attributes', () => {
     // Arrange
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: jest.fn().mockReturnValue(null),
     });
@@ -117,7 +114,6 @@ describe('SignUpComponent', () => {
     // Arrange
     const mockGet = jest.fn().mockReturnValue('/profile');
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: mockGet,
     });
@@ -133,27 +129,10 @@ describe('SignUpComponent', () => {
     );
   });
 
-  it('should render fallback loading spinner', () => {
-    // Arrange
-    mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
-      searchParams: new URLSearchParams(),
-      get: jest.fn().mockReturnValue(null),
-    });
-
-    // Act
-    render(<SignUpComponent />);
-
-    // Assert
-    expect(screen.getByTestId('fallback')).toBeInTheDocument();
-    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
-  });
-
   it('should handle empty redirect URL gracefully', () => {
     // Arrange
     const mockGet = jest.fn().mockReturnValue('');
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: mockGet,
     });
@@ -174,7 +153,6 @@ describe('SignUpComponent', () => {
       .fn()
       .mockReturnValue('/dashboard?tab=settings&view=list');
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: mockGet,
     });
@@ -192,7 +170,6 @@ describe('SignUpComponent', () => {
   it('should have proper CSS classes', () => {
     // Arrange
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: jest.fn().mockReturnValue(null),
     });

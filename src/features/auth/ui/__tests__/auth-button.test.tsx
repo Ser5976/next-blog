@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 
 import { AuthButton } from '../auth-button';
 
-// Делаем моки
+// Создаем мок-компоненты для Clerk
 
 const MockSignedIn = ({ children }: { children: React.ReactNode }) => (
   <div data-testid="signed-in">{children}</div>
@@ -43,6 +43,7 @@ jest.mock('@clerk/nextjs', () => ({
   useAuth: jest.fn(),
 }));
 
+// Создаем мок для других компонентов
 jest.mock('lucide-react', () => ({
   User: ({
     className,
@@ -103,10 +104,10 @@ describe('AuthButton', () => {
     (UserButton as unknown as jest.Mock).mockImplementation(MockUserButton);
   });
 
-  //  ТЕСТ СЦЕНАРИЯ 1: НЕАВТОРИЗОВАННЫЙ ПОЛЬЗОВАТЕЛЬ
+  //   Неавторизованный пользователь
   it('should render sign in button when user is signed out', () => {
     /**
-     * Теория: Настраиваем моки для сценария неавторизованного пользователя
+     * Настраиваем моки для сценария неавторизованного пользователя
      * SignedOut показывает свой контент, SignedIn скрывает
      */
 
@@ -121,7 +122,7 @@ describe('AuthButton', () => {
 
     render(<AuthButton />);
 
-    // ПРОВЕРКИ для неавторизованного пользователя:
+    // Проверки для неавторизованного пользователя:
 
     // 1. Должна отображаться кнопка входа
     const signInButton = screen.getByTestId('sign-in-button');
@@ -132,7 +133,7 @@ describe('AuthButton', () => {
     expect(userIcon).toBeInTheDocument();
     expect(userIcon).toHaveAttribute('aria-hidden', 'true');
 
-    // 3. НЕ должна отображаться кнопка профиля
+    // 3. Не должна отображаться кнопка профиля
     const userButton = screen.queryByTestId('user-button');
     expect(userButton).not.toBeInTheDocument();
 
@@ -144,10 +145,10 @@ describe('AuthButton', () => {
     expect(customButton).toHaveClass('cursor-pointer');
   });
 
-  // 4. ТЕСТ СЦЕНАРИЯ 2: АВТОРИЗОВАННЫЙ ПОЛЬЗОВАТЕЛЬ
+  // Авторизированные пользователь
   it('should render user profile button when user is signed in', () => {
     /**
-     * Теория: Настраиваем моки для сценария авторизованного пользователя
+     *  Настраиваем моки для сценария авторизованного пользователя
      * SignedIn показывает свой контент, SignedOut скрывает
      */
 
@@ -161,13 +162,13 @@ describe('AuthButton', () => {
 
     render(<AuthButton />);
 
-    // ПРОВЕРКИ для авторизованного пользователя:
+    // Проверки для авторизованного пользователя:
 
     // 1. Должна отображаться кнопка профиля пользователя
     const clientUserButton = screen.getByTestId('client-user-button');
     expect(clientUserButton).toBeInTheDocument();
 
-    // 2. НЕ должна отображаться кнопка входа
+    // 2. Не должна отображаться кнопка входа
     const signInButton = screen.queryByTestId('sign-in-button');
     expect(signInButton).not.toBeInTheDocument();
 
@@ -183,7 +184,7 @@ describe('AuthButton', () => {
     expect(customButton).toHaveClass('cursor-pointer');
   });
 
-  // 5. ТЕСТ ВЗАИМОДЕЙСТВИЯ: КЛИК ПО КНОПКЕ ВХОДА С USER-EVENT
+  // Клик по кнопке входа
   it('should call SignInButton when sign in button is clicked', async () => {
     const mockClickHandler = jest.fn();
 
@@ -206,15 +207,15 @@ describe('AuthButton', () => {
 
     render(<AuthButton />);
 
-    // КЛИКАЕМ ПО КНОПКЕ ВХОДА С ПОМОЩЬЮ userEvent
+    // Кликаем по кнопке входа с помощью userEvent
     const signInButton = screen.getByTestId('sign-in-button');
     await user.click(signInButton);
 
-    // ПРОВЕРЯЕМ что обработчик был вызван
+    // Проверяем что обработчик был вызван
     expect(mockClickHandler).toHaveBeenCalledTimes(1);
   });
 
-  // 6. ТЕСТ ДОСТУПНОСТИ (ACCESSIBILITY)
+  //  Тест доступности
   it('should have proper accessibility attributes', () => {
     (SignedOut as unknown as jest.Mock).mockImplementation(
       ({ children }: { children: React.ReactNode }) => (
@@ -234,10 +235,10 @@ describe('AuthButton', () => {
     expect(userIcon).toHaveAttribute('aria-hidden', 'true');
   });
 
-  // 7. ТЕСТ ПЕРЕКЛЮЧЕНИЯ МЕЖДУ СОСТОЯНИЯМИ
+  // Тест переключения между состояниями
   it('should correctly switch between signed in and signed out states', () => {
     /**
-     * Теория: Проверяем что компонент правильно реагирует на изменения
+     *  Проверяем что компонент правильно реагирует на изменения
      * состояния аутентификации через разные рендеры
      */
 

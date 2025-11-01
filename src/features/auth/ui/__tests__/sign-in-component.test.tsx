@@ -45,7 +45,6 @@ describe('SignInComponent', () => {
   it('should render with default redirect URL', () => {
     // Arrange
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: jest.fn().mockReturnValue(null),
     });
@@ -67,7 +66,6 @@ describe('SignInComponent', () => {
     // Arrange
     const mockGet = jest.fn().mockReturnValue('/dashboard');
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: mockGet,
     });
@@ -86,7 +84,6 @@ describe('SignInComponent', () => {
   it('should have proper accessibility attributes', () => {
     // Arrange
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: jest.fn().mockReturnValue(null),
     });
@@ -103,7 +100,6 @@ describe('SignInComponent', () => {
     // Arrange
     const mockGet = jest.fn().mockReturnValue('/profile');
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: mockGet,
     });
@@ -123,7 +119,6 @@ describe('SignInComponent', () => {
     // Arrange
     const mockGet = jest.fn().mockReturnValue('');
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: mockGet,
     });
@@ -144,7 +139,6 @@ describe('SignInComponent', () => {
       .fn()
       .mockReturnValue('/dashboard?tab=settings&view=list');
     mockUseClientSearchParams.mockReturnValue({
-      isReady: true,
       searchParams: new URLSearchParams(),
       get: mockGet,
     });

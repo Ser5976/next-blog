@@ -18,7 +18,7 @@ describe('ClientUserButton', () => {
 
   it('should not render anything initially, then render UserButton after mounting', () => {
     /**
-     * Теория: Компонент использует useEffect для отложенного рендеринга.
+     * Компонент использует useEffect для отложенного рендеринга.
      * На сервере и при первой гидратации он возвращает null.
      * React Testing Library выполняет useEffect синхронно, поэтому мы сразу
      * видим финальное состояние.
