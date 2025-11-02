@@ -1,6 +1,6 @@
 import { prisma } from '@/shared/api/prisma';
-import type { CreateUserInput, User } from './../model';
-import { SyncUserService } from './sync-user-service';
+import type { CreateUserInput, User } from '../../model';
+import { SyncUserService } from '../sync-user-service';
 
 // Мокируем Prisma
 jest.mock('@/shared/api/prisma', () => ({
