@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-const isProtectedRoute = createRouteMatcher(['/categories(.*)']);
+//const isProtectedRoute = createRouteMatcher(['/categories(.*)']);
 const isAdminRoute = createRouteMatcher(['/dashboard(.*)', '/admin(.*)']);
 const isAuthErrorRoute = createRouteMatcher(['/auth-error']);
 const isAuthorRoute = createRouteMatcher([
@@ -22,7 +22,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Базовая защита маршрутов
 
-  if (isProtectedRoute(req)) await auth.protect();
+  //if (isProtectedRoute(req)) await auth.protect();
 
   // Защита админских маршрутов - ТОЛЬКО ADMIN
   if (isAdminRoute(req) && userRole !== 'admin') {

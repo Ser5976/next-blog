@@ -22,21 +22,24 @@ export const Footer = ({ categories }: FooterProps) => {
           aria-labelledby="company-info-heading"
         >
           <h3 id="company-info-heading" className="sr-only">
-            Информация о компании
+            Company Information
           </h3>
           <Link
             href="/"
             className="flex items-center gap-3"
-            aria-label="Createx Blog - go to main page"
+            aria-label="VitaFlow Blog - Home page"
           >
             <div
-              className="h-9 w-9 rounded-md bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-white font-bold shadow"
+              className="h-9 w-9 rounded-md bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold shadow"
               aria-hidden="true"
             >
-              CX
+              VF
             </div>
             <span className="font-semibold text-2xl">
-              Createx<span className="text-primary">Blog</span>
+              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+                VitaFlow
+              </span>
+              <span className="text-foreground">Blog</span>
             </span>
           </Link>
           <p className="text-sm text-muted-foreground">
