@@ -1,5 +1,5 @@
 import { prisma } from '@/shared/api';
-import { FormFaildDeletion } from '@/widgets/dashboard/ui/form-faild-deletion';
+import { FormFaildDeletion } from '@/widgets/dashboard2/ui/form-faild-deletion';
 
 export default async function FailedDeletionsPage() {
   const failed = await prisma.failedUserDeletion.findMany({

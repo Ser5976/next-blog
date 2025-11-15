@@ -1,29 +1,29 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Menu } from 'lucide-react';
 
 import { Category, CategoryLink } from '@/entities/category';
-import { AuthButton } from '@/features/auth';
+import { UserProfile } from '@/features/auth';
 import { SearchForm } from '@/features/search';
 import {
   Button,
   Sheet,
   SheetContent,
-  SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '@/shared/ui';
 
-interface HeaderProps {
+interface MobileMenuProps {
   categories: Category[] | undefined;
 }
 
-export const MobileMenu = ({ categories }: HeaderProps) => {
+export const MobileMenu = ({ categories }: MobileMenuProps) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
+    <Sheet modal={false} open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
           variant="ghost"
@@ -37,15 +37,26 @@ export const MobileMenu = ({ categories }: HeaderProps) => {
         </Button>
       </SheetTrigger>
       <SheetContent
-        side="right"
+        side="left"
         className="w-[75%] sm:w-[400px]"
         aria-label="Mobile navigation menu"
         role="dialog"
         aria-modal="true"
       >
-        <SheetHeader>
-          <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
-        </SheetHeader>
+        <SheetTitle>
+          <div className="px-4 py-6 border-b">
+            <Link href="/" onClick={() => setOpen(false)}>
+              <div className="flex items-center gap-2 px-2">
+                <span className="font-semibold text-xl">
+                  <span className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+                    VitaFlow
+                  </span>
+                  <span className="text-foreground">Blog</span>
+                </span>
+              </div>
+            </Link>
+          </div>
+        </SheetTitle>
 
         <nav
           className="mt-6 px-3 flex flex-col gap-4"
@@ -86,10 +97,8 @@ export const MobileMenu = ({ categories }: HeaderProps) => {
             )}
           </ul>
         </nav>
-        <div className="mt-auto p-4 border-t border-border">
-          <div className="flex items-center gap-3">
-            <AuthButton />
-          </div>
+        <div className="mt-auto">
+          <UserProfile />
         </div>
       </SheetContent>
     </Sheet>

@@ -1,7 +1,11 @@
-export default function Dashboard() {
-  return (
-    <div className=" flex gap-4">
-      <div className="">Привет,Home!!!</div>
-    </div>
-  );
+import { Dashboard } from '@/widgets/dashboard';
+
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ timeRange?: 'week' | 'month' | 'year' }>;
+}) {
+  const { timeRange } = await searchParams;
+
+  return <Dashboard timeRange={timeRange ?? 'month'} />;
 }

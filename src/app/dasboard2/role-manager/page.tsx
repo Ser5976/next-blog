@@ -32,7 +32,7 @@ import {
 import {
   getUsersWithRoles,
   updateUserRole,
-} from '@/widgets/dashboard/model/user-actions';
+} from '@/widgets/dashboard2/model/user-actions';
 
 interface User {
   id: string;

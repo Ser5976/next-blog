@@ -14,7 +14,7 @@ export const CategoryLink = ({ category }: { category: Category }) => {
     <Link
       href={`/categories/${category.slug}`}
       className={cn(
-        'text-sm font-medium text-muted-foreground hover:text-foreground transition-colors uppercase',
+        'text-sm font-medium text-muted-foreground hover:text-foreground transition-colors capitalize ',
         isActive ? 'text-foreground' : 'text-muted-foreground'
       )}
       aria-label={`View posts in ${category.name} category`}

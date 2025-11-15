@@ -1,10 +1,10 @@
 import { Category, CategoryLink } from '@/entities/category';
 
-interface HeaderProps {
+interface CategoriesMenuProps {
   categories: Category[] | undefined;
 }
 
-export const CategoriesMenu = ({ categories }: HeaderProps) => {
+export const CategoriesMenu = ({ categories }: CategoriesMenuProps) => {
   return (
     <nav aria-label="Main blog categories" className="hidden md:flex gap-6">
       <ul className="flex gap-4" role="list" aria-label="Categories list">

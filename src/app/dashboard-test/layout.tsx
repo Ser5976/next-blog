@@ -1,8 +1,8 @@
 import React, { ReactNode } from 'react';
 
-import { Sidebar } from '@/widgets/dashboard-sidebar/ui';
+import Sidebar from '@/widgets/dashboard-test/ui/sidebar';
 
-const DashboardLayout = ({ children }: { children: ReactNode }) => {
+const layout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="min-h-screen w-full">
       <div className="flex">
@@ -13,4 +13,4 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export default DashboardLayout;
+export default layout;
