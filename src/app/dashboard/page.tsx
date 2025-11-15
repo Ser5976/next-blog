@@ -1,4 +1,4 @@
-import { Dashboard } from '@/widgets/dashboard';
+import { Dashboard } from '@/widgets/dashboard-overview';
 
 export default async function DashboardPage({
   searchParams,
