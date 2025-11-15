@@ -1,1 +1,1 @@
-export type { IStatCard } from './types';
+export type { IStatCard, IErrorMessage } from './types';

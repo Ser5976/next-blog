@@ -26,7 +26,7 @@ export const StatCard = ({
           ) : (
             <ArrowDown className="h-3 w-3" />
           )}
-          {Math.abs(trend)}% с прошлого периода
+          {Math.abs(trend)}% from the previous period
         </div>
       )}
       <p className="text-xs text-muted-foreground mt-1">{description}</p>

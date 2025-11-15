@@ -1,6 +1,10 @@
+import { Suspense } from 'react';
+
+import { SkeletonLoader } from '@/entities/stat-card';
+import { PostsStats } from '@/features/posts-stats';
 import { TimeFilter } from './time-filter';
 
-export const Dashboard = ({
+export const DashboardOverview = ({
   timeRange,
 }: {
   timeRange: 'week' | 'month' | 'year';
@@ -17,6 +21,12 @@ export const Dashboard = ({
             </p>
           </div>
           <TimeFilter initialPeriod={timeRange} />
+        </div>
+        {/* Основная статистика */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Suspense fallback={<SkeletonLoader />}>
+            <PostsStats />
+          </Suspense>
         </div>
       </div>
     </div>

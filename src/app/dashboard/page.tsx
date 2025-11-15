@@ -1,4 +1,4 @@
-import { Dashboard } from '@/widgets/dashboard-overview';
+import { DashboardOverview } from '@/widgets/dashboard-overview';
 
 export default async function DashboardPage({
   searchParams,
@@ -7,5 +7,5 @@ export default async function DashboardPage({
 }) {
   const { timeRange } = await searchParams;
 
-  return <Dashboard timeRange={timeRange ?? 'month'} />;
+  return <DashboardOverview timeRange={timeRange ?? 'month'} />;
 }
