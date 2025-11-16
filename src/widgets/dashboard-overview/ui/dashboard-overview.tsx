@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { SkeletonLoader } from '@/entities/stat-card';
 import { TimeFilter, TimeRageType } from '@/entities/time-range';
 import { PostsStats } from '@/features/posts-stats';
+import { ViewsStats } from '@/features/view-stats';
 
 export const DashboardOverview = ({
   timeRange,
@@ -25,7 +26,10 @@ export const DashboardOverview = ({
         {/* Основная статистика */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Suspense fallback={<SkeletonLoader />}>
-            <PostsStats timeRange={timeRange ?? 'month'} />
+            <PostsStats timeRange={timeRange} />
+          </Suspense>
+          <Suspense fallback={<SkeletonLoader />}>
+            <ViewsStats timeRange={timeRange} />
           </Suspense>
         </div>
       </div>

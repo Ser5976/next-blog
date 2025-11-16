@@ -26,7 +26,7 @@ export const NavButton = ({
       <Button
         variant={isActive ? 'secondary' : 'ghost'}
         className={cn(
-          'w-full justify-start transition-all',
+          'w-full justify-start transition-all cursor-pointer',
           isActive && 'font-medium'
         )}
         onClick={handleClick}

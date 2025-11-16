@@ -21,6 +21,7 @@ export function TimeFilter({ initialPeriod }: { initialPeriod: TimeRageType }) {
         variant={initialPeriod === 'week' ? 'default' : 'outline'}
         size="sm"
         onClick={() => handlePeriodChange('week')}
+        className=" cursor-pointer"
       >
         Week
       </Button>
@@ -28,6 +29,7 @@ export function TimeFilter({ initialPeriod }: { initialPeriod: TimeRageType }) {
         variant={initialPeriod === 'month' ? 'default' : 'outline'}
         size="sm"
         onClick={() => handlePeriodChange('month')}
+        className=" cursor-pointer"
       >
         Month
       </Button>
@@ -35,6 +37,7 @@ export function TimeFilter({ initialPeriod }: { initialPeriod: TimeRageType }) {
         variant={initialPeriod === 'year' ? 'default' : 'outline'}
         size="sm"
         onClick={() => handlePeriodChange('year')}
+        className=" cursor-pointer"
       >
         Year
       </Button>
