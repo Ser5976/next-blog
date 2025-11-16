@@ -1,13 +1,13 @@
 import { Suspense } from 'react';
 
 import { SkeletonLoader } from '@/entities/stat-card';
+import { TimeFilter, TimeRageType } from '@/entities/time-range';
 import { PostsStats } from '@/features/posts-stats';
-import { TimeFilter } from './time-filter';
 
 export const DashboardOverview = ({
   timeRange,
 }: {
-  timeRange: 'week' | 'month' | 'year';
+  timeRange: TimeRageType;
 }) => {
   return (
     <div className="min-h-screen bg-background p-4 md:p-6">
@@ -25,7 +25,7 @@ export const DashboardOverview = ({
         {/* Основная статистика */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Suspense fallback={<SkeletonLoader />}>
-            <PostsStats />
+            <PostsStats timeRange={timeRange ?? 'month'} />
           </Suspense>
         </div>
       </div>

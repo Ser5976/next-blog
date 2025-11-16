@@ -3,16 +3,13 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/shared/ui';
+import { TimeRageType } from '../model';
 
-export function TimeFilter({
-  initialPeriod,
-}: {
-  initialPeriod: 'week' | 'month' | 'year';
-}) {
+export function TimeFilter({ initialPeriod }: { initialPeriod: TimeRageType }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handlePeriodChange = (period: 'week' | 'month' | 'year') => {
+  const handlePeriodChange = (period: TimeRageType) => {
     const params = new URLSearchParams(searchParams);
     params.set('timeRange', period);
     router.push(`?${params.toString()}`, { scroll: false });
