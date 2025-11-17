@@ -216,7 +216,7 @@ const Dashboard = () => {
             description="За все время"
           />
           <StatCard
-            title="Средний рейтинг"
+            title="Average rating"
             value={stats.averageRating}
             icon={Star}
             trend={2}
