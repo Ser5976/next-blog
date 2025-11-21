@@ -10,7 +10,7 @@ export const CommentsStats = async ({
   timeRange: TimeRageType;
 }) => {
   const stats = await getCommentsStats(timeRange);
-  console.log('stats', stats);
+  // console.log('stats', stats);
   if (!stats) return <ErrorMessage message="Something went wrong!" />;
 
   return (

@@ -10,12 +10,13 @@ import {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+
     const timeRange = searchParams.get('timeRange') as
       | 'week'
       | 'month'
       | 'year'
       | null;
-
+    console.log('timeRage!!!!!!:', timeRange);
     const [currentStats, previousStats] = await Promise.all([
       getUsersStats(timeRange),
       getUsersStats(getPreviousPeriod(timeRange)),
@@ -44,6 +45,7 @@ export async function GET(request: NextRequest) {
 
 async function getUsersStats(timeRange: string | null) {
   const dateFilter = getDateFilter(timeRange);
+  console.log(`проверка ${timeRange}:`, dateFilter);
   const whereClause = dateFilter ? { createdAt: dateFilter } : {};
 
   const totalUsers = await prisma.user.count({

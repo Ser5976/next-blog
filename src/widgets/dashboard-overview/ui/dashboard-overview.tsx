@@ -5,6 +5,7 @@ import { TimeFilter, TimeRageType } from '@/entities/time-range';
 import { CommentsStats } from '@/features/comments-stats';
 import { PostsStats } from '@/features/posts-stats';
 import { RatingStats } from '@/features/rating-stats';
+import { UsersStats } from '@/features/users-stats';
 import { ViewsStats } from '@/features/view-stats';
 
 export const DashboardOverview = ({
@@ -38,6 +39,9 @@ export const DashboardOverview = ({
           </Suspense>
           <Suspense fallback={<SkeletonLoader />}>
             <CommentsStats timeRange={timeRange} />
+          </Suspense>
+          <Suspense fallback={<SkeletonLoader />}>
+            <UsersStats timeRange={timeRange} />
           </Suspense>
         </div>
       </div>

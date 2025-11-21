@@ -5,7 +5,7 @@ export const getCommentsStats = async (
   timeRange: TimeRageType
 ): Promise<ICommentsStats | null> => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/comments?timeRage=${timeRange}`,
+    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/comments?timeRange=${timeRange}`,
     {
       next: { revalidate: 60 },
     }

@@ -5,7 +5,7 @@ export const getViewsStats = async (
   timeRange: TimeRageType
 ): Promise<IViewStats | null> => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/total-views?timeRage=${timeRange}`,
+    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/total-views?timeRange=${timeRange}`,
     {
       next: { revalidate: 60 },
     }

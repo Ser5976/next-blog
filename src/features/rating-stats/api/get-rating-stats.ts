@@ -5,7 +5,7 @@ export const getRatingStats = async (
   timeRange: TimeRageType
 ): Promise<IRatingStats | null> => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/ratings?timeRage=${timeRange}`,
+    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/ratings?timeRange=${timeRange}`,
     {
       next: { revalidate: 60 },
     }
