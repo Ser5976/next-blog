@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { SkeletonLoader } from '@/entities/stat-card';
 import { TimeFilter, TimeRageType } from '@/entities/time-range';
 import { CommentsStats } from '@/features/comments-stats';
+import { EfficiencyStats } from '@/features/efficiency';
 import { PostsStats } from '@/features/posts-stats';
 import { RatingStats } from '@/features/rating-stats';
 import { UsersStats } from '@/features/users-stats';
@@ -42,6 +43,9 @@ export const DashboardOverview = ({
           </Suspense>
           <Suspense fallback={<SkeletonLoader />}>
             <UsersStats timeRange={timeRange} />
+          </Suspense>
+          <Suspense fallback={<SkeletonLoader />}>
+            <EfficiencyStats timeRange={timeRange} />
           </Suspense>
         </div>
       </div>

@@ -237,7 +237,7 @@ const Dashboard = () => {
             description="Зарегистрированные читатели"
           />
           <StatCard
-            title="Эффективность"
+            title="Efficiency"
             value="84%"
             icon={TrendingUp}
             trend={5}
