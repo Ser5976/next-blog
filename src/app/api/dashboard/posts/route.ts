@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/shared/api';
-import {
-  calculateChanges,
-  getDateFilter,
-  getPreviousPeriod,
-} from '@/shared/lib';
+import { calculateChanges, getDateFilter } from '@/shared/lib';
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,8 +14,8 @@ export async function GET(request: NextRequest) {
 
     // Получаем данные за текущий и предыдущий период
     const [currentStats, previousStats] = await Promise.all([
-      getPostsStats(timeRange),
-      getPostsStats(getPreviousPeriod(timeRange)),
+      getPostsStats(timeRange, false), // Текущий период
+      getPostsStats(timeRange, true), // Предыдущий период
     ]);
 
     const changes = calculateChanges(currentStats, previousStats);
@@ -45,8 +41,15 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function getPostsStats(timeRange: string | null) {
-  const dateFilter = getDateFilter(timeRange);
+async function getPostsStats(
+  timeRange: string | null,
+  isPreviousPeriod: boolean = false
+) {
+  const dateFilter = getDateFilter(timeRange, isPreviousPeriod);
+  /*  console.log(
+    `фильтр для ${timeRange} (предыдущий: ${isPreviousPeriod}):`,
+    dateFilter
+  ); */
   const whereClause = dateFilter ? { createdAt: dateFilter } : {};
 
   const [totalPosts, publishedPosts] = await Promise.all([

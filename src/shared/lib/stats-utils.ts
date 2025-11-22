@@ -1,18 +1,45 @@
-export function getDateFilter(timeRange: string | null) {
+export function getDateFilter(
+  timeRange: string | null,
+  isPreviousPeriod: boolean = false
+) {
   if (!timeRange) return null;
 
   const now = new Date();
-  const filter: { gte: Date } = { gte: new Date(now) };
+  const filter: { gte: Date; lte?: Date } = { gte: new Date(now) };
 
   switch (timeRange) {
     case 'week':
-      filter.gte.setDate(now.getDate() - 7);
+      if (isPreviousPeriod) {
+        // Предыдущая неделя: 14-7 дней назад
+        filter.gte.setDate(now.getDate() - 14);
+        filter.lte = new Date(now);
+        filter.lte.setDate(now.getDate() - 7);
+      } else {
+        // Текущая неделя: последние 7 дней
+        filter.gte.setDate(now.getDate() - 7);
+      }
       break;
     case 'month':
-      filter.gte.setMonth(now.getMonth() - 1);
+      if (isPreviousPeriod) {
+        // Предыдущий месяц: 2 месяца назад - 1 месяц назад
+        filter.gte.setMonth(now.getMonth() - 2);
+        filter.lte = new Date(now);
+        filter.lte.setMonth(now.getMonth() - 1);
+      } else {
+        // Текущий месяц: последний месяц
+        filter.gte.setMonth(now.getMonth() - 1);
+      }
       break;
     case 'year':
-      filter.gte.setFullYear(now.getFullYear() - 1);
+      if (isPreviousPeriod) {
+        // Предыдущий год: 2 года назад - 1 год назад
+        filter.gte.setFullYear(now.getFullYear() - 2);
+        filter.lte = new Date(now);
+        filter.lte.setFullYear(now.getFullYear() - 1);
+      } else {
+        // Текущий год: последний год
+        filter.gte.setFullYear(now.getFullYear() - 1);
+      }
       break;
     default:
       return null;
@@ -24,13 +51,9 @@ export function getDateFilter(timeRange: string | null) {
 export function getPreviousPeriod(timeRange: string | null): string | null {
   if (!timeRange) return null;
 
-  const previousMap = {
-    week: 'week',
-    month: 'month',
-    year: 'year',
-  };
-
-  return previousMap[timeRange as keyof typeof previousMap] || null;
+  // Для упрощения возвращаем тот же период, но в реальности
+  // нужно будет передавать конкретные даты предыдущего периода
+  return timeRange;
 }
 
 export function calculateChange(

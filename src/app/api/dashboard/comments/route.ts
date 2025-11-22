@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/shared/api';
-import {
-  calculateChange,
-  getDateFilter,
-  getPreviousPeriod,
-} from '@/shared/lib';
+import { calculateChange, getDateFilter } from '@/shared/lib';
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,8 +13,8 @@ export async function GET(request: NextRequest) {
       | null;
 
     const [currentStats, previousStats] = await Promise.all([
-      getCommentsStats(timeRange),
-      getCommentsStats(getPreviousPeriod(timeRange)),
+      getCommentsStats(timeRange, false),
+      getCommentsStats(timeRange, true),
     ]);
 
     const change = calculateChange(
@@ -42,8 +38,15 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function getCommentsStats(timeRange: string | null) {
-  const dateFilter = getDateFilter(timeRange);
+async function getCommentsStats(
+  timeRange: string | null,
+  isPreviousPeriod: boolean = false
+) {
+  const dateFilter = getDateFilter(timeRange, isPreviousPeriod);
+  // console.log(
+  //   `фильтр для ${timeRange} (предыдущий: ${isPreviousPeriod}):`,
+  //   dateFilter
+  // );
   const whereClause = dateFilter ? { post: { createdAt: dateFilter } } : {};
 
   const totalComments = await prisma.comment.count({

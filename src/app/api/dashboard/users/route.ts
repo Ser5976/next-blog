@@ -1,25 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { prisma } from '@/shared/api';
-import {
-  calculateChange,
-  getDateFilter,
-  getPreviousPeriod,
-} from '@/shared/lib';
+import { calculateChange, getDateFilter } from '@/shared/lib';
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-
     const timeRange = searchParams.get('timeRange') as
       | 'week'
       | 'month'
       | 'year'
       | null;
-    console.log('timeRage!!!!!!:', timeRange);
+
     const [currentStats, previousStats] = await Promise.all([
-      getUsersStats(timeRange),
-      getUsersStats(getPreviousPeriod(timeRange)),
+      getUsersStats(timeRange, false), // Текущий период
+      getUsersStats(timeRange, true), // Предыдущий период
     ]);
 
     const change = calculateChange(
@@ -43,10 +38,21 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function getUsersStats(timeRange: string | null) {
-  const dateFilter = getDateFilter(timeRange);
-  console.log(`проверка ${timeRange}:`, dateFilter);
-  const whereClause = dateFilter ? { createdAt: dateFilter } : {};
+async function getUsersStats(
+  timeRange: string | null,
+  isPreviousPeriod: boolean = false
+) {
+  const dateFilter = getDateFilter(timeRange, isPreviousPeriod);
+  console.log(
+    `фильтр для ${timeRange} (предыдущий: ${isPreviousPeriod}):`,
+    dateFilter
+  );
+
+  const whereClause = dateFilter
+    ? {
+        createdAt: dateFilter,
+      }
+    : {};
 
   const totalUsers = await prisma.user.count({
     where: whereClause,
