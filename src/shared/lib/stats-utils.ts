@@ -5,45 +5,52 @@ export function getDateFilter(
   if (!timeRange) return null;
 
   const now = new Date();
-  const filter: { gte: Date; lte?: Date } = { gte: new Date(now) };
+  const filter: { gte: Date; lte: Date } = {
+    gte: new Date(now),
+    lte: new Date(now),
+  };
 
   switch (timeRange) {
     case 'week':
       if (isPreviousPeriod) {
-        // Предыдущая неделя: 14-7 дней назад
+        // Предыдущая неделя: с 14 по 7 дней назад
         filter.gte.setDate(now.getDate() - 14);
-        filter.lte = new Date(now);
         filter.lte.setDate(now.getDate() - 7);
       } else {
         // Текущая неделя: последние 7 дней
         filter.gte.setDate(now.getDate() - 7);
+        filter.lte.setDate(now.getDate());
       }
       break;
     case 'month':
       if (isPreviousPeriod) {
-        // Предыдущий месяц: 2 месяца назад - 1 месяц назад
-        filter.gte.setMonth(now.getMonth() - 2);
-        filter.lte = new Date(now);
-        filter.lte.setMonth(now.getMonth() - 1);
+        // Предыдущий месяц: с начала месяца 2 месяца назад до начала прошлого месяца
+        filter.gte.setMonth(now.getMonth() - 2, 1);
+        filter.lte.setMonth(now.getMonth() - 1, 0); // последний день предыдущего месяца
       } else {
-        // Текущий месяц: последний месяц
+        // Текущий месяц: с начала прошлого месяца до сейчас
         filter.gte.setMonth(now.getMonth() - 1);
+        filter.lte.setMonth(now.getMonth());
       }
       break;
     case 'year':
       if (isPreviousPeriod) {
-        // Предыдущий год: 2 года назад - 1 год назад
-        filter.gte.setFullYear(now.getFullYear() - 2);
-        filter.lte = new Date(now);
-        filter.lte.setFullYear(now.getFullYear() - 1);
+        // Предыдущий год: с начала года 2 года назад до начала прошлого года
+        filter.gte.setFullYear(now.getFullYear() - 2, 0, 1);
+        filter.lte.setFullYear(now.getFullYear() - 1, 0, 0);
       } else {
-        // Текущий год: последний год
+        // Текущий год: с начала прошлого года до сейчас
         filter.gte.setFullYear(now.getFullYear() - 1);
+        filter.lte.setFullYear(now.getFullYear());
       }
       break;
     default:
       return null;
   }
+
+  // Убедимся, что время установлено корректно
+  filter.gte.setHours(0, 0, 0, 0);
+  filter.lte.setHours(23, 59, 59, 999);
 
   return filter;
 }

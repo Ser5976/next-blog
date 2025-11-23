@@ -297,7 +297,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                Популярные категории
+                Popular categories
               </CardTitle>
               <CardDescription>Распределение по тематикам</CardDescription>
             </CardHeader>

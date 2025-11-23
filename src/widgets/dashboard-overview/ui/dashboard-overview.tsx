@@ -4,6 +4,7 @@ import { SkeletonLoader } from '@/entities/stat-card';
 import { TimeFilter, TimeRageType } from '@/entities/time-range';
 import { CommentsStats } from '@/features/comments-stats';
 import { EfficiencyStats } from '@/features/efficiency';
+import { PopularCategories } from '@/features/popular-categories';
 import { PopularPosts } from '@/features/popular-post';
 import { PostsStats } from '@/features/posts-stats';
 import { RatingStats } from '@/features/rating-stats';
@@ -52,6 +53,9 @@ export const DashboardOverview = ({
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Suspense fallback={<SkeletonLoader />}>
             <PopularPosts timeRange={timeRange} />
+          </Suspense>
+          <Suspense fallback={<SkeletonLoader />}>
+            <PopularCategories timeRange={timeRange} />
           </Suspense>
         </div>
       </div>
