@@ -1,6 +1,6 @@
-// user-profile.tsx
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 
 import { AuthButton } from '@/features/auth';
@@ -8,8 +8,14 @@ import { getDisplayName, getEmail } from '../lib';
 
 export function UserProfile() {
   const { isLoaded, user } = useUser();
+  const [isMounted, setIsMounted] = useState(false);
 
-  if (!isLoaded) {
+  // Гарантируем, что клиентский рендеринг происходит только после монтирования
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted || !isLoaded) {
     return (
       <div
         className="p-4 border-t"
