@@ -29,3 +29,5 @@ export {
   SheetDescription,
 } from './sheet';
 export { LoadingSpinner } from './loading-spinner';
+export { Title } from './title';
+export { Subtitle } from './subtitle';
