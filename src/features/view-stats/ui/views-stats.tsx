@@ -1,14 +1,10 @@
 import { Eye } from 'lucide-react';
 
 import { ErrorMessage, StatCard } from '@/entities/stat-card';
-import { TimeRageType } from '@/entities/time-range';
 import { getViewsStats } from '../api';
+import { IViewStatsProps } from '../model';
 
-export const ViewsStats = async ({
-  timeRange,
-}: {
-  timeRange: TimeRageType;
-}) => {
+export const ViewsStats = async ({ timeRange }: IViewStatsProps) => {
   const stats = await getViewsStats(timeRange);
   //console.log('stats', stats);
   if (!stats) return <ErrorMessage message="Something went wrong!" />;

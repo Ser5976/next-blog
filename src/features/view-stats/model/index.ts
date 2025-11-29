@@ -1,1 +1,1 @@
-export type { IViewStats } from './types';
+export type { IViewStats, IViewStatsProps } from './types';

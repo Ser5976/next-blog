@@ -1,16 +1,12 @@
 import { TrendingUp } from 'lucide-react';
 
 import { ErrorMessage, StatCard } from '@/entities/stat-card';
-import { TimeRageType } from '@/entities/time-range';
 import { getEfficiencyStats } from '../api';
+import { IEfficiencyProps } from '../model';
 
-export const EfficiencyStats = async ({
-  timeRange,
-}: {
-  timeRange: TimeRageType;
-}) => {
+export const EfficiencyStats = async ({ timeRange }: IEfficiencyProps) => {
   const stats = await getEfficiencyStats(timeRange);
-  console.log('stats', stats);
+  // console.log('stats', stats);
   if (!stats) return <ErrorMessage message="Something went wrong!" />;
 
   return (

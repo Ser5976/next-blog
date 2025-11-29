@@ -1,7 +1,6 @@
 import { TrendingUp } from 'lucide-react';
 
 import { ErrorMessage } from '@/entities/stat-card';
-import { TimeRageType } from '@/entities/time-range';
 import {
   Card,
   CardContent,
@@ -10,14 +9,13 @@ import {
   CardTitle,
 } from '@/shared/ui/card';
 import { getPopularCategories } from '../api';
+import { IPopularCategoriesProps } from '../model';
 
 export const PopularCategories = async ({
   timeRange,
-}: {
-  timeRange: TimeRageType;
-}) => {
+}: IPopularCategoriesProps) => {
   const popularCategories = await getPopularCategories(timeRange);
-  console.log('popularCategories', popularCategories);
+  // console.log('popularCategories', popularCategories);
   if (!popularCategories)
     return <ErrorMessage message="Something went wrong!" />;
 

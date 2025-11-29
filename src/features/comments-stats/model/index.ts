@@ -1,1 +1,1 @@
-export type { ICommentsStats } from './types';
+export type { ICommentsStats, ICommentsProps } from './types';

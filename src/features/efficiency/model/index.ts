@@ -1,1 +1,1 @@
-export type { IEfficiencyStats } from './types';
+export type { IEfficiencyStats, IEfficiencyProps } from './types';

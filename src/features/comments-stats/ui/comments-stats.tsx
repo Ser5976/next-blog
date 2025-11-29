@@ -1,14 +1,10 @@
 import { MessageSquare } from 'lucide-react';
 
 import { ErrorMessage, StatCard } from '@/entities/stat-card';
-import { TimeRageType } from '@/entities/time-range';
 import { getCommentsStats } from '../api';
+import { ICommentsProps } from '../model';
 
-export const CommentsStats = async ({
-  timeRange,
-}: {
-  timeRange: TimeRageType;
-}) => {
+export const CommentsStats = async ({ timeRange }: ICommentsProps) => {
   const stats = await getCommentsStats(timeRange);
   // console.log('stats', stats);
   if (!stats) return <ErrorMessage message="Something went wrong!" />;

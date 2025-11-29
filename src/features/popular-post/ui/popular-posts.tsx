@@ -1,7 +1,6 @@
 import { BarChart3, Eye, MessageSquare, Star } from 'lucide-react';
 
 import { ErrorMessage } from '@/entities/stat-card';
-import { TimeRageType } from '@/entities/time-range';
 import { Badge } from '@/shared/ui/badge';
 import {
   Card,
@@ -11,12 +10,9 @@ import {
   CardTitle,
 } from '@/shared/ui/card';
 import { getPopularPosts } from '../api';
+import { IPopularPostsProps } from '../model';
 
-export const PopularPosts = async ({
-  timeRange,
-}: {
-  timeRange: TimeRageType;
-}) => {
+export const PopularPosts = async ({ timeRange }: IPopularPostsProps) => {
   const popularPosts = await getPopularPosts(timeRange);
   //console.log('popularPosts', popularPosts);
   if (!popularPosts) return <ErrorMessage message="Something went wrong!" />;

@@ -1,1 +1,1 @@
-export type { IUsersStats } from './types';
+export type { IUsersStats, IUsersStatsProps } from './types';

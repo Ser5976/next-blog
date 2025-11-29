@@ -1,1 +1,1 @@
-export type { IPopularCategories } from './types';
+export type { IPopularCategories, IPopularCategoriesProps } from './types';

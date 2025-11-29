@@ -1,1 +1,1 @@
-export type { IRatingStats } from './types';
+export type { IRatingStats, IRatingStatsProps } from './types';

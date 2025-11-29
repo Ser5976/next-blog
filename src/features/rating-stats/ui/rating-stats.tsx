@@ -1,14 +1,10 @@
 import { Star } from 'lucide-react';
 
 import { ErrorMessage, StatCard } from '@/entities/stat-card';
-import { TimeRageType } from '@/entities/time-range';
 import { getRatingStats } from '../api';
+import { IRatingStatsProps } from '../model';
 
-export const RatingStats = async ({
-  timeRange,
-}: {
-  timeRange: TimeRageType;
-}) => {
+export const RatingStats = async ({ timeRange }: IRatingStatsProps) => {
   const stats = await getRatingStats(timeRange);
   //console.log('stats', stats);
   if (!stats) return <ErrorMessage message="Something went wrong!" />;
