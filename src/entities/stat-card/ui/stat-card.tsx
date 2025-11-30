@@ -51,16 +51,3 @@ export const StatCard = ({
     </CardContent>
   </Card>
 );
-
-export const ErrorMessage = ({ message }: { message: string }) => (
-  <Card role="alert" aria-live="assertive">
-    <CardContent className="pt-6">
-      <div
-        className="text-center text-red-600"
-        aria-label={`Error: ${message}`}
-      >
-        {message}
-      </div>
-    </CardContent>
-  </Card>
-);
