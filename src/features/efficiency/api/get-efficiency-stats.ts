@@ -4,17 +4,24 @@ import { IEfficiencyStats } from '../model';
 export const getEfficiencyStats = async (
   timeRange: TimeRageType
 ): Promise<IEfficiencyStats | null> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/efficiency?timeRange=${timeRange}`,
-    {
-      next: { revalidate: 60 },
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/efficiency?timeRange=${timeRange}`,
+      {
+        next: { revalidate: 60 },
+      }
+    );
+
+    if (!res.ok) {
+      console.error(
+        `Failed to fetch efficiency stats: ${res.status} ${res.statusText}`
+      );
+      return null;
     }
-  );
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    //throw new Error('Failed to fetch data');
+
+    return await res.json();
+  } catch (error) {
+    console.error('Network error fetching efficiency stats:', error);
     return null;
   }
-  const efficiencyStats = await res.json();
-  return efficiencyStats;
 };

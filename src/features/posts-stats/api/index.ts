@@ -1,1 +1,1 @@
-export { getPoststStats } from './get-posts-stats';
+export { getPostsStats } from './get-posts-stats';

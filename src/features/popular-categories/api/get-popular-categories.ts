@@ -4,17 +4,24 @@ import { IPopularCategories } from '../model';
 export const getPopularCategories = async (
   timeRange: TimeRageType
 ): Promise<IPopularCategories[] | null> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/popular-categories?timeRange=${timeRange}`,
-    {
-      next: { revalidate: 60 },
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/popular-categories?timeRange=${timeRange}`,
+      {
+        next: { revalidate: 60 },
+      }
+    );
+
+    if (!res.ok) {
+      console.error(
+        `Failed to fetch popular categories: ${res.status} ${res.statusText}`
+      );
+      return null;
     }
-  );
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    //throw new Error('Failed to fetch data');
+
+    return await res.json();
+  } catch (error) {
+    console.error('Network error fetching popular categories:', error);
     return null;
   }
-  const popularCategories = await res.json();
-  return popularCategories;
 };

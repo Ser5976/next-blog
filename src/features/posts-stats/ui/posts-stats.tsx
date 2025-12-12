@@ -1,11 +1,11 @@
 import { FileText } from 'lucide-react';
 
 import { ErrorMessage, StatCard } from '@/entities/stat-card';
-import { getPoststStats } from '../api';
+import { getPostsStats } from '../api';
 import { IPostsStatsProps } from '../model';
 
 export const PostsStats = async ({ timeRange }: IPostsStatsProps) => {
-  const stats = await getPoststStats(timeRange);
+  const stats = await getPostsStats(timeRange);
   //console.log('stats', stats);
   if (!stats) return <ErrorMessage message="Something went wrong!" />;
 

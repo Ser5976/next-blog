@@ -1,6 +1,6 @@
-import { getCommentsStats } from '@/features/comments-stats/api/get-comments-stats';
+import { getPopularCategories } from '@/features/popular-categories/api/get-popular-categories';
 
-describe('getCommentsStats', () => {
+describe('getPopularCategories', () => {
   const originalFetch = global.fetch;
   const originalNextPublicDomain = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -17,16 +17,21 @@ describe('getCommentsStats', () => {
     process.env.NEXT_PUBLIC_DOMAIN = originalNextPublicDomain;
   });
 
-  it('should return comments stats on successful fetch', async () => {
+  it('should return popular categories on successful fetch', async () => {
     // Arrange: Подготавливаем мок-данные
-    const mockStats = {
-      totalComments: { current: 250, change: 15 },
-    };
+    const mockCategories = [
+      {
+        name: 'Technology',
+        postCount: 50,
+        totalViews: 10000,
+        viewsPercentage: 40,
+      },
+    ];
 
     // Мок ответа от сервера
     const mockResponse = {
       ok: true,
-      json: async () => mockStats,
+      json: async () => mockCategories,
     } as Response;
 
     // Подменяем глобальный fetch
@@ -34,19 +39,17 @@ describe('getCommentsStats', () => {
 
     // Act: Вызываем тестируемую функцию
     const timeRange = 'week';
-    const result = await getCommentsStats(timeRange);
+    const result = await getPopularCategories(timeRange);
 
     // Assert: Проверяем результаты
-    // 1. Проверяем, что fetch вызван с правильными аргументами
     expect(global.fetch).toHaveBeenCalledWith(
-      `http://localhost:3000/api/dashboard/comments?timeRange=${timeRange}`,
+      `http://localhost:3000/api/dashboard/popular-categories?timeRange=${timeRange}`,
       {
         next: { revalidate: 60 },
       }
     );
 
-    // 2. Проверяем, что функция вернула правильные данные
-    expect(result).toEqual(mockStats);
+    expect(result).toEqual(mockCategories);
   });
 
   it('should return null when fetch is not successful', async () => {
@@ -59,18 +62,16 @@ describe('getCommentsStats', () => {
 
     // Act: Вызываем функцию
     const timeRange = 'month';
-    const result = await getCommentsStats(timeRange);
+    const result = await getPopularCategories(timeRange);
 
     // Assert: Проверяем
-    // 1. Проверяем правильность URL
     expect(global.fetch).toHaveBeenCalledWith(
-      `http://localhost:3000/api/dashboard/comments?timeRange=${timeRange}`,
+      `http://localhost:3000/api/dashboard/popular-categories?timeRange=${timeRange}`,
       {
         next: { revalidate: 60 },
       }
     );
 
-    // 2. Проверяем, что при ошибке возвращается null
     expect(result).toBeNull();
   });
 
@@ -80,17 +81,24 @@ describe('getCommentsStats', () => {
 
     // Act & Assert: Проверяем, что функция возвращает null при ошибке
     const timeRange = 'week';
-    const result = await getCommentsStats(timeRange);
+    const result = await getPopularCategories(timeRange);
 
     expect(result).toBeNull();
   });
 
   it('should use different timeRange values correctly', async () => {
     // Arrange: Настраиваем мок
-    const mockStats = { totalComments: { current: 100, change: 5 } };
+    const mockCategories = [
+      {
+        name: 'Technology',
+        postCount: 30,
+        totalViews: 5000,
+        viewsPercentage: 35,
+      },
+    ];
     const mockResponse = {
       ok: true,
-      json: async () => mockStats,
+      json: async () => mockCategories,
     } as Response;
 
     global.fetch = jest.fn(() => Promise.resolve(mockResponse));
@@ -99,18 +107,34 @@ describe('getCommentsStats', () => {
     const testCases = ['week', 'month', 'year'] as const;
 
     for (const timeRange of testCases) {
-      await getCommentsStats(timeRange);
+      await getPopularCategories(timeRange);
 
       // Assert: Проверяем, что каждый раз вызывается с правильным timeRange
       expect(global.fetch).toHaveBeenCalledWith(
-        `http://localhost:3000/api/dashboard/comments?timeRange=${timeRange}`,
+        `http://localhost:3000/api/dashboard/popular-categories?timeRange=${timeRange}`,
         {
           next: { revalidate: 60 },
         }
       );
 
-      // Очищаем мок между вызовами
       (global.fetch as jest.Mock).mockClear();
     }
+  });
+
+  it('should handle empty array response', async () => {
+    // Arrange: Пустой массив
+    const mockResponse = {
+      ok: true,
+      json: async () => [],
+    } as Response;
+
+    global.fetch = jest.fn(() => Promise.resolve(mockResponse));
+
+    // Act
+    const timeRange = 'week';
+    const result = await getPopularCategories(timeRange);
+
+    // Assert
+    expect(result).toEqual([]);
   });
 });

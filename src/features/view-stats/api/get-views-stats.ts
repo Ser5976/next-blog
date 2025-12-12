@@ -4,17 +4,24 @@ import { IViewStats } from '../model';
 export const getViewsStats = async (
   timeRange: TimeRageType
 ): Promise<IViewStats | null> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/total-views?timeRange=${timeRange}`,
-    {
-      next: { revalidate: 60 },
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/total-views?timeRange=${timeRange}`,
+      {
+        next: { revalidate: 60 },
+      }
+    );
+
+    if (!res.ok) {
+      console.error(
+        `Failed to fetch views stats: ${res.status} ${res.statusText}`
+      );
+      return null;
     }
-  );
-  if (!res.ok) {
-    // This will activate the closest `error.js` Error Boundary
-    //throw new Error('Failed to fetch data');
+
+    return await res.json();
+  } catch (error) {
+    console.error('Network error fetching views stats:', error);
     return null;
   }
-  const viewsStats = await res.json();
-  return viewsStats;
 };

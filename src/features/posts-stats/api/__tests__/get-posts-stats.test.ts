@@ -1,6 +1,6 @@
-import { getPoststStats } from '@/features/posts-stats/api/get-posts-stats';
+import { getPostsStats } from '@/features/posts-stats/api/get-posts-stats';
 
-describe('getPoststStats', () => {
+describe('getPostsStats', () => {
   const originalFetch = global.fetch;
   const originalNextPublicDomain = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -17,10 +17,76 @@ describe('getPoststStats', () => {
     process.env.NEXT_PUBLIC_DOMAIN = originalNextPublicDomain;
   });
 
-  it('should return post stats on successful fetch', async () => {
+  it('should return posts stats on successful fetch', async () => {
+    // Arrange: Подготавливаем мок-данные
     const mockStats = {
-      totalPosts: { current: 100, change: 10 },
-      publishedPosts: { current: 80 },
+      totalPosts: { current: 150, change: 12 },
+      publishedPosts: { current: 120, change: 8 },
+    };
+
+    // Мок ответа от сервера
+    const mockResponse = {
+      ok: true,
+      json: async () => mockStats,
+    } as Response;
+
+    // Подменяем глобальный fetch
+    global.fetch = jest.fn(() => Promise.resolve(mockResponse));
+
+    // Act: Вызываем тестируемую функцию
+    const timeRange = 'week';
+    const result = await getPostsStats(timeRange);
+
+    // Assert: Проверяем результаты
+    expect(global.fetch).toHaveBeenCalledWith(
+      `http://localhost:3000/api/dashboard/posts?timeRange=${timeRange}`,
+      {
+        next: { revalidate: 60 },
+      }
+    );
+
+    expect(result).toEqual(mockStats);
+  });
+
+  it('should return null when fetch is not successful', async () => {
+    // Arrange: Мок неудачного ответа
+    const mockResponse = {
+      ok: false,
+    } as Response;
+
+    global.fetch = jest.fn(() => Promise.resolve(mockResponse));
+
+    // Act: Вызываем функцию
+    const timeRange = 'month';
+    const result = await getPostsStats(timeRange);
+
+    // Assert: Проверяем
+    expect(global.fetch).toHaveBeenCalledWith(
+      `http://localhost:3000/api/dashboard/posts?timeRange=${timeRange}`,
+      {
+        next: { revalidate: 60 },
+      }
+    );
+
+    expect(result).toBeNull();
+  });
+
+  it('should handle network errors gracefully', async () => {
+    // Arrange: Симулируем ошибку сети
+    global.fetch = jest.fn(() => Promise.reject(new Error('Network error')));
+
+    // Act & Assert: Проверяем, что функция возвращает null при ошибке
+    const timeRange = 'week';
+    const result = await getPostsStats(timeRange);
+
+    expect(result).toBeNull();
+  });
+
+  it('should use different timeRange values correctly', async () => {
+    // Arrange: Настраиваем мок
+    const mockStats = {
+      totalPosts: { current: 100, change: 5 },
+      publishedPosts: { current: 80, change: 3 },
     };
     const mockResponse = {
       ok: true,
@@ -29,34 +95,22 @@ describe('getPoststStats', () => {
 
     global.fetch = jest.fn(() => Promise.resolve(mockResponse));
 
-    const timeRange = 'week';
-    const result = await getPoststStats(timeRange);
+    // Act: Тестируем с разными значениями timeRange
+    const testCases = ['week', 'month', 'year'] as const;
 
-    expect(global.fetch).toHaveBeenCalledWith(
-      `http://localhost:3000/api/dashboard/posts?timeRange=${timeRange}`,
-      {
-        next: { revalidate: 60 },
-      }
-    );
-    expect(result).toEqual(mockStats);
-  });
+    for (const timeRange of testCases) {
+      await getPostsStats(timeRange);
 
-  it('should return null when fetch is not successful', async () => {
-    const mockResponse = {
-      ok: false,
-    } as Response;
+      // Assert: Проверяем, что каждый раз вызывается с правильным timeRange
+      expect(global.fetch).toHaveBeenCalledWith(
+        `http://localhost:3000/api/dashboard/posts?timeRange=${timeRange}`,
+        {
+          next: { revalidate: 60 },
+        }
+      );
 
-    global.fetch = jest.fn(() => Promise.resolve(mockResponse));
-
-    const timeRange = 'month';
-    const result = await getPoststStats(timeRange);
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      `http://localhost:3000/api/dashboard/posts?timeRange=${timeRange}`,
-      {
-        next: { revalidate: 60 },
-      }
-    );
-    expect(result).toBeNull();
+      // Очищаем мок между вызовами
+      (global.fetch as jest.Mock).mockClear();
+    }
   });
 });

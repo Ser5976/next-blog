@@ -1,6 +1,6 @@
-import { getCommentsStats } from '@/features/comments-stats/api/get-comments-stats';
+import { getEfficiencyStats } from '@/features/efficiency/api/get-efficiency-stats';
 
-describe('getCommentsStats', () => {
+describe('getEfficiencyStats', () => {
   const originalFetch = global.fetch;
   const originalNextPublicDomain = process.env.NEXT_PUBLIC_DOMAIN;
 
@@ -17,10 +17,10 @@ describe('getCommentsStats', () => {
     process.env.NEXT_PUBLIC_DOMAIN = originalNextPublicDomain;
   });
 
-  it('should return comments stats on successful fetch', async () => {
+  it('should return efficiency stats on successful fetch', async () => {
     // Arrange: Подготавливаем мок-данные
     const mockStats = {
-      totalComments: { current: 250, change: 15 },
+      efficiency: { current: 85, change: 6.25 },
     };
 
     // Мок ответа от сервера
@@ -34,12 +34,12 @@ describe('getCommentsStats', () => {
 
     // Act: Вызываем тестируемую функцию
     const timeRange = 'week';
-    const result = await getCommentsStats(timeRange);
+    const result = await getEfficiencyStats(timeRange);
 
     // Assert: Проверяем результаты
     // 1. Проверяем, что fetch вызван с правильными аргументами
     expect(global.fetch).toHaveBeenCalledWith(
-      `http://localhost:3000/api/dashboard/comments?timeRange=${timeRange}`,
+      `http://localhost:3000/api/dashboard/efficiency?timeRange=${timeRange}`,
       {
         next: { revalidate: 60 },
       }
@@ -59,12 +59,12 @@ describe('getCommentsStats', () => {
 
     // Act: Вызываем функцию
     const timeRange = 'month';
-    const result = await getCommentsStats(timeRange);
+    const result = await getEfficiencyStats(timeRange);
 
     // Assert: Проверяем
     // 1. Проверяем правильность URL
     expect(global.fetch).toHaveBeenCalledWith(
-      `http://localhost:3000/api/dashboard/comments?timeRange=${timeRange}`,
+      `http://localhost:3000/api/dashboard/efficiency?timeRange=${timeRange}`,
       {
         next: { revalidate: 60 },
       }
@@ -80,14 +80,14 @@ describe('getCommentsStats', () => {
 
     // Act & Assert: Проверяем, что функция возвращает null при ошибке
     const timeRange = 'week';
-    const result = await getCommentsStats(timeRange);
+    const result = await getEfficiencyStats(timeRange);
 
     expect(result).toBeNull();
   });
 
   it('should use different timeRange values correctly', async () => {
     // Arrange: Настраиваем мок
-    const mockStats = { totalComments: { current: 100, change: 5 } };
+    const mockStats = { efficiency: { current: 75, change: 5 } };
     const mockResponse = {
       ok: true,
       json: async () => mockStats,
@@ -99,11 +99,11 @@ describe('getCommentsStats', () => {
     const testCases = ['week', 'month', 'year'] as const;
 
     for (const timeRange of testCases) {
-      await getCommentsStats(timeRange);
+      await getEfficiencyStats(timeRange);
 
       // Assert: Проверяем, что каждый раз вызывается с правильным timeRange
       expect(global.fetch).toHaveBeenCalledWith(
-        `http://localhost:3000/api/dashboard/comments?timeRange=${timeRange}`,
+        `http://localhost:3000/api/dashboard/efficiency?timeRange=${timeRange}`,
         {
           next: { revalidate: 60 },
         }
