@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 
-import { getCommentsStats } from '@/features/comments-stats/api';
+import { getCommentsStats } from '../../api';
 import { CommentsStats } from '../comments-stats';
 
 jest.mock('@/features/comments-stats/api', () => ({
@@ -28,7 +28,7 @@ describe('CommentsStats', () => {
 
   it('should render StatCard with correct data on successful fetch', async () => {
     const mockData = {
-      totalComments: { current: 250, previous: 200, change: 15 },
+      totalComments: { current: 150, previous: 120, change: 25 },
     };
     mockGetCommentsStats.mockResolvedValue(mockData);
 
@@ -36,8 +36,8 @@ describe('CommentsStats', () => {
     render(jsx);
 
     expect(screen.getByText('Comments')).toBeInTheDocument();
-    expect(screen.getByText('Value: 250')).toBeInTheDocument();
-    expect(screen.getByText('Trend: 15')).toBeInTheDocument();
+    expect(screen.getByText('Value: 150')).toBeInTheDocument();
+    expect(screen.getByText('Trend: 25')).toBeInTheDocument();
     expect(screen.getByText('Community activity')).toBeInTheDocument();
   });
 
@@ -50,5 +50,51 @@ describe('CommentsStats', () => {
     expect(
       screen.getByText('Error: Something went wrong!')
     ).toBeInTheDocument();
+  });
+
+  it('should render with different timeRange values', async () => {
+    const mockData = {
+      totalComments: { current: 200, previous: 180, change: 11.1 },
+    };
+    mockGetCommentsStats.mockResolvedValue(mockData);
+
+    const timeRanges = ['week', 'month', 'year'] as const;
+
+    for (const timeRange of timeRanges) {
+      const jsx = await CommentsStats({ timeRange });
+      const { unmount } = render(jsx);
+
+      expect(screen.getByText('Comments')).toBeInTheDocument();
+      expect(mockGetCommentsStats).toHaveBeenCalledWith(timeRange);
+
+      unmount();
+      jest.clearAllMocks();
+    }
+  });
+
+  it('should handle zero values correctly', async () => {
+    const mockData = {
+      totalComments: { current: 0, previous: 0, change: 0 },
+    };
+    mockGetCommentsStats.mockResolvedValue(mockData);
+
+    const jsx = await CommentsStats({ timeRange: 'month' });
+    render(jsx);
+
+    expect(screen.getByText('Value: 0')).toBeInTheDocument();
+    expect(screen.getByText('Trend: 0')).toBeInTheDocument();
+    expect(screen.getByText('Community activity')).toBeInTheDocument();
+  });
+
+  it('should handle negative trend', async () => {
+    const mockData = {
+      totalComments: { current: 100, previous: 120, change: -16.7 },
+    };
+    mockGetCommentsStats.mockResolvedValue(mockData);
+
+    const jsx = await CommentsStats({ timeRange: 'year' });
+    render(jsx);
+
+    expect(screen.getByText('Trend: -16.7')).toBeInTheDocument();
   });
 });
