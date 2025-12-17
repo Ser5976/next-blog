@@ -17,6 +17,7 @@ export const StatCard = ({
   >
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
       <CardTitle
+        data-testid="card-title"
         className="text-sm font-medium"
         id={`stat-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
       >

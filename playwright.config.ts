@@ -1,5 +1,4 @@
-// Используйте dotenv для чтения переменных окружения из .env файла
-// require('dotenv').config();
+import 'dotenv/config';
 
 import { defineConfig } from '@playwright/test';
 
@@ -24,6 +23,20 @@ export default defineConfig({
     /* Собирать трассировку при неудачной попытке. См. https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
   },
+  projects: [
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+    },
+    {
+      name: 'e2e',
+      dependencies: ['setup'],
+      testIgnore: /auth\.setup\.ts/,
+      use: {
+        storageState: 'tests/.auth/user.json',
+      },
+    },
+  ],
 
   /* Конфигурация для отдельных проектов */
   // projects: [

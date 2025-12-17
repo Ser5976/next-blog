@@ -23,7 +23,11 @@ export const PopularPosts = async ({ timeRange }: IPopularPostsProps) => {
       aria-describedby="popular-posts-description"
     >
       <CardHeader>
-        <CardTitle className="flex items-center gap-2" id="popular-posts-title">
+        <CardTitle
+          data-testid="card-title"
+          className="flex items-center gap-2"
+          id="popular-posts-title"
+        >
           <BarChart3 className="h-5 w-5" aria-hidden="true" />
           Popular articles
         </CardTitle>
