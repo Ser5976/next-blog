@@ -1,12 +1,4 @@
-import {
-  Activity,
-  Calendar,
-  PenTool,
-  Shield,
-  TrendingUp,
-  UserPlus,
-  Users,
-} from 'lucide-react';
+import { PenTool, Shield, UserPlus, Users } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 
@@ -16,9 +8,6 @@ interface UserStatsProps {
     admins: number;
     authors: number;
     regular: number;
-    activeToday: number;
-    activeThisWeek?: number;
-    newThisMonth?: number;
   };
 }
 
@@ -51,31 +40,10 @@ export function UserStats({ stats }: UserStatsProps) {
       description: 'Regular users',
       className: 'text-green-600',
     },
-    {
-      title: 'Active Today',
-      value: stats.activeToday,
-      icon: Activity,
-      description: 'Signed in today',
-      className: 'text-purple-600',
-    },
-    {
-      title: 'Active This Week',
-      value: stats.activeThisWeek || 0,
-      icon: Calendar,
-      description: 'Active in last 7 days',
-      className: 'text-orange-600',
-    },
-    {
-      title: 'New This Month',
-      value: stats.newThisMonth || 0,
-      icon: TrendingUp,
-      description: 'Joined in last 30 days',
-      className: 'text-cyan-600',
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-4 mb-6">
       {statItems.map((item) => (
         <Card key={item.title}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

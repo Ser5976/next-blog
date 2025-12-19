@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Loader2, RefreshCw, Users } from 'lucide-react';
+import { Loader2, Mail, RefreshCw, Users } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/shared/ui/button';
@@ -27,12 +27,9 @@ import { UsersFiltersComponent } from './users-filters';
 export const DashboardUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentUserId] = useState<string>('');
   const [filters, setFilters] = useState<UsersFilters>({
     page: 1,
     limit: 10,
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
   });
   const [pagination, setPagination] = useState({
     total: 0,
@@ -44,7 +41,6 @@ export const DashboardUsers = () => {
     admins: 0,
     authors: 0,
     regular: 0,
-    activeToday: 0,
   });
 
   const loadData = useCallback(async () => {
@@ -59,7 +55,7 @@ export const DashboardUsers = () => {
           page: result.page,
           totalPages: result.totalPages,
         });
-        setStats(result.stats); // 👈 Статистика приходит вместе с пользователями
+        setStats(result.stats);
       } else {
         toast.error(result.message || 'Failed to load users');
       }
@@ -81,12 +77,12 @@ export const DashboardUsers = () => {
 
       if (result.success) {
         toast.success('Role updated successfully');
-        // Обновляем локальное состояние
         setUsers((prev) =>
           prev.map((user) =>
             user.id === userId ? { ...user, role: newRole } : user
           )
         );
+        loadData();
       } else {
         toast.error(result.message);
       }
@@ -96,13 +92,14 @@ export const DashboardUsers = () => {
     }
   };
 
-  const handleDelete = async (userId: string) => {
+  const handleDelete = async (userId: string, userEmail: string) => {
+    if (!confirm(`Delete user ${userEmail}?`)) return;
+
     try {
       const result = await deleteUser({ userId });
 
       if (result.success) {
         toast.success('User deleted successfully');
-        // Перезагружаем данные
         loadData();
       } else {
         toast.error(result.message);
@@ -116,9 +113,12 @@ export const DashboardUsers = () => {
   const handlePageChange = (page: number) => {
     setFilters((prev) => ({ ...prev, page }));
   };
-
-  const handleRefresh = () => {
-    loadData();
+  const handleItemsPerPageChange = (itemsPerPage: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      limit: itemsPerPage,
+      page: 1, // Сбрасываем на первую страницу при изменении лимита
+    }));
   };
 
   return (
@@ -131,15 +131,15 @@ export const DashboardUsers = () => {
               User Management
             </h1>
             <p className="text-muted-foreground mt-1">
-              Manage user roles, permissions, and accounts
+              Manage users with Clerk integration
             </p>
           </div>
           <Button
-            onClick={handleRefresh}
+            onClick={loadData}
             variant="outline"
             size="sm"
             disabled={loading}
-            className="gap-2 cursor-pointer"
+            className="gap-2"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -151,21 +151,41 @@ export const DashboardUsers = () => {
         </div>
 
         {/* Статистика */}
-        {!loading && <UserStats stats={stats} />}
+        <UserStats stats={stats} />
 
         {/* Основной контент */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Users List
-            </CardTitle>
-            <CardDescription>
-              Showing {users.length} of {pagination.total} users
-            </CardDescription>
+          <CardHeader className="pb-3">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Users
+                </CardTitle>
+                <CardDescription>
+                  {loading
+                    ? 'Loading users...'
+                    : `${pagination.total} total users`}
+                </CardDescription>
+              </div>
+
+              {/* Пагинация вверху (как в Clerk Dashboard) */}
+
+              <div className="border-t pt-6">
+                <Pagination
+                  currentPage={pagination.page}
+                  totalPages={pagination.totalPages}
+                  totalItems={pagination.total}
+                  itemsPerPage={filters.limit || 10}
+                  onPageChange={handlePageChange}
+                  onItemsPerPageChange={handleItemsPerPageChange}
+                />
+              </div>
+            </div>
           </CardHeader>
-          <CardContent>
-            {/* Фильтры */}
+
+          <CardContent className="pt-0">
+            {/* Поиск */}
             <UsersFiltersComponent
               filters={filters}
               onFiltersChange={setFilters}
@@ -182,46 +202,52 @@ export const DashboardUsers = () => {
                 ))}
               </div>
             ) : users.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="h-12 w-12 mx-auto bg-muted rounded-full flex items-center justify-center mb-4">
-                  <Users className="h-6 w-6 text-muted-foreground" />
-                </div>
+              <div className="text-center py-12 border rounded-lg">
+                <Mail className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium mb-2">No users found</h3>
                 <p className="text-muted-foreground text-sm mb-4">
-                  {filters.search || filters.role
-                    ? 'Try adjusting your search or filters'
-                    : 'No users in the system yet'}
+                  {filters.emailSearch
+                    ? `No users found matching "${filters.emailSearch}"`
+                    : 'No users in the system'}
                 </p>
-                {(filters.search || filters.role) && (
+                {filters.emailSearch && (
                   <Button
                     variant="outline"
                     onClick={() => setFilters({ page: 1, limit: 10 })}
                   >
-                    Clear filters
+                    Clear search
                   </Button>
                 )}
               </div>
             ) : (
-              <div className="space-y-3">
-                {users.map((user) => (
-                  <UserRow
-                    key={user.id}
-                    user={user}
-                    onRoleChange={handleRoleChange}
-                    onDelete={handleDelete}
-                    currentUserId={currentUserId}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="space-y-3 mb-6">
+                  {users.map((user) => (
+                    <UserRow
+                      key={user.id}
+                      user={user}
+                      onRoleChange={handleRoleChange}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                </div>
+
+                {/* Пагинация внизу (дублируем для удобства) */}
+
+                <div className="border-t pt-6">
+                  <div className="border-t pt-6">
+                    <Pagination
+                      currentPage={pagination.page}
+                      totalPages={pagination.totalPages}
+                      totalItems={pagination.total}
+                      itemsPerPage={filters.limit || 10}
+                      onPageChange={handlePageChange}
+                      onItemsPerPageChange={handleItemsPerPageChange}
+                    />
+                  </div>
+                </div>
+              </>
             )}
-
-            {/* Пагинация */}
-
-            <Pagination
-              currentPage={pagination.page}
-              totalPages={pagination.totalPages}
-              onPageChange={handlePageChange}
-            />
           </CardContent>
         </Card>
       </div>

@@ -1,3 +1,4 @@
+// widgets/dashboard2/user-management/model/types.ts
 export interface User {
   id: string;
   email: string;
@@ -10,12 +11,9 @@ export interface User {
 }
 
 export interface UsersFilters {
-  search?: string;
-  role?: string;
   page?: number;
   limit?: number;
-  sortBy?: 'createdAt' | 'lastSignInAt' | 'email';
-  sortOrder?: 'asc' | 'desc';
+  emailSearch?: string; // Только поиск по email (тот, что Clerk поддерживает)
 }
 
 export interface UsersResponse {
