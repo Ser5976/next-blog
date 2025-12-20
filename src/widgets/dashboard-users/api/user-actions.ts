@@ -8,20 +8,11 @@ import {
   User,
   UsersFilters,
   UsersResponse,
-} from './types';
+} from '../model';
 
-export interface UsersWithStatsResponse extends UsersResponse {
-  stats: {
-    total: number;
-    admins: number;
-    authors: number;
-    regular: number;
-  };
-}
-
-export async function getUsersWithStats(
+export async function getUsersClerk(
   filters: UsersFilters = {}
-): Promise<UsersWithStatsResponse> {
+): Promise<UsersResponse> {
   try {
     const { userId: currentUserId, sessionClaims } = await auth();
 
@@ -76,35 +67,8 @@ export async function getUsersWithStats(
       total = usersResponse.totalCount;
     } else {
       // Без поиска: получаем общее количество
-      const allResponse = await client.users.getUserList({ limit: 10 });
+      const allResponse = await client.users.getUserList({ limit });
       total = allResponse.totalCount;
-    }
-
-    // 👉 Рассчитываем статистику (только при первой загрузке или без поиска)
-    const stats = {
-      total: 0,
-      admins: 0,
-      authors: 0,
-      regular: 0,
-    };
-
-    // Получаем статистику только если нет активного поиска
-    // или если это первая страница (чтобы не нагружать API)
-    if (!emailSearch && page === 1) {
-      const statsUsers = await client.users.getUserList({
-        limit: 1000,
-        query: emailSearch, // 👈 Учитываем поиск и в статистике
-      });
-
-      stats.total = statsUsers.totalCount;
-
-      // Считаем статистику
-      statsUsers.data.forEach((clerkUser) => {
-        const role = (clerkUser.publicMetadata?.role as string) || 'user';
-        if (role === 'admin') stats.admins++;
-        else if (role === 'author') stats.authors++;
-        else stats.regular++;
-      });
     }
 
     const totalPages = Math.ceil(total / limit);
@@ -115,7 +79,6 @@ export async function getUsersWithStats(
       total,
       page,
       totalPages,
-      stats,
     };
   } catch (error) {
     console.error('Error getting users with stats:', error);
@@ -125,12 +88,6 @@ export async function getUsersWithStats(
       total: 0,
       page: 1,
       totalPages: 0,
-      stats: {
-        total: 0,
-        admins: 0,
-        authors: 0,
-        regular: 0,
-      },
       message:
         error instanceof Error
           ? error.message
@@ -139,7 +96,10 @@ export async function getUsersWithStats(
   }
 }
 
-export async function updateUserRole({ userId, newRole }: UpdateRoleParams) {
+export async function updateUserRoleClerk({
+  userId,
+  newRole,
+}: UpdateRoleParams) {
   try {
     const { userId: currentUserId, sessionClaims } = await auth();
 
@@ -175,7 +135,7 @@ export async function updateUserRole({ userId, newRole }: UpdateRoleParams) {
   }
 }
 
-export async function deleteUser({ userId }: DeleteUserParams) {
+export async function deleteUserClerk({ userId }: DeleteUserParams) {
   try {
     const { userId: currentUserId, sessionClaims } = await auth();
 

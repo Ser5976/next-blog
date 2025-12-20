@@ -1,4 +1,3 @@
-// widgets/dashboard2/user-management/model/types.ts
 export interface User {
   id: string;
   email: string;
@@ -13,7 +12,7 @@ export interface User {
 export interface UsersFilters {
   page?: number;
   limit?: number;
-  emailSearch?: string; // Только поиск по email (тот, что Clerk поддерживает)
+  emailSearch?: string;
 }
 
 export interface UsersResponse {
@@ -25,11 +24,17 @@ export interface UsersResponse {
   message?: string;
 }
 
+export interface UpdateRoleParams {
+  userId: string;
+  newRole: string;
+}
+
 export interface DeleteUserParams {
   userId: string;
 }
 
-export interface UpdateRoleParams {
-  userId: string;
-  newRole: string;
+export interface ApiResponse<T = unknown> {
+  data?: T;
+  error?: string;
+  status: number;
 }
