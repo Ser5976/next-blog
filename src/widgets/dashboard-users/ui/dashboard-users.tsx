@@ -129,6 +129,14 @@ export const DashboardUsers = () => {
     },
     [filters.emailSearch, pagination.totalPages, prefetchUsers, safeLimit]
   );
+  // 👇 Функция изменения количества элементов на странице
+  const handleItemsPerPageChange = useCallback((itemsPerPage: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      limit: itemsPerPage,
+      page: 1, // Сбрасываем на первую страницу
+    }));
+  }, []);
 
   const handleFiltersChange = useCallback((newFilters: FiltersType) => {
     setFilters({
@@ -240,7 +248,7 @@ export const DashboardUsers = () => {
                 totalItems={pagination.total}
                 itemsPerPage={safeLimit}
                 onPageChange={handlePageChange}
-                isLoading={isFetching}
+                onItemsPerPageChange={handleItemsPerPageChange}
                 className="mt-0"
               />
             </div>
@@ -271,7 +279,7 @@ export const DashboardUsers = () => {
                 totalItems={pagination.total}
                 itemsPerPage={safeLimit}
                 onPageChange={handlePageChange}
-                isLoading={isFetching}
+                onItemsPerPageChange={handleItemsPerPageChange}
               />
             </div>
           </CardContent>

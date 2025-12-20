@@ -1,6 +1,11 @@
 'use client';
 
-import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+} from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
 import {
@@ -17,8 +22,7 @@ interface PaginationProps {
   totalItems: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
-  onItemsPerPageChange?: (items: number) => void;
-  isLoading?: boolean;
+  onItemsPerPageChange?: (itemsPerPage: number) => void;
   className?: string;
 }
 
@@ -29,73 +33,91 @@ export function Pagination({
   itemsPerPage = 10,
   onPageChange,
   onItemsPerPageChange,
-  isLoading = false,
   className = '',
 }: PaginationProps) {
-  // Расчет диапазона
+  // Рассчитываем диапазон
   const startItem = Math.min((currentPage - 1) * itemsPerPage + 1, totalItems);
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-  // Опции для выбора количества элементов на странице
+
+  // Опции для выбора количества элементов
   const pageSizeOptions = [3, 5, 10, 20, 50, 100];
 
   return (
     <div
       className={`flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 ${className}`}
     >
-      {/* Results Info */}
-      <div className="text-sm text-muted-foreground whitespace-nowrap">
-        {isLoading ? (
+      {/* Левая часть: информация и выбор количества */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        {/* Информация о результатах */}
+        <div className="text-sm text-muted-foreground whitespace-nowrap">
+          {totalItems > 0 ? (
+            <>
+              <span className="font-medium">
+                {startItem}-{endItem}
+              </span>{' '}
+              of{' '}
+              <span className="font-medium">{totalItems.toLocaleString()}</span>
+            </>
+          ) : (
+            '0 results'
+          )}
+        </div>
+
+        {/* Выбор количества элементов на странице */}
+        {onItemsPerPageChange && (
           <div className="flex items-center gap-2">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            <span>Loading...</span>
+            <span className="text-sm text-muted-foreground hidden sm:inline">
+              Show
+            </span>
+            <Select
+              value={itemsPerPage.toString()}
+              onValueChange={(value) => onItemsPerPageChange(Number(value))}
+            >
+              <SelectTrigger className="h-8 w-20">
+                <SelectValue placeholder={itemsPerPage} />
+              </SelectTrigger>
+              <SelectContent>
+                {pageSizeOptions.map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <span className="text-sm text-muted-foreground hidden sm:inline">
+              per page
+            </span>
           </div>
-        ) : totalItems > 0 ? (
-          <>
-            <span className="font-medium">
-              {startItem}-{endItem}
-            </span>{' '}
-            of{' '}
-            <span className="font-medium">{totalItems.toLocaleString()}</span>
-          </>
-        ) : (
-          '0 results'
         )}
       </div>
-      {/* Выбор количества элементов на странице */}
-      {onItemsPerPageChange && (
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-muted-foreground">Show</span>
-          <Select
-            value={itemsPerPage.toString()}
-            onValueChange={(value) => onItemsPerPageChange(Number(value))}
-          >
-            <SelectTrigger className="h-8 w-20">
-              <SelectValue placeholder={itemsPerPage} />
-            </SelectTrigger>
-            <SelectContent>
-              {pageSizeOptions.map((size) => (
-                <SelectItem key={size} value={size.toString()}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      )}
 
-      {/* Navigation */}
+      {/* Правая часть: навигация */}
       <div className="flex items-center gap-1">
+        {/* Первая страница */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onPageChange(1)}
+          disabled={currentPage === 1}
+          className="h-8 w-8"
+          aria-label="First page"
+        >
+          <ChevronsLeft className="h-4 w-4" />
+        </Button>
+
+        {/* Предыдущая страница */}
         <Button
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage - 1)}
-          disabled={currentPage === 1 || isLoading}
+          disabled={currentPage === 1}
           className="h-8 w-8"
           aria-label="Previous page"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
 
+        {/* Номер текущей страницы и общее количество */}
         <div className="flex items-center gap-2 px-3 text-sm">
           <span className="font-medium">Page</span>
           <span className="font-semibold">{currentPage}</span>
@@ -103,15 +125,28 @@ export function Pagination({
           <span className="font-semibold">{totalPages}</span>
         </div>
 
+        {/* Следующая страница */}
         <Button
           variant="outline"
           size="icon"
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={currentPage === totalPages || isLoading}
+          disabled={currentPage === totalPages}
           className="h-8 w-8"
           aria-label="Next page"
         >
           <ChevronRight className="h-4 w-4" />
+        </Button>
+
+        {/* Последняя страница */}
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => onPageChange(totalPages)}
+          disabled={currentPage === totalPages}
+          className="h-8 w-8"
+          aria-label="Last page"
+        >
+          <ChevronsRight className="h-4 w-4" />
         </Button>
       </div>
     </div>
