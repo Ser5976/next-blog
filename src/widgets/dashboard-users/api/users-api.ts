@@ -6,19 +6,12 @@ import {
   UsersFilters,
   UsersResponse,
 } from '../model/types';
-import { safeNumber } from '../utils';
 
 export async function getUsers(filters: UsersFilters): Promise<UsersResponse> {
-  // 👇 Обеспечиваем безопасные значения параметров
-  const safeParams = {
-    page: safeNumber(filters.page, 1),
-    limit: safeNumber(filters.limit, 10),
-    emailSearch: filters.emailSearch,
-  };
   try {
     const { data } = await axios.get<UsersResponse>(
       '/api/dashboard/users-clerk',
-      { params: safeParams }
+      { params: filters }
     );
     return data;
   } catch (error) {

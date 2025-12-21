@@ -22,24 +22,11 @@ import { Pagination } from './pagination';
 import { UsersFiltersComponent } from './users-filters';
 import { UsersTable } from './users-table';
 
-// 👇 Вспомогательная функция для безопасных значений
-function getSafePage(page: number | undefined): number {
-  return page && page > 0 ? page : 1;
-}
-
-function getSafeLimit(limit: number | undefined): number {
-  return limit && limit > 0 ? limit : 10;
-}
-
 export const DashboardUsers = () => {
   const [filters, setFilters] = useState<FiltersType>({
     page: 1,
     limit: 10,
   });
-
-  // 👇 Безопасные значения из фильтров
-  const safePage = getSafePage(filters.page);
-  const safeLimit = getSafeLimit(filters.limit);
 
   // TanStack Query хуки с безопасными фильтрами
   const {
@@ -50,8 +37,8 @@ export const DashboardUsers = () => {
     refetch,
     isFetching,
   } = useUsers({
-    page: safePage,
-    limit: safeLimit,
+    page: filters.page,
+    limit: filters.limit,
     emailSearch: filters.emailSearch,
   });
 
@@ -111,7 +98,7 @@ export const DashboardUsers = () => {
 
   const handlePageChange = useCallback(
     (page: number) => {
-      const newPage = getSafePage(page);
+      const newPage = page;
       setFilters((prev) => ({
         ...prev,
         page: newPage,
@@ -122,12 +109,12 @@ export const DashboardUsers = () => {
       if (nextPage <= pagination.totalPages) {
         prefetchUsers({
           page: nextPage,
-          limit: safeLimit,
+          limit: filters.limit,
           emailSearch: filters.emailSearch,
         });
       }
     },
-    [filters.emailSearch, pagination.totalPages, prefetchUsers, safeLimit]
+    [filters.emailSearch, pagination.totalPages, prefetchUsers, filters.limit]
   );
   // 👇 Функция изменения количества элементов на странице
   const handleItemsPerPageChange = useCallback((itemsPerPage: number) => {
@@ -140,8 +127,8 @@ export const DashboardUsers = () => {
 
   const handleFiltersChange = useCallback((newFilters: FiltersType) => {
     setFilters({
-      page: getSafePage(newFilters.page),
-      limit: getSafeLimit(newFilters.limit),
+      page: newFilters.page,
+      limit: newFilters.limit,
       emailSearch: newFilters.emailSearch,
     });
   }, []);
@@ -152,11 +139,11 @@ export const DashboardUsers = () => {
 
   // Префетчим следующую страницу при наведении
   const handlePrefetchNextPage = useCallback(() => {
-    const nextPage = safePage + 1;
+    const nextPage = filters.page + 1;
     if (nextPage <= pagination.totalPages) {
       prefetchUsers({
         page: nextPage,
-        limit: safeLimit,
+        limit: filters.limit,
         emailSearch: filters.emailSearch,
       });
     }
@@ -164,8 +151,8 @@ export const DashboardUsers = () => {
     filters.emailSearch,
     pagination.totalPages,
     prefetchUsers,
-    safeLimit,
-    safePage,
+    filters.limit,
+    filters.page,
   ]);
 
   if (isError) {
@@ -246,7 +233,7 @@ export const DashboardUsers = () => {
                 currentPage={pagination.page}
                 totalPages={pagination.totalPages}
                 totalItems={pagination.total}
-                itemsPerPage={safeLimit}
+                itemsPerPage={filters.limit}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
                 className="mt-0"
@@ -277,7 +264,7 @@ export const DashboardUsers = () => {
                 currentPage={pagination.page}
                 totalPages={pagination.totalPages}
                 totalItems={pagination.total}
-                itemsPerPage={safeLimit}
+                itemsPerPage={filters.limit}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />

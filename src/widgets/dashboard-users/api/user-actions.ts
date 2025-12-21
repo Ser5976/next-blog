@@ -11,7 +11,7 @@ import {
 } from '../model';
 
 export async function getUsersClerk(
-  filters: UsersFilters = {}
+  filters: UsersFilters
 ): Promise<UsersResponse> {
   try {
     const { userId: currentUserId, sessionClaims } = await auth();

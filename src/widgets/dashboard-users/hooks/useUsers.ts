@@ -38,6 +38,9 @@ export function usePrefetchUsers() {
     return queryClient.prefetchQuery({
       queryKey: usersQueryKeys.list(filters),
       queryFn: () => getUsers(filters),
+      // Оптимизации
+      staleTime: 1000 * 30, // 30 секунд
+      gcTime: 1000 * 60 * 5, // 5 минут (бывший cacheTime)
     });
   };
 }

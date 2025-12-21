@@ -40,7 +40,7 @@ export function Pagination({
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
 
   // Опции для выбора количества элементов
-  const pageSizeOptions = [3, 5, 10, 20, 50, 100];
+  const pageSizeOptions = [1, 3, 5, 10, 20, 50, 100];
 
   return (
     <div

@@ -10,8 +10,8 @@ export interface User {
 }
 
 export interface UsersFilters {
-  page?: number;
-  limit?: number;
+  page: number;
+  limit: number;
   emailSearch?: string;
 }
 
