@@ -38,3 +38,25 @@ export interface ApiResponse<T = unknown> {
   error?: string;
   status: number;
 }
+
+export interface UsersErrorProps {
+  error?: Error | null;
+  onRetry?: () => void;
+}
+
+export interface UsersEmptyProps {
+  searchQuery?: string;
+}
+
+export interface ConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'default' | 'destructive';
+  onConfirm: () => void;
+  onCancel: () => void;
+  isLoading?: boolean;
+}

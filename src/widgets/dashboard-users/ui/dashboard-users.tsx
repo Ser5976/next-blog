@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
 import { Loader2, RefreshCw, Users } from 'lucide-react';
 
 import { Button } from '@/shared/ui/button';
@@ -11,175 +10,43 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/card';
-import {
-  useDeleteUser,
-  usePrefetchUsers,
-  useUpdateRole,
-  useUsers,
-} from '../hooks';
-import { UsersFilters as FiltersType } from '../model';
+import { useUsersManagement } from '../hooks';
+import { ConfirmDialog } from './confirm-dialog';
 import { Pagination } from './pagination';
+import { UserRow } from './user-row';
+import { UsersEmpty } from './users-empty';
+import { UsersError } from './users-error';
 import { UsersFiltersComponent } from './users-filters';
-import { UsersTable } from './users-table';
+import { UsersSkeleton } from './users-skeleton';
 
 export const DashboardUsers = () => {
-  const [filters, setFilters] = useState<FiltersType>({
-    page: 1,
-    limit: 10,
-  });
-
-  // TanStack Query хуки с безопасными фильтрами
   const {
-    data: usersData,
+    filters,
+    deleteDialog,
+    users,
+    total,
+    page,
+    totalPages,
     isLoading,
     isError,
     error,
-    refetch,
     isFetching,
-  } = useUsers({
-    page: filters.page,
-    limit: filters.limit,
-    emailSearch: filters.emailSearch,
-  });
-
-  const updateRoleMutation = useUpdateRole();
-  const deleteUserMutation = useDeleteUser();
-  const prefetchUsers = usePrefetchUsers();
-
-  // 👇 Мемоизированные данные с безопасным доступом
-  const { users, pagination } = useMemo(() => {
-    if (!usersData) {
-      return {
-        users: [],
-        pagination: {
-          total: 0,
-          page: 1,
-          totalPages: 1,
-        },
-      };
-    }
-
-    return {
-      users: usersData.users || [],
-      pagination: {
-        total: usersData.total ?? 0,
-        page: usersData.page ?? 1,
-        totalPages: usersData.totalPages ?? 1,
-      },
-    };
-  }, [usersData]);
-
-  // Обработчики
-  const handleRoleChange = useCallback(
-    async (userId: string, newRole: string) => {
-      try {
-        await updateRoleMutation.mutateAsync({ userId, newRole });
-      } catch (error) {
-        // Ошибка обрабатывается в хуке
-      }
-    },
-    [updateRoleMutation]
-  );
-
-  const handleDelete = useCallback(
-    async (userId: string, userEmail: string) => {
-      if (!confirm(`Are you sure you want to delete user ${userEmail}?`)) {
-        return;
-      }
-
-      try {
-        await deleteUserMutation.mutateAsync(userId);
-      } catch (error) {
-        // Ошибка обрабатывается в хуке
-      }
-    },
-    [deleteUserMutation]
-  );
-
-  const handlePageChange = useCallback(
-    (page: number) => {
-      const newPage = page;
-      setFilters((prev) => ({
-        ...prev,
-        page: newPage,
-      }));
-
-      // Префетчим следующую страницу
-      const nextPage = newPage + 1;
-      if (nextPage <= pagination.totalPages) {
-        prefetchUsers({
-          page: nextPage,
-          limit: filters.limit,
-          emailSearch: filters.emailSearch,
-        });
-      }
-    },
-    [filters.emailSearch, pagination.totalPages, prefetchUsers, filters.limit]
-  );
-  // 👇 Функция изменения количества элементов на странице
-  const handleItemsPerPageChange = useCallback((itemsPerPage: number) => {
-    setFilters((prev) => ({
-      ...prev,
-      limit: itemsPerPage,
-      page: 1, // Сбрасываем на первую страницу
-    }));
-  }, []);
-
-  const handleFiltersChange = useCallback((newFilters: FiltersType) => {
-    setFilters({
-      page: newFilters.page,
-      limit: newFilters.limit,
-      emailSearch: newFilters.emailSearch,
-    });
-  }, []);
-
-  const handleRefresh = useCallback(() => {
-    refetch();
-  }, [refetch]);
-
-  // Префетчим следующую страницу при наведении
-  const handlePrefetchNextPage = useCallback(() => {
-    const nextPage = filters.page + 1;
-    if (nextPage <= pagination.totalPages) {
-      prefetchUsers({
-        page: nextPage,
-        limit: filters.limit,
-        emailSearch: filters.emailSearch,
-      });
-    }
-  }, [
-    filters.emailSearch,
-    pagination.totalPages,
-    prefetchUsers,
-    filters.limit,
-    filters.page,
-  ]);
-
+    debouncedEmailSearch,
+    handleRoleChange,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+    handlePageChange,
+    handleItemsPerPageChange,
+    handleFiltersChange,
+    handleRefresh,
+    handlePrefetchNextPage,
+    isUserUpdatingRole,
+    isUserDeleting,
+    deleteUserMutation,
+  } = useUsersManagement();
   if (isError) {
-    return (
-      <div className="min-h-screen bg-background p-4 md:p-6">
-        <div className="max-w-7xl mx-auto">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-12">
-                <div className="text-red-500 mb-4">
-                  <Users className="h-12 w-12 mx-auto" />
-                </div>
-                <h3 className="text-lg font-medium mb-2">
-                  Error loading users
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  {error?.message || 'An error occurred while loading users'}
-                </p>
-                <Button onClick={handleRefresh} variant="outline">
-                  Try Again
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
+    return <UsersError error={error} onRetry={handleRefresh} />;
   }
 
   return (
@@ -224,15 +91,15 @@ export const DashboardUsers = () => {
                 <CardDescription>
                   {isLoading
                     ? 'Loading users...'
-                    : `${pagination.total.toLocaleString()} total users`}
+                    : `${total.toLocaleString()} total users`}
                 </CardDescription>
               </div>
 
               {/* Top Pagination */}
               <Pagination
-                currentPage={pagination.page}
-                totalPages={pagination.totalPages}
-                totalItems={pagination.total}
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
                 itemsPerPage={filters.limit}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
@@ -248,22 +115,34 @@ export const DashboardUsers = () => {
               onFiltersChange={handleFiltersChange}
             />
 
-            {/* Users Table */}
+            {/* Users List */}
             <div onMouseEnter={handlePrefetchNextPage}>
-              <UsersTable
-                users={users}
-                isLoading={isLoading}
-                onRoleChange={handleRoleChange}
-                onDelete={handleDelete}
-              />
+              {isLoading ? (
+                <UsersSkeleton />
+              ) : users.length === 0 ? (
+                <UsersEmpty searchQuery={debouncedEmailSearch} />
+              ) : (
+                <div className="space-y-3">
+                  {users.map((user) => (
+                    <UserRow
+                      key={user.id}
+                      user={user}
+                      onRoleChange={handleRoleChange}
+                      onDelete={handleDeleteClick}
+                      isUpdatingRole={isUserUpdatingRole(user.id)}
+                      isDeleting={isUserDeleting(user.id)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Bottom Pagination */}
             <div className="border-t pt-6">
               <Pagination
-                currentPage={pagination.page}
-                totalPages={pagination.totalPages}
-                totalItems={pagination.total}
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
                 itemsPerPage={filters.limit}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
@@ -272,6 +151,23 @@ export const DashboardUsers = () => {
           </CardContent>
         </Card>
       </div>
+      <ConfirmDialog
+        open={deleteDialog.open}
+        onOpenChange={(open) => {
+          if (!open) handleCancelDelete();
+        }}
+        title="Delete User"
+        description={`Are you sure you want to delete ${deleteDialog.userEmail}? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isLoading={
+          deleteUserMutation.isPending &&
+          deleteDialog.userId === deleteUserMutation.variables
+        }
+      />
     </div>
   );
 };

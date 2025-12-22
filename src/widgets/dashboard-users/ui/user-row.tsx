@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import {
   Calendar,
@@ -32,14 +31,19 @@ import { User as UserType } from '../model';
 
 interface UserRowProps {
   user: UserType;
-  onRoleChange: (userId: string, newRole: string) => Promise<void>;
-  onDelete: (userId: string, userEmail: string) => Promise<void>;
+  onRoleChange: (userId: string, newRole: string) => void;
+  onDelete: (userId: string, userEmail: string) => void;
+  isUpdatingRole?: boolean;
+  isDeleting?: boolean;
 }
 
-export function UserRow({ user, onRoleChange, onDelete }: UserRowProps) {
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
+export function UserRow({
+  user,
+  onRoleChange,
+  onDelete,
+  isUpdatingRole = false,
+  isDeleting = false,
+}: UserRowProps) {
   const getRoleVariant = (role: string) => {
     switch (role) {
       case 'admin':
@@ -84,7 +88,6 @@ export function UserRow({ user, onRoleChange, onDelete }: UserRowProps) {
       const date = new Date(timestamp);
       if (isNaN(date.getTime())) return 'Invalid date';
 
-      // Форматируем как "Jan 1, 2024"
       const monthNames = [
         'Jan',
         'Feb',
@@ -106,35 +109,19 @@ export function UserRow({ user, onRoleChange, onDelete }: UserRowProps) {
 
       return `${month} ${day}, ${year}`;
     } catch (error) {
+      if (error instanceof Error) return error.message;
       return 'Error';
     }
   };
 
-  const handleRoleChange = async (newRole: string) => {
-    if (newRole === user.role || isUpdating || isDeleting) return;
-    console.log('userId:', user.id);
-    setIsUpdating(true);
-    try {
-      await onRoleChange(user.id, newRole);
-    } catch (error) {
-      // Ошибка уже обрабатывается в родительском компоненте
-    } finally {
-      setIsUpdating(false);
-    }
+  const handleRoleChange = (newRole: string) => {
+    if (newRole === user.role || isUpdatingRole || isDeleting) return;
+    onRoleChange(user.id, newRole);
   };
 
-  const handleDelete = async () => {
-    console.log('userId delete:', user.id);
-    if (isUpdating || isDeleting) return;
-
-    setIsDeleting(true);
-    try {
-      await onDelete(user.id, user.email);
-    } catch (error) {
-      // Ошибка уже обрабатывается в родительском компоненте
-    } finally {
-      setIsDeleting(false);
-    }
+  const handleDelete = () => {
+    if (isUpdatingRole || isDeleting) return;
+    onDelete(user.id, user.email);
   };
 
   const getFullName = () => {
@@ -143,10 +130,10 @@ export function UserRow({ user, onRoleChange, onDelete }: UserRowProps) {
     }
     if (user.firstName) return user.firstName;
     if (user.lastName) return user.lastName;
-    return user.email.split('@')[0]; // Берем имя до @ из email
+    return user.email.split('@')[0];
   };
 
-  const isDisabled = isUpdating || isDeleting;
+  const isDisabled = isUpdatingRole || isDeleting;
 
   return (
     <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors group">
@@ -228,10 +215,10 @@ export function UserRow({ user, onRoleChange, onDelete }: UserRowProps) {
             disabled={isDisabled}
           >
             <SelectTrigger
-              className={`w-32 ${isUpdating ? 'opacity-50' : ''}`}
+              className={`w-32 ${isUpdatingRole ? 'opacity-50' : ''}`}
               aria-label="Change user role"
             >
-              {isUpdating ? (
+              {isUpdatingRole ? (
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-3 w-3 animate-spin" />
                   <span className="text-sm">Updating...</span>

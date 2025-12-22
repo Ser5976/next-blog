@@ -53,10 +53,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  console.log('🔵 PATCH /api/users/role called');
   try {
     const body = await request.json();
-    console.log('📥 Request body:', body);
+
     const { data } = body;
 
     // Валидация тела запроса

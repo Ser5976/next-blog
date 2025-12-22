@@ -8,8 +8,8 @@ import { UserRow } from './user-row';
 interface UsersTableProps {
   users: User[];
   isLoading: boolean;
-  onRoleChange: (userId: string, newRole: string) => Promise<void>;
-  onDelete: (userId: string, userEmail: string) => Promise<void>;
+  onRoleChange: (userId: string, newRole: string) => void;
+  onDelete: (userId: string, userEmail: string) => void;
 }
 
 export function UsersTable({
