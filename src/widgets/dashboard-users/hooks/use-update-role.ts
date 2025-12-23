@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 import { updateUserRole } from '../api';
 import { User } from '../model';
-import { usersQueryKeys } from './useUsers';
+import { usersQueryKeys } from './use-users';
 
 export function useUpdateRole() {
   const queryClient = useQueryClient();

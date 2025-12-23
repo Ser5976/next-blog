@@ -1,5 +1,6 @@
 'use client';
 
+import { memo, useCallback } from 'react';
 import Image from 'next/image';
 import {
   Calendar,
@@ -10,9 +11,10 @@ import {
   PenTool,
   Shield,
   User,
+  UserIcon,
 } from 'lucide-react';
 
-import { Badge } from '@/shared/ui/badge';
+import { formatDate } from '@/shared/lib';
 import { Button } from '@/shared/ui/button';
 import {
   DropdownMenu,
@@ -27,111 +29,46 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
-import { User as UserType } from '../model';
+import { UserRowProps } from '../model';
+import { ROLE_DISPLAY_NAMES, ROLE_ICONS } from '../model/constants';
 
-interface UserRowProps {
-  user: UserType;
-  onRoleChange: (userId: string, newRole: string) => void;
-  onDelete: (userId: string, userEmail: string) => void;
-  isUpdatingRole?: boolean;
-  isDeleting?: boolean;
-}
-
-export function UserRow({
+const UserRowComponent = ({
   user,
   onRoleChange,
   onDelete,
   isUpdatingRole = false,
   isDeleting = false,
-}: UserRowProps) {
-  const getRoleVariant = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'destructive';
-      case 'author':
-        return 'default';
-      case 'user':
-        return 'secondary';
-      default:
-        return 'outline';
-    }
-  };
+}: UserRowProps) => {
+  const getRoleDisplayName = useCallback((role: string): string => {
+    return ROLE_DISPLAY_NAMES[role as keyof typeof ROLE_DISPLAY_NAMES] || role;
+  }, []);
+  const getRoleIcon = useCallback((role: string) => {
+    const IconComponent =
+      ROLE_ICONS[role as keyof typeof ROLE_ICONS] || UserIcon;
+    return <IconComponent className="h-3 w-3" aria-hidden="true" />;
+  }, []);
 
-  const getRoleDisplayName = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'Administrator';
-      case 'author':
-        return 'Author';
-      case 'user':
-        return 'User';
-      default:
-        return role;
-    }
-  };
+  const handleRoleChange = useCallback(
+    (newRole: string) => {
+      if (newRole === user.role || isUpdatingRole || isDeleting) return;
+      onRoleChange(user.id, newRole);
+    },
+    [user.id, user.role, isUpdatingRole, isDeleting, onRoleChange]
+  );
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return <Shield className="h-3 w-3" />;
-      case 'author':
-        return <PenTool className="h-3 w-3" />;
-      default:
-        return <User className="h-3 w-3" />;
-    }
-  };
-
-  const formatDate = (timestamp: number | null) => {
-    if (!timestamp) return 'Never';
-
-    try {
-      const date = new Date(timestamp);
-      if (isNaN(date.getTime())) return 'Invalid date';
-
-      const monthNames = [
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec',
-      ];
-
-      const month = monthNames[date.getMonth()];
-      const day = date.getDate();
-      const year = date.getFullYear();
-
-      return `${month} ${day}, ${year}`;
-    } catch (error) {
-      if (error instanceof Error) return error.message;
-      return 'Error';
-    }
-  };
-
-  const handleRoleChange = (newRole: string) => {
-    if (newRole === user.role || isUpdatingRole || isDeleting) return;
-    onRoleChange(user.id, newRole);
-  };
-
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     if (isUpdatingRole || isDeleting) return;
     onDelete(user.id, user.email);
-  };
+  }, [user.id, user.email, isUpdatingRole, isDeleting, onDelete]);
 
-  const getFullName = () => {
+  function getFullName() {
     if (user.firstName && user.lastName) {
       return `${user.firstName} ${user.lastName}`;
     }
     if (user.firstName) return user.firstName;
     if (user.lastName) return user.lastName;
     return user.email.split('@')[0];
-  };
+  }
 
   const isDisabled = isUpdatingRole || isDeleting;
 
@@ -154,11 +91,6 @@ export function UserRow({
               <User className="h-6 w-6 text-muted-foreground" />
             </div>
           )}
-
-          {/* Индикатор активности */}
-          {user.lastSignInAt && (
-            <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-background bg-green-500" />
-          )}
         </div>
 
         {/* Информация */}
@@ -168,13 +100,6 @@ export function UserRow({
             <h4 className="font-medium truncate text-foreground">
               {getFullName()}
             </h4>
-            <Badge
-              variant={getRoleVariant(user.role)}
-              className="text-xs flex items-center gap-1 px-2 py-0.5"
-            >
-              {getRoleIcon(user.role)}
-              <span className="capitalize">{user.role}</span>
-            </Badge>
           </div>
 
           {/* Детали */}
@@ -294,4 +219,7 @@ export function UserRow({
       </div>
     </div>
   );
-}
+};
+
+export const UserRow = memo(UserRowComponent);
+UserRow.displayName = 'UserRow';

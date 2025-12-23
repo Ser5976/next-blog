@@ -60,3 +60,11 @@ export interface ConfirmDialogProps {
   onCancel: () => void;
   isLoading?: boolean;
 }
+
+export interface UserRowProps {
+  user: User;
+  onRoleChange: (userId: string, newRole: string) => void;
+  onDelete: (userId: string, userEmail: string) => void;
+  isUpdatingRole?: boolean;
+  isDeleting?: boolean;
+}

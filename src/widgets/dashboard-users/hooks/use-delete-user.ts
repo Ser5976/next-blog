@@ -3,7 +3,7 @@ import { toast } from 'sonner';
 
 import { deleteUser } from '../api';
 import { User } from '../model';
-import { usersQueryKeys } from './useUsers';
+import { usersQueryKeys } from './use-users';
 
 export function useDeleteUser() {
   const queryClient = useQueryClient();

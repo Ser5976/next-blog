@@ -8,4 +8,5 @@ export type {
   UsersErrorProps,
   UsersEmptyProps,
   ConfirmDialogProps,
+  UserRowProps,
 } from './types';

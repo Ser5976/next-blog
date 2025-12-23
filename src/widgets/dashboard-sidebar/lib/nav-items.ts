@@ -1,9 +1,9 @@
 import {
-  BarChart,
   FileText,
   LayoutDashboard,
   MessageCircle,
   Settings,
+  Users,
 } from 'lucide-react';
 
 export const NAV_ITEMS = [
@@ -20,17 +20,18 @@ export const NAV_ITEMS = [
     exact: false,
   },
   {
+    href: '/dashboard/users',
+    label: 'Users',
+    icon: Users,
+    exact: false,
+  },
+  {
     href: '/dashboard/comments',
     label: 'Comments',
     icon: MessageCircle,
     exact: false,
   },
-  {
-    href: '/dashboard/analytics',
-    label: 'Analytics',
-    icon: BarChart,
-    exact: false,
-  },
+
   {
     href: '/dashboard/settings',
     label: 'Settings',
