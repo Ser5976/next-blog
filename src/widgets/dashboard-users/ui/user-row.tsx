@@ -140,7 +140,7 @@ const UserRowComponent = ({
             disabled={isDisabled}
           >
             <SelectTrigger
-              className={`w-32 ${isUpdatingRole ? 'opacity-50' : ''}`}
+              className={` cursor-pointer w-32 ${isUpdatingRole ? 'opacity-50' : ''}`}
               aria-label="Change user role"
             >
               {isUpdatingRole ? (
@@ -187,7 +187,7 @@ const UserRowComponent = ({
               variant="ghost"
               size="icon"
               disabled={isDisabled}
-              className="h-9 w-9"
+              className="h-9 w-9 cursor-pointer"
               aria-label="User actions"
             >
               {isDeleting ? (

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { updateUserRole } from '../api';
-import { User } from '../model';
+import { UsersResponse } from '../model';
 import { usersQueryKeys } from './use-users';
 
 export function useUpdateRole() {
@@ -17,13 +17,13 @@ export function useUpdateRole() {
       await queryClient.cancelQueries({ queryKey: usersQueryKeys.all });
 
       // Сохраняем предыдущее состояние
-      const previousData = queryClient.getQueryData<{ users: User[] }>(
+      const previousData = queryClient.getQueryData<UsersResponse>(
         usersQueryKeys.all
       );
 
       // Оптимистично обновляем данные
-      queryClient.setQueryData<{ users: User[] }>(usersQueryKeys.all, (old) => {
-        if (!old) return old;
+      queryClient.setQueryData<UsersResponse>(usersQueryKeys.all, (old) => {
+        if (!old || !old.users) return old;
 
         return {
           ...old,
@@ -35,7 +35,7 @@ export function useUpdateRole() {
         };
       });
 
-      return { previousData };
+      return { previousData, variables };
     },
 
     // При ошибке откатываем изменения
@@ -47,14 +47,16 @@ export function useUpdateRole() {
       }
     },
 
-    // При успехе показываем уведомление
+    // При успехе показываем уведомление и обновляем кэш
     onSuccess: () => {
       toast.success('Role updated successfully');
-    },
 
-    // В любом случае инвалидируем кэш
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: usersQueryKeys.all });
+      // Показываем спинер до полного обновления кэша
+      // Возвращаем промис, чтобы мутация считалась завершенной только после обновления кэша
+      return queryClient.invalidateQueries({
+        queryKey: usersQueryKeys.all,
+        refetchType: 'active', // Только активные запросы
+      });
     },
   });
 }

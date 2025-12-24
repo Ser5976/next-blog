@@ -37,12 +37,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: result.message }, { status: 400 });
     }
 
-    // Кэширование на 30 секунд
-    const headers = {
-      'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
-    };
-
-    return NextResponse.json(result, { headers });
+    return NextResponse.json(result);
   } catch (error) {
     console.error('GET /api/users error:', error);
     return NextResponse.json(
