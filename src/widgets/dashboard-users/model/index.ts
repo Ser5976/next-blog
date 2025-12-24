@@ -5,8 +5,6 @@ export type {
   DeleteUserParams,
   UpdateRoleParams,
   ApiResponse,
-  UsersErrorProps,
-  UsersEmptyProps,
-  ConfirmDialogProps,
+  UsersFiltersProps,
   UserRowProps,
 } from './types';

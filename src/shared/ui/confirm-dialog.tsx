@@ -11,8 +11,20 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/ui/alert-dialog';
-import { ConfirmDialogProps } from '../model';
+} from './alert-dialog';
+
+export interface ConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: 'default' | 'destructive';
+  onConfirm: () => void;
+  onCancel: () => void;
+  isLoading?: boolean;
+}
 
 export function ConfirmDialog({
   open,

@@ -2,6 +2,13 @@
 
 import { Loader2, RefreshCw, Users } from 'lucide-react';
 
+import {
+  ConfirmDialog,
+  ListSkeleton,
+  Pagination,
+  UniversalEmpty,
+  UniversalError,
+} from '@/shared/ui';
 import { Button } from '@/shared/ui/button';
 import {
   Card,
@@ -11,13 +18,8 @@ import {
   CardTitle,
 } from '@/shared/ui/card';
 import { useUsersManagement } from '../hooks';
-import { ConfirmDialog } from './confirm-dialog';
-import { Pagination } from './pagination';
 import { UserRow } from './user-row';
-import { UsersEmpty } from './users-empty';
-import { UsersError } from './users-error';
 import { UsersFiltersComponent } from './users-filters';
-import { UsersSkeleton } from './users-skeleton';
 
 export const DashboardUsers = () => {
   const {
@@ -46,7 +48,14 @@ export const DashboardUsers = () => {
     deleteUserMutation,
   } = useUsersManagement();
   if (isError) {
-    return <UsersError error={error} onRetry={handleRefresh} />;
+    return (
+      <UniversalError
+        error={error}
+        onRetry={handleRefresh}
+        title="Error loading users"
+        icon={<Users className="h-12 w-12 mx-auto" />}
+      />
+    );
   }
 
   return (
@@ -101,6 +110,7 @@ export const DashboardUsers = () => {
                 totalPages={totalPages}
                 totalItems={total}
                 itemsPerPage={filters.limit}
+                pageSizeOptions={[1, 3, 5, 10, 20, 50, 100]}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
                 className="mt-0"
@@ -118,9 +128,13 @@ export const DashboardUsers = () => {
             {/* Users List */}
             <div onMouseEnter={handlePrefetchNextPage}>
               {isLoading ? (
-                <UsersSkeleton />
+                <ListSkeleton />
               ) : users.length === 0 ? (
-                <UsersEmpty searchQuery={debouncedEmailSearch} />
+                <UniversalEmpty
+                  searchQuery={debouncedEmailSearch}
+                  icon={<Users className="h-12 w-12" />}
+                  title="No users"
+                />
               ) : (
                 <div className="space-y-3">
                   {users.map((user) => (
@@ -144,6 +158,7 @@ export const DashboardUsers = () => {
                 totalPages={totalPages}
                 totalItems={total}
                 itemsPerPage={filters.limit}
+                pageSizeOptions={[1, 3, 5, 10, 20, 50, 100]}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />

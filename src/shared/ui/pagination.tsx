@@ -1,5 +1,3 @@
-'use client';
-
 import {
   ChevronLeft,
   ChevronRight,
@@ -7,20 +5,21 @@ import {
   ChevronsRight,
 } from 'lucide-react';
 
-import { Button } from '@/shared/ui/button';
+import { Button } from './button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/ui/select';
+} from './select';
 
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
   totalItems: number;
   itemsPerPage: number;
+  pageSizeOptions?: number[];
   onPageChange: (page: number) => void;
   onItemsPerPageChange?: (itemsPerPage: number) => void;
   className?: string;
@@ -31,6 +30,7 @@ export function Pagination({
   totalPages = 1,
   totalItems = 0,
   itemsPerPage = 10,
+  pageSizeOptions = [1, 3, 5, 10, 20, 50, 100],
   onPageChange,
   onItemsPerPageChange,
   className = '',
@@ -38,9 +38,6 @@ export function Pagination({
   // Рассчитываем диапазон
   const startItem = Math.min((currentPage - 1) * itemsPerPage + 1, totalItems);
   const endItem = Math.min(currentPage * itemsPerPage, totalItems);
-
-  // Опции для выбора количества элементов
-  const pageSizeOptions = [1, 3, 5, 10, 20, 50, 100];
 
   return (
     <div

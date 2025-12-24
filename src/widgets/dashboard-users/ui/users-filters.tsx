@@ -10,12 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/shared/ui/tooltip';
-import { UsersFilters } from '../model/types';
-
-interface UsersFiltersProps {
-  filters: UsersFilters;
-  onFiltersChange: (filters: UsersFilters) => void;
-}
+import { UsersFiltersProps } from '../model';
 
 export function UsersFiltersComponent({
   filters,
