@@ -47,6 +47,7 @@ export const DashboardUsers = () => {
     isUserDeleting,
     deleteUserMutation,
   } = useUsersManagement();
+
   if (isError) {
     return (
       <UniversalError
@@ -54,12 +55,16 @@ export const DashboardUsers = () => {
         onRetry={handleRefresh}
         title="Error loading users"
         icon={<Users className="h-12 w-12 mx-auto" />}
+        data-testid="users-error-state"
       />
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6">
+    <div
+      className="min-h-screen bg-background p-4 md:p-6"
+      data-testid="dashboard-users"
+    >
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -78,26 +83,28 @@ export const DashboardUsers = () => {
             size="sm"
             disabled={isLoading || isFetching}
             className="gap-2"
+            aria-label="Refresh users list"
+            data-testid="refresh-users-button"
           >
             {isLoading || isFetching ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
             ) : (
-              <RefreshCw className="h-4 w-4" />
+              <RefreshCw className="h-4 w-4" aria-hidden="true" />
             )}
             Refresh
           </Button>
         </div>
 
         {/* Main Content */}
-        <Card>
+        <Card data-testid="users-card">
           <CardHeader className="pb-3">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
+                  <Users className="h-5 w-5" aria-hidden="true" />
                   Users
                 </CardTitle>
-                <CardDescription>
+                <CardDescription data-testid="users-count">
                   {isLoading
                     ? 'Loading users...'
                     : `${total.toLocaleString()} total users`}
@@ -114,6 +121,7 @@ export const DashboardUsers = () => {
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
                 className="mt-0"
+                data-testid="pagination-top"
               />
             </div>
           </CardHeader>
@@ -126,17 +134,28 @@ export const DashboardUsers = () => {
             />
 
             {/* Users List */}
-            <div onMouseEnter={handlePrefetchNextPage}>
+            <div
+              onMouseEnter={handlePrefetchNextPage}
+              role="region"
+              aria-label="Users list"
+              data-testid="users-list-container"
+            >
               {isLoading ? (
-                <ListSkeleton />
+                <ListSkeleton data-testid="users-loading" />
               ) : users.length === 0 ? (
                 <UniversalEmpty
                   searchQuery={debouncedEmailSearch}
-                  icon={<Users className="h-12 w-12" />}
+                  icon={<Users className="h-12 w-12" aria-hidden="true" />}
                   title="No users"
+                  data-testid="users-empty-state"
                 />
               ) : (
-                <div className="space-y-3">
+                <div
+                  className="space-y-3"
+                  role="list"
+                  aria-label="User list items"
+                  data-testid="users-list"
+                >
                   {users.map((user) => (
                     <UserRow
                       key={user.id}
@@ -161,6 +180,7 @@ export const DashboardUsers = () => {
                 pageSizeOptions={[1, 3, 5, 10, 20, 50, 100]}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
+                data-testid="pagination-bottom"
               />
             </div>
           </CardContent>
@@ -182,6 +202,8 @@ export const DashboardUsers = () => {
           deleteUserMutation.isPending &&
           deleteDialog.userId === deleteUserMutation.variables
         }
+        data-testid="delete-user-dialog"
+        aria-label="Confirm user deletion"
       />
     </div>
   );

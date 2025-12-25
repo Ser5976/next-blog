@@ -24,6 +24,8 @@ export interface UniversalErrorProps {
   children?: React.ReactNode;
   /** CSS классы */
   className?: string;
+  /** test ID для тестирования */
+  'data-testid'?: string;
 }
 
 const iconSizes = {
@@ -43,6 +45,7 @@ export function UniversalError({
   onRetry,
   children,
   className = '',
+  'data-testid': testId = 'universal-error',
 }: UniversalErrorProps) {
   // Определяем текст ошибки
   const errorMessage = message || error?.message || 'An error occurred';
@@ -55,27 +58,45 @@ export function UniversalError({
 
   // Рендер иконки
   const renderIcon = () => {
-    const defaultIcon = <AlertCircle className={`${iconSizeClass} mx-auto`} />;
+    const defaultIcon = (
+      <AlertCircle
+        className={`${iconSizeClass} mx-auto`}
+        aria-hidden="true"
+        data-testid="error-icon"
+      />
+    );
     const iconToRender = icon || defaultIcon;
 
-    return <div className={`${iconColor} mb-4`}>{iconToRender}</div>;
+    return (
+      <div className={`${iconColor} mb-4`} data-testid="error-icon-container">
+        {iconToRender}
+      </div>
+    );
   };
 
   // Базовый контент
   const errorContent = (
     <>
       {renderIcon()}
-      <h3 className="text-lg font-medium mb-2">{title}</h3>
-      <p className="text-muted-foreground text-sm mb-6">{errorMessage}</p>
+      <h3 className="text-lg font-medium mb-2" data-testid="error-title">
+        {title}
+      </h3>
+      <p
+        className="text-muted-foreground text-sm mb-6"
+        data-testid="error-message"
+      >
+        {errorMessage}
+      </p>
       {onRetry && (
         <Button
           onClick={onRetry}
           variant={variant === 'simple' ? 'outline' : 'default'}
+          data-testid="error-retry-button"
         >
           {retryButtonText}
         </Button>
       )}
-      {children}
+      {children && <div data-testid="error-children">{children}</div>}
     </>
   );
 
@@ -83,36 +104,80 @@ export function UniversalError({
   switch (variant) {
     case 'inline':
       return (
-        <div className={`text-center py-6 ${className}`}>{errorContent}</div>
+        <div
+          className={`text-center py-6 ${className}`}
+          role="alert"
+          aria-live="assertive"
+          data-testid={`${testId}-inline`}
+        >
+          {errorContent}
+        </div>
       );
 
     case 'simple':
       return (
-        <div className={`text-center py-4 ${className}`}>
-          <div className="flex items-center justify-center gap-3 mb-2">
+        <div
+          className={`text-center py-4 ${className}`}
+          role="alert"
+          aria-live="assertive"
+          data-testid={`${testId}-simple`}
+        >
+          <div
+            className="flex items-center justify-center gap-3 mb-2"
+            data-testid="simple-error-header"
+          >
             <AlertCircle
               className={`h-5 w-5 text-destructive ${iconSizeClass}`}
+              aria-hidden="true"
+              data-testid="simple-error-icon"
             />
-            <h3 className="text-md font-medium">{title}</h3>
+            <h3
+              className="text-md font-medium"
+              data-testid="simple-error-title"
+            >
+              {title}
+            </h3>
           </div>
-          <p className="text-sm text-muted-foreground mb-4">{errorMessage}</p>
+          <p
+            className="text-sm text-muted-foreground mb-4"
+            data-testid="simple-error-message"
+          >
+            {errorMessage}
+          </p>
           {onRetry && (
-            <Button onClick={onRetry} variant="outline" size="sm">
+            <Button
+              onClick={onRetry}
+              variant="outline"
+              size="sm"
+              data-testid="simple-error-retry-button"
+            >
               {retryButtonText}
             </Button>
           )}
-          {children}
+          {children && (
+            <div data-testid="simple-error-children">{children}</div>
+          )}
         </div>
       );
 
     case 'card':
     default:
       return (
-        <div className={`min-h-screen bg-background p-4 md:p-6 ${className}`}>
+        <div
+          className={`min-h-screen bg-background p-4 md:p-6 ${className}`}
+          role="alert"
+          aria-live="assertive"
+          data-testid={`${testId}-card`}
+        >
           <div className="max-w-7xl mx-auto">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-12">{errorContent}</div>
+            <Card data-testid="error-card">
+              <CardContent className="pt-6" data-testid="error-card-content">
+                <div
+                  className="text-center py-12"
+                  data-testid="error-card-content-inner"
+                >
+                  {errorContent}
+                </div>
               </CardContent>
             </Card>
           </div>

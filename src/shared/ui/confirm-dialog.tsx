@@ -24,6 +24,8 @@ export interface ConfirmDialogProps {
   onConfirm: () => void;
   onCancel: () => void;
   isLoading?: boolean;
+  'data-testid'?: string;
+  'aria-label'?: string;
 }
 
 export function ConfirmDialog({
@@ -37,16 +39,32 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
   isLoading = false,
+  'data-testid': testId = 'confirm-dialog',
+  'aria-label': ariaLabel = 'Confirmation dialog',
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+    <AlertDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      aria-label={ariaLabel}
+      data-testid={testId}
+    >
+      <AlertDialogContent data-testid="confirm-dialog-content">
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle data-testid="confirm-dialog-title">
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription data-testid="confirm-dialog-description">
+            {description}
+          </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel} disabled={isLoading}>
+          <AlertDialogCancel
+            className=" cursor-pointer"
+            onClick={onCancel}
+            disabled={isLoading}
+            data-testid="confirm-dialog-cancel"
+          >
             {cancelText}
           </AlertDialogCancel>
           <AlertDialogAction
@@ -57,13 +75,19 @@ export function ConfirmDialog({
             disabled={isLoading}
             className={
               variant === 'destructive'
-                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
+                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90 cursor-pointer'
                 : ''
             }
+            data-testid="confirm-dialog-confirm"
+            aria-label={isLoading ? 'Processing...' : confirmText}
           >
             {isLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2
+                  className="mr-2 h-4 w-4 animate-spin"
+                  aria-hidden="true"
+                  data-testid="loading-spinner"
+                />
                 Processing...
               </>
             ) : (

@@ -19,6 +19,8 @@ export interface UniversalEmptyProps {
   children?: React.ReactNode;
   /** CSS классы */
   className?: string;
+  /** test ID для тестирования */
+  'data-testid'?: string;
 }
 
 const iconSizes = {
@@ -38,6 +40,7 @@ export function UniversalEmpty({
   emptyMessage = 'No data available',
   children,
   className = '',
+  'data-testid': testId = 'universal-empty',
 }: UniversalEmptyProps) {
   // Определяем, показываем ли мы состояние поиска
   const isSearchState = Boolean(searchQuery);
@@ -59,20 +62,38 @@ export function UniversalEmpty({
     }
 
     const IconComponent = isSearchState ? Search : FolderOpen;
-    return <IconComponent className={`${iconSizeClass}`} />;
+    return (
+      <IconComponent
+        className={`${iconSizeClass}`}
+        aria-hidden="true"
+        data-testid="empty-icon"
+      />
+    );
   };
 
   return (
-    <div className={`text-center py-12 ${className}`}>
-      <div className="text-muted-foreground mx-auto w-fit mb-4">
+    <div
+      className={`text-center py-12 ${className}`}
+      role="status"
+      aria-label={finalTitle}
+      data-testid={testId}
+    >
+      <div
+        className="text-muted-foreground mx-auto w-fit mb-4"
+        data-testid="empty-icon-container"
+      >
         {renderIcon()}
       </div>
 
-      <h3 className="text-lg font-medium mb-2">{finalTitle}</h3>
+      <h3 className="text-lg font-medium mb-2" data-testid="empty-title">
+        {finalTitle}
+      </h3>
 
-      <p className="text-muted-foreground">{finalDescription}</p>
+      <p className="text-muted-foreground" data-testid="empty-description">
+        {finalDescription}
+      </p>
 
-      {children}
+      {children && <div data-testid="empty-children">{children}</div>}
     </div>
   );
 }
