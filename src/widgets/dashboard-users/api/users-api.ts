@@ -40,7 +40,6 @@ export async function deleteUser(userId: string): Promise<ApiResponse> {
     const { data } = await axios.delete<ApiResponse>(
       `/api/dashboard/users-clerk/${userId}`
     );
-
     return data;
   } catch (error) {
     console.error('updateUserRole: error:', error);

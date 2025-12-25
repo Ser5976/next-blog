@@ -5,6 +5,10 @@ import {
   updateUserRoleClerk,
 } from '@/widgets/dashboard-users/api';
 import { UsersFilters } from '@/widgets/dashboard-users/model';
+import {
+  updateRoleSchema,
+  usersFiltersSchema,
+} from '@/widgets/dashboard-users/model/validation-schemes';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,22 +20,22 @@ export async function GET(request: NextRequest) {
       emailSearch: searchParams.get('emailSearch') || undefined,
     };
 
-    // Валидация параметров
-    if (filters.page && filters.page < 1) {
+    // валидация body при помощи zod
+    // валидация при помощи zod
+    const validation = usersFiltersSchema.safeParse(filters);
+    //console.log('GET validation:', validation);
+
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Page must be greater than 0' },
+        {
+          error: 'Validation error',
+          message: validation.error.message,
+        },
         { status: 400 }
       );
     }
 
-    if (filters.limit && (filters.limit < 1 || filters.limit > 100)) {
-      return NextResponse.json(
-        { error: 'Limit must be between 1 and 100' },
-        { status: 400 }
-      );
-    }
-
-    const result = await getUsersClerk(filters);
+    const result = await getUsersClerk(validation.data);
 
     if (!result.success) {
       return NextResponse.json({ error: result.message }, { status: 400 });
@@ -53,27 +57,22 @@ export async function PATCH(request: NextRequest) {
 
     const { data } = body;
 
-    // Валидация тела запроса
-    if (!data.userId || !data.newRole) {
-      console.log('❌ Validation failed: missing userId or newRole');
-      return NextResponse.json(
-        { error: 'userId and newRole are required' },
-        { status: 400 }
-      );
-    }
+    // валидация body при помощи zod
+    const validation = updateRoleSchema.safeParse(data);
 
-    const validRoles = ['user', 'author', 'admin'];
-    if (!validRoles.includes(data.newRole)) {
-      console.log('❌ Invalid role:', data.newRole);
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid role specified' },
+        {
+          error: 'Validation error',
+          message: validation.error.message,
+        },
         { status: 400 }
       );
     }
 
     const result = await updateUserRoleClerk({
-      userId: data.userId,
-      newRole: data.newRole,
+      userId: validation.data.userId,
+      newRole: validation.data.newRole,
     });
 
     if (!result.success) {

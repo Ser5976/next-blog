@@ -1,22 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { deleteUserClerk } from '@/widgets/dashboard-users/api';
+import { deleteUserSchema } from '@/widgets/dashboard-users/model/validation-schemes';
 
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const { userId } = await params;
+    const userId = await params;
 
-    if (!userId) {
+    // валидация при помощи zod
+    const validation = deleteUserSchema.safeParse(userId);
+    // console.log('DELETE validation:', validation);
+
+    if (!validation.success) {
       return NextResponse.json(
-        { error: 'User ID is required' },
+        {
+          error: 'Validation error',
+          message: validation.error.message,
+        },
         { status: 400 }
       );
     }
-    console.log('delete:', userId);
-    const result = await deleteUserClerk({ userId });
+    const result = await deleteUserClerk(validation.data);
 
     if (!result.success) {
       return NextResponse.json({ error: result.message }, { status: 400 });
