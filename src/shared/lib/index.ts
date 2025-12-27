@@ -5,4 +5,4 @@ export {
   calculateChange,
   calculateChanges,
 } from './stats-utils';
-export { formatDate } from './format-date';
+export { formatDate, formatDateDay, formatDateTime } from './format-date';

@@ -36,3 +36,14 @@ export { Pagination } from './pagination';
 export { UniversalError } from './universal-error';
 export { ListSkeleton } from './list-skeleton';
 export { ConfirmDialog } from './confirm-dialog';
+export {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardAction,
+  CardDescription,
+  CardContent,
+} from './card';
+export { Separator } from './separator';
+export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';

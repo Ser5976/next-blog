@@ -2,6 +2,7 @@
 
 import { memo, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   Calendar,
   Loader2,
@@ -250,9 +251,21 @@ const UserRowComponent = ({
             data-testid="user-actions-menu"
           >
             <DropdownMenuItem
+              asChild
+              className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+              data-testid="user-post-link"
+            >
+              <Link
+                href={`/dashboard/users/${user.id}`}
+                className="cursor-pointer"
+              >
+                <span className="flex items-center gap-2">View Profile</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem
               onClick={handleDelete}
               disabled={isDisabled}
-              className="text-red-600 focus:text-red-600 focus:bg-red-50"
+              className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
               data-testid="delete-user-button"
             >
               <span className="flex items-center gap-2">
