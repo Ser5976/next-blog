@@ -15,6 +15,7 @@ import {
   UserIcon,
 } from 'lucide-react';
 
+import { getFullName } from '@/features/user-profile-info';
 import { formatDate } from '@/shared/lib';
 import { Button } from '@/shared/ui/button';
 import {
@@ -30,8 +31,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/shared/ui/select';
+import { ROLE_DISPLAY_NAMES, ROLE_ICONS } from '../lib';
 import { UserRowProps } from '../model';
-import { ROLE_DISPLAY_NAMES, ROLE_ICONS } from '../model/constants';
 
 const UserRowComponent = ({
   user,
@@ -62,18 +63,9 @@ const UserRowComponent = ({
     onDelete(user.id, user.email);
   }, [user.id, user.email, isUpdatingRole, isDeleting, onDelete]);
 
-  function getFullName() {
-    if (user.firstName && user.lastName) {
-      return `${user.firstName} ${user.lastName}`;
-    }
-    if (user.firstName) return user.firstName;
-    if (user.lastName) return user.lastName;
-    return user.email.split('@')[0];
-  }
-
   const isDisabled = isUpdatingRole || isDeleting;
   const ariaBusy = isUpdatingRole || isDeleting;
-  const ariaLabel = `${getFullName()}, ${user.email}, role: ${user.role}`;
+  const ariaLabel = `${getFullName(user)}, ${user.email}, role: ${user.role}`;
 
   return (
     <div
@@ -90,7 +82,7 @@ const UserRowComponent = ({
           {user.imageUrl ? (
             <Image
               src={user.imageUrl}
-              alt={getFullName()}
+              alt={getFullName(user)}
               width={48}
               height={48}
               className="h-12 w-12 rounded-full border object-cover flex-shrink-0"
@@ -118,7 +110,7 @@ const UserRowComponent = ({
               className="font-medium truncate text-foreground"
               data-testid="user-fullname"
             >
-              {getFullName()}
+              {getFullName(user)}
             </h4>
           </div>
 
@@ -176,7 +168,7 @@ const UserRowComponent = ({
           >
             <SelectTrigger
               className={` cursor-pointer w-32 ${isUpdatingRole ? 'opacity-50' : ''}`}
-              aria-label={`Change role for ${getFullName()}`}
+              aria-label={`Change role for ${getFullName(user)}`}
               aria-busy={isUpdatingRole}
               data-testid="role-select-trigger"
             >
@@ -230,7 +222,7 @@ const UserRowComponent = ({
               size="icon"
               disabled={isDisabled}
               className="h-9 w-9 cursor-pointer"
-              aria-label={`Actions for ${getFullName()}`}
+              aria-label={`Actions for ${getFullName(user)}`}
               aria-haspopup="true"
               aria-expanded="false"
               data-testid="user-actions-button"

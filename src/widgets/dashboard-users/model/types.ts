@@ -1,13 +1,4 @@
-export interface User {
-  id: string;
-  email: string;
-  firstName: string | null;
-  lastName: string | null;
-  role: string;
-  imageUrl: string;
-  createdAt: number;
-  lastSignInAt: number | null;
-}
+import { User } from '@/features/user-profile-info';
 
 export interface UsersFilters {
   page: number;

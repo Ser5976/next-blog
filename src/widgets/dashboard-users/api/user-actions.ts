@@ -2,10 +2,10 @@
 
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
+import { User } from '@/features/user-profile-info';
 import {
   DeleteUserParams,
   UpdateRoleParams,
-  User,
   UsersFilters,
   UsersResponse,
 } from '../model';

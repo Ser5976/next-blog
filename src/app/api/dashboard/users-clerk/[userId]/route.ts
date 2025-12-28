@@ -1,7 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getUserClerk } from '@/features/user-profile-info/api';
 import { deleteUserClerk } from '@/widgets/dashboard-users/api';
 import { deleteUserSchema } from '@/widgets/dashboard-users/model/validation-schemes';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ userId: string }> }
+) {
+  try {
+    const { userId } = await params;
+
+    const result = await getUserClerk(userId);
+
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error('GET /api/users-clerk error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function DELETE(
   request: NextRequest,

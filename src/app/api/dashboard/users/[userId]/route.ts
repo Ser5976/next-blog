@@ -5,11 +5,12 @@ import { prisma } from '@/shared/api';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const { userId } = await params;
     const client = await clerkClient();
-    const clerkUser = await client.users.getUser(params.userId);
+    const clerkUser = await client.users.getUser(userId);
 
     if (!clerkUser) {
       return NextResponse.json(
@@ -20,7 +21,7 @@ export async function GET(
 
     // Получаем статистику из базы данных
     const userStats = await prisma.user.findUnique({
-      where: { clerkId: params.userId },
+      where: { clerkId: userId },
       select: {
         _count: {
           select: {

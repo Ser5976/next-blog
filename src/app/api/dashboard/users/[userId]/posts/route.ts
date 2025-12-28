@@ -5,9 +5,10 @@ import { prisma } from '@/shared/api';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const { userId } = await params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
@@ -15,7 +16,7 @@ export async function GET(
 
     // Проверяем существование пользователя
     const client = await clerkClient();
-    const clerkUser = await client.users.getUser(params.userId);
+    const clerkUser = await client.users.getUser(userId);
 
     if (!clerkUser) {
       return NextResponse.json(
@@ -26,7 +27,7 @@ export async function GET(
 
     // Ищем пользователя в базе по clerkId
     const dbUser = await prisma.user.findUnique({
-      where: { clerkId: params.userId },
+      where: { clerkId: userId },
     });
 
     if (!dbUser) {

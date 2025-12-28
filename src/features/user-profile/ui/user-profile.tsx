@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { formatDate, formatDateDay, formatDateTime } from '@/shared/lib';
+import { formatDateDay, formatDateTime } from '@/shared/lib';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
@@ -46,8 +46,8 @@ interface UserProfileProps {
 export function UserProfile({ userId }: UserProfileProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('posts');
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  // const [page, setPage] = useState(1);
+  // const [limit, setLimit] = useState(10);
 
   const {
     data: profileData,
@@ -61,9 +61,9 @@ export function UserProfile({ userId }: UserProfileProps) {
     data: postsData,
     isLoading: isLoadingPosts,
     isError: isErrorPosts,
-    error: postsError,
+    //error: postsError,
     refetch: refetchPosts,
-  } = useUserPosts(userId, page, limit);
+  } = useUserPosts(userId);
 
   const handleRefresh = () => {
     refetchProfile();

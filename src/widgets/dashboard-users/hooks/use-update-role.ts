@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { User, userProfileQueryKeys } from '@/features/user-profile-info';
 import { updateUserRole } from '../api';
 import { UsersResponse } from '../model';
 import { usersQueryKeys } from './use-users';
@@ -13,49 +14,94 @@ export function useUpdateRole() {
 
     // Оптимистичное обновление
     onMutate: async (variables) => {
-      // Отменяем текущие запросы
-      await queryClient.cancelQueries({ queryKey: usersQueryKeys.all });
+      const { userId, newRole } = variables;
 
-      // Сохраняем предыдущее состояние
-      const previousData = queryClient.getQueryData<UsersResponse>(
+      // 1. Отменяем текущие запросы для обоих ключей
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: usersQueryKeys.all }),
+        queryClient.cancelQueries({
+          queryKey: userProfileQueryKeys.profile(userId),
+        }),
+      ]);
+
+      // 2. Сохраняем предыдущее состояние для обоих
+      const previousUsersData = queryClient.getQueryData<UsersResponse>(
         usersQueryKeys.all
       );
 
-      // Оптимистично обновляем данные
-      queryClient.setQueryData<UsersResponse>(usersQueryKeys.all, (old) => {
-        if (!old || !old.users) return old;
+      const userProfileKey = userProfileQueryKeys.profile(userId);
+      const previousProfileData = queryClient.getQueryData(userProfileKey);
 
-        return {
-          ...old,
-          users: old.users.map((user) =>
-            user.id === variables.userId
-              ? { ...user, role: variables.newRole }
-              : user
-          ),
-        };
-      });
+      // 3. Оптимистично обновляем данные списка пользователей
+      if (previousUsersData) {
+        queryClient.setQueryData<UsersResponse>(usersQueryKeys.all, (old) => {
+          if (!old || !old.users) return old;
 
-      return { previousData, variables };
+          return {
+            ...old,
+            users: old.users.map((user) =>
+              user.id === userId ? { ...user, role: newRole } : user
+            ),
+          };
+        });
+      }
+
+      // 4. Оптимистично обновляем данные профиля пользователя
+      if (previousProfileData) {
+        queryClient.setQueryData<User>(userProfileKey, (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            role: newRole,
+          };
+        });
+      }
+
+      // Возвращаем контекст для возможного отката
+      return { previousUsersData, previousProfileData, variables };
     },
 
     // При ошибке откатываем изменения
     onError: (error, variables, context) => {
+      const { userId } = variables;
       toast.error(error.message || 'Failed to update role');
 
-      if (context?.previousData) {
-        queryClient.setQueryData(usersQueryKeys.all, context.previousData);
+      // Восстанавливаем данные списка пользователей
+      if (context?.previousUsersData) {
+        queryClient.setQueryData(usersQueryKeys.all, context.previousUsersData);
+      }
+
+      // Восстанавливаем данные профиля
+      if (context?.previousProfileData) {
+        const userProfileKey = userProfileQueryKeys.profile(userId);
+        queryClient.setQueryData(userProfileKey, context.previousProfileData);
       }
     },
 
     // При успехе показываем уведомление и обновляем кэш
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
+      const { userId } = variables;
       toast.success('Role updated successfully');
 
-      // Показываем спинер до полного обновления кэша
-      // Возвращаем промис, чтобы мутация считалась завершенной только после обновления кэша
-      return queryClient.invalidateQueries({
-        queryKey: usersQueryKeys.all,
-        refetchType: 'active', // Только активные запросы
+      // Инвалидируем кэш для обоих запросов, чтобы синхронизировать с сервером
+      return Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: usersQueryKeys.all,
+          refetchType: 'active',
+        }),
+        queryClient.invalidateQueries({
+          queryKey: userProfileQueryKeys.profile(userId),
+          refetchType: 'active',
+        }),
+      ]);
+    },
+
+    // Дополнительно: обработка завершения (успех или ошибка)
+    onSettled: (data, error, variables) => {
+      const { userId } = variables;
+      // Гарантируем, что данные актуальны после мутации
+      queryClient.invalidateQueries({
+        queryKey: userProfileQueryKeys.profile(userId),
       });
     },
   });
