@@ -47,3 +47,4 @@ export {
 } from './card';
 export { Separator } from './separator';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export { Badge, badgeVariants } from './badge';

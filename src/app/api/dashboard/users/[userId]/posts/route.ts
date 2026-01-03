@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { clerkClient } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api';
 
@@ -9,10 +9,16 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const skip = (page - 1) * limit;
+    // Проверяем авторизацию и роль
+    const { userId: currentUserId, sessionClaims } = await auth();
+
+    if (!currentUserId) {
+      throw new Error('Not authorized');
+    }
+
+    if (sessionClaims?.metadata?.role !== 'admin') {
+      throw new Error('Insufficient rights to view users');
+    }
 
     // Проверяем существование пользователя
     const client = await clerkClient();
@@ -29,65 +35,135 @@ export async function GET(
     const dbUser = await prisma.user.findUnique({
       where: { clerkId: userId },
     });
-
     if (!dbUser) {
+      // Если пользователя нет в базе, возвращаем пустой результат
       return NextResponse.json({
         success: true,
         posts: [],
-        total: 0,
-        page,
-        limit,
         totalPages: 0,
+        stats: {
+          totalPosts: 0,
+          publishedPosts: 0,
+          draftPosts: 0,
+          totalViews: 0,
+          averageRating: 0,
+          totalRatings: 0,
+        },
       });
     }
 
     // Получаем посты пользователя
-    const [posts, total] = await Promise.all([
-      prisma.post.findMany({
-        where: { authorId: dbUser.id },
-        select: {
-          id: true,
-          title: true,
-          slug: true,
-          excerpt: true,
-          coverImage: true,
-          published: true,
-          viewCount: true,
-          averageRating: true,
-          ratingCount: true,
-          createdAt: true,
-          publishedAt: true,
-          category: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          tags: {
-            select: {
-              id: true,
-              name: true,
-            },
+    const posts = await prisma.post.findMany({
+      where: { authorId: dbUser.id },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+        coverImage: true,
+        published: true,
+        viewCount: true,
+        averageRating: true,
+        ratingCount: true,
+        createdAt: true,
+        publishedAt: true,
+        tags: {
+          select: {
+            id: true,
+            name: true,
           },
         },
-        orderBy: {
-          createdAt: 'desc',
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
         },
-        skip,
-        take: limit,
-      }),
-      prisma.post.count({
-        where: { authorId: dbUser.id },
-      }),
-    ]);
+        _count: {
+          select: {
+            comments: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    console.log('post:', posts);
+
+    // Получаем общую статистику по постам пользователя
+    const [publishedPosts, viewStats, ratingStats, averageRating] =
+      await Promise.all([
+        // Опубликованные посты
+        prisma.post.count({
+          where: {
+            authorId: dbUser.id,
+            published: true,
+          },
+        }),
+
+        // Общее количество просмотров
+        prisma.post.aggregate({
+          where: { authorId: dbUser.id },
+          _sum: {
+            viewCount: true,
+          },
+        }),
+        // Общее количество оценок
+        prisma.post.aggregate({
+          where: { authorId: dbUser.id },
+          _sum: {
+            ratingCount: true,
+          },
+        }),
+        // Средний рейтинг
+        prisma.post.aggregate({
+          where: {
+            authorId: dbUser.id,
+            averageRating: { not: null },
+          },
+          _avg: {
+            averageRating: true,
+          },
+        }),
+      ]);
+
+    // Форматируем данные
+    const formattedPosts = posts.map((post) => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      coverImage: post.coverImage,
+      published: post.published,
+      viewCount: post.viewCount,
+      averageRating: post.averageRating,
+      ratingCount: post.ratingCount,
+      createdAt: post.createdAt,
+      publishedAt: post.publishedAt,
+      tags: post.tags,
+      category: post.category
+        ? {
+            id: post.category.id,
+            name: post.category.name,
+          }
+        : null,
+
+      stats: {
+        commentsCount: post._count.comments,
+      },
+    }));
 
     return NextResponse.json({
       success: true,
-      posts,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
+      posts: formattedPosts,
+      stats: {
+        totalPosts: posts.length,
+        publishedPosts,
+        totalViews: viewStats._sum.viewCount || 0,
+        averageRating: averageRating._avg.averageRating || 0,
+        totalRatings: ratingStats._sum.ratingCount || 0,
+      },
     });
   } catch (error) {
     console.error('Error fetching user posts:', error);

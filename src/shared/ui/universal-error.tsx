@@ -24,6 +24,7 @@ export interface UniversalErrorProps {
   children?: React.ReactNode;
   /** CSS классы */
   className?: string;
+  classNameCard?: string;
   /** test ID для тестирования */
   'data-testid'?: string;
 }
@@ -45,6 +46,7 @@ export function UniversalError({
   onRetry,
   children,
   className = '',
+  classNameCard = '',
   'data-testid': testId = 'universal-error',
 }: UniversalErrorProps) {
   // Определяем текст ошибки
@@ -164,23 +166,21 @@ export function UniversalError({
     default:
       return (
         <div
-          className={`min-h-screen bg-background p-4 md:p-6 ${className}`}
+          className={` bg-background  ${className}`}
           role="alert"
           aria-live="assertive"
           data-testid={`${testId}-card`}
         >
-          <div className="max-w-7xl mx-auto">
-            <Card data-testid="error-card">
-              <CardContent className="pt-6" data-testid="error-card-content">
-                <div
-                  className="text-center py-12"
-                  data-testid="error-card-content-inner"
-                >
-                  {errorContent}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Card data-testid="error-card" className={`${classNameCard}`}>
+            <CardContent className="pt-6" data-testid="error-card-content">
+              <div
+                className="text-center py-12"
+                data-testid="error-card-content-inner"
+              >
+                {errorContent}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       );
   }

@@ -8,6 +8,8 @@ export const getFullName = (user: UserFullName) => {
   }
   if (user.firstName) return user.firstName;
   if (user.lastName) return user.lastName;
+  // Добавляем проверку на наличие email
+  if (!user.email) return 'User';
   return user.email.split('@')[0];
 };
 

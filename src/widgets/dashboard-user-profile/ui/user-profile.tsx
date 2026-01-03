@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { UserProfileInfo } from '@/features/user-profile-info';
 import { Button, Subtitle, Title } from '@/shared/ui';
 import { DASHBOARD_HEADER } from '../lib';
+import { UserContent } from './user-content';
 
 export const UserProfile = ({ userId }: { userId: string }) => {
   return (
@@ -31,8 +32,8 @@ export const UserProfile = ({ userId }: { userId: string }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column - Profile Card */}
         <UserProfileInfo userId={userId} />
-
         {/* Right Column - Content */}
+        <UserContent userId={userId} />
       </div>
     </div>
   );

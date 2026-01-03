@@ -16,5 +16,10 @@ export function useUserProfile(userId: string) {
     gcTime: 1000 * 60 * 10, // 10 минут
     retry: 1,
     enabled: !!userId,
+    retryDelay: 1000,
+    // Не обновлять при фокусе, чтобы не мешать пользователю
+    refetchOnWindowFocus: false,
+    // Убираем placeholder data чтобы не было миганий
+    placeholderData: undefined,
   });
 }

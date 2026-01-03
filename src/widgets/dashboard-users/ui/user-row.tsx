@@ -244,7 +244,7 @@ const UserRowComponent = ({
           >
             <DropdownMenuItem
               asChild
-              className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+              className="cursor-pointer"
               data-testid="user-post-link"
             >
               <Link
@@ -257,7 +257,7 @@ const UserRowComponent = ({
             <DropdownMenuItem
               onClick={handleDelete}
               disabled={isDisabled}
-              className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+              className="text-red-600 focus:text-red-600  cursor-pointer"
               data-testid="delete-user-button"
             >
               <span className="flex items-center gap-2">

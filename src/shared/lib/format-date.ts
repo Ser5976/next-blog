@@ -1,4 +1,4 @@
-export const formatDate = (timestamp: number | null) => {
+export const formatDate = (timestamp: number | null | Date | string) => {
   if (!timestamp) return 'Never';
 
   try {
