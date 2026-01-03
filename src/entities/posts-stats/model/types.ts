@@ -1,4 +1,4 @@
-export interface PostsStats {
+export interface IPostsStats {
   totalPosts: number;
   publishedPosts: number;
   totalViews: number;
@@ -7,5 +7,5 @@ export interface PostsStats {
 }
 
 export interface PostsStatsProps {
-  stats: PostsStats;
+  stats: IPostsStats;
 }

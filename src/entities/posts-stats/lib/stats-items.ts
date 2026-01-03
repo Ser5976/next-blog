@@ -1,6 +1,6 @@
-import { PostsStats } from '../model';
+import { IPostsStats } from '../model';
 
-export const statsItems = (stats: PostsStats) => {
+export const statsItems = (stats: IPostsStats) => {
   return [
     {
       value: stats.totalPosts,

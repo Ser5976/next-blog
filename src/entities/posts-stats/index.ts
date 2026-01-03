@@ -1,1 +1,2 @@
-export type { PostsStats } from './model';
+export type { IPostsStats } from './model';
+export { PostsStats } from './ui';

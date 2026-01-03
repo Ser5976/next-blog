@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react';
 import { FileText } from 'lucide-react';
 
 import { PostRow } from '@/entities/post-row';
-import { UserPostsStats } from '@/entities/posts-stats/ui/posts-stats';
+import { PostsStats } from '@/entities/posts-stats';
 import {
   ConfirmDialog,
   ListSkeleton,
@@ -91,7 +91,7 @@ export function UserPostsList({ userId }: { userId: string }) {
   return (
     <div className="space-y-6">
       {/* Статистика */}
-      <UserPostsStats stats={stats} />
+      <PostsStats stats={stats} />
 
       {/* Список постов */}
       <div className="space-y-3" role="list" aria-label="User posts list">

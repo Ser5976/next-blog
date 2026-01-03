@@ -1,7 +1,7 @@
 import { statsItems } from '../lib';
 import { PostsStatsProps } from '../model';
 
-export function UserPostsStats({ stats }: PostsStatsProps) {
+export function PostsStats({ stats }: PostsStatsProps) {
   const STATS_ITEMS = statsItems(stats);
 
   return (

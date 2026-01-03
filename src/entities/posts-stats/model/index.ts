@@ -1,1 +1,1 @@
-export type { PostsStats, PostsStatsProps } from './types';
+export type { IPostsStats, PostsStatsProps } from './types';
