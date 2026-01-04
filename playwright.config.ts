@@ -29,9 +29,18 @@ export default defineConfig({
       testMatch: /auth\.setup\.ts/,
     },
     {
+      name: 'auth', // Проект для тестов аутентификации (неаутентифицированные пользователи)
+      testMatch: /auth\.spec\.ts/,
+      // Явно НЕ используем storageState - тесты должны быть неаутентифицированными
+      // Это гарантирует, что тесты проверяют поведение для неавторизованных пользователей
+      use: {
+        // storageState не указан - значит тесты запускаются без сохраненной сессии
+      },
+    },
+    {
       name: 'e2e',
       dependencies: ['setup'],
-      testIgnore: /auth\.setup\.ts/,
+      testIgnore: /auth\.(setup|spec)\.ts/, // Исключаем и setup, и spec тесты аутентификации
       use: {
         storageState: 'tests/.auth/user.json',
       },

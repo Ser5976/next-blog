@@ -88,11 +88,36 @@ test.describe('Dashboard Overview - Complete E2E Tests', () => {
         exact: true,
       });
 
-      // Кликаем и ждем изменения URL
-      await button.click();
+      // Проверяем текущий URL перед кликом
+      const currentUrl = page.url();
+      const currentParams = new URLSearchParams(new URL(currentUrl).search);
+      const currentTimeRange = currentParams.get('timeRange');
 
-      // Проверяем  URL
-      await expect(page).toHaveURL(new RegExp(`timeRange=${timeRange.value}`));
+      // Кликаем только если параметр еще не установлен
+      if (currentTimeRange !== timeRange.value) {
+        // Убеждаемся, что кнопка видима и готова к клику
+        await expect(button).toBeVisible();
+        await expect(button).toBeEnabled();
+
+        // Кликаем на кнопку и ждем изменения URL
+        // Используем Promise.all для одновременного ожидания навигации и клика
+        await Promise.all([
+          page.waitForFunction(
+            (expectedValue) => {
+              const params = new URLSearchParams(window.location.search);
+              return params.get('timeRange') === expectedValue;
+            },
+            timeRange.value,
+            { timeout: 10000 }
+          ),
+          button.click(),
+        ]);
+      } else {
+        // Если параметр уже установлен, просто проверяем URL
+        await expect(page).toHaveURL(
+          new RegExp(`timeRange=${timeRange.value}`)
+        );
+      }
 
       // Проверяем конкретный параметр в URL
       const url = page.url();
@@ -122,7 +147,9 @@ test.describe('Dashboard Overview - Complete E2E Tests', () => {
       });
     });
 
-    await page.goto('/dashboard', { waitUntil: 'networkidle' });
+    // Используем 'load' вместо 'networkidle' - более надежно
+    // networkidle может никогда не достигнуться из-за фоновых запросов
+    await page.goto('/dashboard', { waitUntil: 'load', timeout: 30000 });
 
     // 1️⃣ Dashboard загрузился
     await expect(
