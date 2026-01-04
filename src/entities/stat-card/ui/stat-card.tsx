@@ -40,7 +40,9 @@ export const StatCard = ({
           ) : (
             <ArrowDown className="h-3 w-3" aria-hidden="true" />
           )}
-          <span>{Math.abs(trend)}% from the previous period</span>
+          <span>
+            {Math.abs(Number(trend.toFixed(1)))}% from the previous period
+          </span>
         </div>
       )}
       <p

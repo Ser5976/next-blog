@@ -89,7 +89,7 @@ export async function GET(
         createdAt: 'desc',
       },
     });
-    console.log('post:', posts);
+    // console.log('post:', posts);
 
     // Получаем общую статистику по постам пользователя
     const [publishedPosts, viewStats, ratingStats, averageRating] =
