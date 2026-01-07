@@ -1,0 +1,1 @@
+export { UserPostsList } from './ui';

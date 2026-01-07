@@ -1,5 +1,3 @@
-//import { UserProfile } from '@/features/user-profile/ui';
-
 import { UserProfile } from '@/widgets/dashboard-user-profile';
 
 export default async function UserProfilePage({

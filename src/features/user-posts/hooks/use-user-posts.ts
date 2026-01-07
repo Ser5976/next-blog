@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { getUserPosts } from '../api';
 import { UserPostsResponse } from '../model';
@@ -25,19 +25,4 @@ export function useUserPosts(userId: string) {
     // Убираем placeholder data чтобы не было миганий
     placeholderData: undefined,
   });
-}
-
-// Хук для префетчинга
-export function usePrefetchUserPosts() {
-  const queryClient = useQueryClient();
-
-  return (userId: string) => {
-    return queryClient.prefetchQuery({
-      queryKey: userPostsQueryKeys.all,
-      queryFn: () => getUserPosts(userId),
-      // Оптимизации
-      staleTime: 1000 * 30, // 30 секунд
-      gcTime: 1000 * 60 * 5, // 5 минут (бывший cacheTime)
-    });
-  };
 }

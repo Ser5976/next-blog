@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { FileText, MessageCircle } from 'lucide-react';
 
-import { UserPostsList } from '@/features/user-posts/ui';
+import { UserCommentsList } from '@/features/user-comments';
+import { UserPostsList } from '@/features/user-posts';
 import {
   Card,
   CardContent,
@@ -46,7 +47,9 @@ export function UserContent({ userId }: { userId: string }) {
               <UserPostsList userId={userId} />
             </TabsContent>
 
-            <TabsContent value="comments" className="mt-6"></TabsContent>
+            <TabsContent value="comments" className="mt-6">
+              <UserCommentsList userId={userId} />
+            </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
