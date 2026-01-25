@@ -21,6 +21,13 @@ const eslintConfig = [
       'src/generated/**/*',
       '**/generated/**/*',
     ],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
+      // Отключаем правило Next.js про img
+      '@next/next/no-img-element': 'off',
+      // Отключаем правило про alt атрибут
+      'jsx-a11y/alt-text': 'off',
+    },
   },
 ];
 

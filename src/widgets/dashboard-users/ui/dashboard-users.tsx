@@ -164,6 +164,7 @@ export const DashboardUsers = () => {
                       onDelete={handleDeleteClick}
                       isUpdatingRole={isUserUpdatingRole(user.id)}
                       isDeleting={isUserDeleting(user.id)}
+                      data-testid={`user-row-${user.id}`}
                     />
                   ))}
                 </div>

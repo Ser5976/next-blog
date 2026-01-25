@@ -165,6 +165,7 @@ const UserRowComponent = ({
             onValueChange={handleRoleChange}
             disabled={isDisabled}
             data-testid="role-select"
+            aria-label={`Change role for ${getFullName(user)}`}
           >
             <SelectTrigger
               className={` cursor-pointer w-32 ${isUpdatingRole ? 'opacity-50' : ''}`}
@@ -246,6 +247,7 @@ const UserRowComponent = ({
               asChild
               className="cursor-pointer"
               data-testid="user-post-link"
+              aria-label={`Delete ${getFullName(user)}`}
             >
               <Link
                 href={`/dashboard/users/${user.id}`}
