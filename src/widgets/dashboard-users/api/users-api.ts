@@ -28,6 +28,7 @@ export async function updateUserRole(
       '/api/dashboard/users-clerk',
       { data: params }
     );
+
     return data;
   } catch (error) {
     console.error('updateUserRole: error:', error);

@@ -24,10 +24,9 @@ export interface DeleteUserParams {
   userId: string;
 }
 
-export interface ApiResponse<T = unknown> {
-  data?: T;
-  error?: string;
-  status: number;
+export interface ApiResponse {
+  message: string;
+  success: boolean;
 }
 
 export interface UserRowProps {
