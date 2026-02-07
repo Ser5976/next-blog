@@ -26,7 +26,7 @@ export function useUserPostDelete() {
 
           return {
             ...old,
-            users: old.posts.filter((post) => post.id !== postId),
+            posts: old.posts.filter((post) => post.id !== postId),
           };
         }
       );
