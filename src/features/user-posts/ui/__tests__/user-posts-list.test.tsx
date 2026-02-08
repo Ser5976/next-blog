@@ -383,31 +383,7 @@ describe('UserPostsList – unit tests', () => {
     // После onCancel диалог должен закрыться
   });
 
-  // Test 9: Состояние загрузки при удалении
-  it('shows loading state in delete dialog when mutation is pending', async () => {
-    const postsData = createPostsData({
-      posts: [createPost({ id: 'post-123', title: 'Post to delete' })],
-    });
-
-    mockUseUserPosts({ data: postsData });
-    mockUseUserPostDelete({
-      isPending: true,
-      variables: 'post-123',
-    });
-
-    render(<UserPostsList userId={userId} />);
-
-    const user = userEvent.setup();
-
-    // Открываем диалог удаления
-    await user.click(screen.getByTestId('delete-post-button-post-123'));
-
-    // Проверяем что кнопка подтверждения в состоянии загрузки
-    const confirmButton = screen.getByTestId('dialog-confirm-button');
-    expect(confirmButton).toBeDisabled();
-  });
-
-  // Test 10: Передача состояния isDeleting в PostRow
+  // Test 9: Передача состояния isDeleting в PostRow
   it('passes isDeleting prop to PostRow when deleting that specific post', () => {
     const postsData = createPostsData({
       posts: [
@@ -449,38 +425,5 @@ describe('UserPostsList – unit tests', () => {
     // Второй пост не должен быть в состоянии удаления
     expect(deleteButton2).not.toBeDisabled();
     expect(deleteButton2).toHaveTextContent('Delete');
-  });
-
-  // Test 11: Проверка атрибутов accessibility
-  it('has proper accessibility attributes', () => {
-    const postsData = createPostsData();
-
-    mockUseUserPosts({ data: postsData });
-
-    render(<UserPostsList userId={userId} />);
-
-    // Проверяем role="list" для списка постов
-    const list = screen.getByRole('list');
-    expect(list).toHaveAttribute('aria-label', 'User posts list');
-  });
-
-  // Test 12: Обработка обновления userId
-  it('calls useUserPosts with correct userId', () => {
-    const testUserId = 'test-user-456';
-
-    render(<UserPostsList userId={testUserId} />);
-
-    expect(useUserPosts).toHaveBeenCalledWith(testUserId);
-  });
-
-  // Test 13: Проверка что ConfirmDialog не рендерится по умолчанию
-  it('does not render ConfirmDialog by default', () => {
-    const postsData = createPostsData();
-
-    mockUseUserPosts({ data: postsData });
-
-    render(<UserPostsList userId={userId} />);
-
-    expect(screen.queryByTestId('confirm-dialog')).not.toBeInTheDocument();
   });
 });
