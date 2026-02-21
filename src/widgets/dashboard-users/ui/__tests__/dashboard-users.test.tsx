@@ -201,3 +201,4 @@ describe('DashboardUsers – unit tests', () => {
     expect(handleDeleteClick).toHaveBeenCalledWith('42', 'delete@test.com');
   });
 });
+

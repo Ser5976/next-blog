@@ -284,3 +284,4 @@ describe('UsersFiltersComponent - Unit Tests', () => {
     });
   });
 });
+

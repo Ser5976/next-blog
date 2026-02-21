@@ -17,6 +17,7 @@ export {
   DropdownMenuSubContent,
 } from './dropdown-menu';
 export { Input } from './input';
+export { Textarea } from './textarea';
 export { Avatar, AvatarImage, AvatarFallback } from './avatar';
 export {
   Sheet,
