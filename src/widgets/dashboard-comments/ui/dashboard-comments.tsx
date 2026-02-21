@@ -1,26 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Loader2, MessageSquare, RefreshCw } from 'lucide-react';
 
 import {
   ConfirmDialog,
   ListSkeleton,
   Pagination,
-  Textarea,
   UniversalEmpty,
   UniversalError,
 } from '@/shared/ui';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/shared/ui/alert-dialog';
 import { Button } from '@/shared/ui/button';
 import {
   Card,
@@ -38,7 +26,6 @@ export const DashboardComments = () => {
   const {
     filters,
     deleteDialog,
-    editDialog,
     comments,
     total,
     page,
@@ -48,8 +35,6 @@ export const DashboardComments = () => {
     error,
     isFetching,
     debouncedSearch,
-    handleEditClick,
-    handleCancelEdit,
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
@@ -58,52 +43,9 @@ export const DashboardComments = () => {
     handleFiltersChange,
     handleRefresh,
     handlePrefetchNextPage,
-    isCommentEditing,
     isCommentDeleting,
-    updateCommentMutation,
     deleteCommentMutation,
   } = useCommentsManagement();
-
-  // Локальное состояние для редактирования
-  const [editContent, setEditContent] = useState('');
-
-  // Синхронизируем editContent с editDialog при открытии
-  useEffect(() => {
-    if (editDialog.open && editDialog.currentContent) {
-      setEditContent(editDialog.currentContent);
-    }
-  }, [editDialog.open, editDialog.currentContent]);
-
-  // Обработчик открытия диалога редактирования
-  const handleEditDialogOpen = (commentId: string, currentContent: string) => {
-    handleEditClick(commentId, currentContent);
-  };
-
-  // Обработчик подтверждения редактирования
-  const handleEditConfirm = () => {
-    if (editDialog.commentId && editContent.trim()) {
-      // Вызываем мутацию напрямую
-      updateCommentMutation.mutate(
-        {
-          commentId: editDialog.commentId,
-          content: editContent.trim(),
-        },
-        {
-          onSettled: () => {
-            handleCancelEdit();
-            setEditContent('');
-          },
-        }
-      );
-    }
-  };
-
-  // Валидация содержимого
-  const isEditContentValid =
-    editContent.trim().length > 0 && editContent.trim().length <= 5000;
-  const isEditLoading =
-    updateCommentMutation.isPending &&
-    editDialog.commentId === updateCommentMutation.variables?.commentId;
 
   if (isError) {
     return (
@@ -219,9 +161,7 @@ export const DashboardComments = () => {
                     <CommentRow
                       key={comment.id}
                       comment={comment}
-                      onEdit={handleEditDialogOpen}
                       onDelete={handleDeleteClick}
-                      isEditing={isCommentEditing(comment.id)}
                       isDeleting={isCommentDeleting(comment.id)}
                     />
                   ))}
@@ -245,73 +185,6 @@ export const DashboardComments = () => {
           </CardContent>
         </Card>
       </div>
-
-      {/* Edit Dialog */}
-      <AlertDialog
-        open={editDialog.open}
-        onOpenChange={(open) => {
-          if (!open) {
-            handleCancelEdit();
-            setEditContent('');
-          }
-        }}
-        data-testid="edit-comment-dialog"
-      >
-        <AlertDialogContent className="max-w-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle data-testid="edit-comment-dialog-title">
-              Edit Comment
-            </AlertDialogTitle>
-            <AlertDialogDescription data-testid="edit-comment-dialog-description">
-              Update the comment content below. Changes will be saved
-              immediately.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="py-4">
-            <Textarea
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              placeholder="Enter comment content..."
-              className="min-h-[200px] resize-none"
-              disabled={isEditLoading}
-              aria-label="Comment content"
-              data-testid="edit-comment-textarea"
-            />
-            <div className="mt-2 text-sm text-muted-foreground">
-              {editContent.length} / 5000 characters
-            </div>
-          </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel
-              onClick={() => {
-                handleCancelEdit();
-                setEditContent('');
-              }}
-              disabled={isEditLoading}
-              data-testid="edit-comment-cancel"
-            >
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleEditConfirm}
-              disabled={!isEditContentValid || isEditLoading}
-              data-testid="edit-comment-save"
-            >
-              {isEditLoading ? (
-                <>
-                  <Loader2
-                    className="mr-2 h-4 w-4 animate-spin"
-                    aria-hidden="true"
-                  />
-                  Saving...
-                </>
-              ) : (
-                'Save'
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       {/* Delete Dialog */}
       <ConfirmDialog

@@ -1,11 +1,6 @@
 import axios from 'axios';
 
-import {
-  ApiResponse,
-  CommentsFilters,
-  CommentsResponse,
-  UpdateCommentParams,
-} from '../model';
+import { ApiResponse, CommentsFilters, CommentsResponse } from '../model';
 
 export async function getComments(
   filters: CommentsFilters
@@ -19,22 +14,6 @@ export async function getComments(
   } catch (error) {
     console.error('getComments: error:', error);
     throw new Error('Something went wrong, comments were not received');
-  }
-}
-
-export async function updateComment(
-  params: UpdateCommentParams
-): Promise<ApiResponse> {
-  try {
-    const { data } = await axios.patch<ApiResponse>(
-      `/api/dashboard/comments/${params.commentId}`,
-      { content: params.content }
-    );
-
-    return data;
-  } catch (error) {
-    console.error('updateComment: error:', error);
-    throw new Error('Something went wrong, the comment was not updated');
   }
 }
 

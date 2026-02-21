@@ -2,14 +2,9 @@
 
 import { useCallback, useState } from 'react';
 
-import {
-  useDeleteComment,
-  usePrefetchComments,
-  useUpdateComment,
-  useComments,
-} from '.';
-import { CommentsFilters as FiltersType } from '../model';
 import { useCustomDebounce } from '@/widgets/dashboard-users/hooks/use-custom-debounce';
+import { useComments, useDeleteComment, usePrefetchComments } from '.';
+import { CommentsFilters as FiltersType } from '../model';
 
 export function useCommentsManagement() {
   // State
@@ -23,12 +18,6 @@ export function useCommentsManagement() {
     commentId: string | null;
     commentContent: string | null;
   }>({ open: false, commentId: null, commentContent: null });
-
-  const [editDialog, setEditDialog] = useState<{
-    open: boolean;
-    commentId: string | null;
-    currentContent: string | null;
-  }>({ open: false, commentId: null, currentContent: null });
 
   // Дебаунс для поиска
   const debouncedSearch = useCustomDebounce(filters.search || '', 500);
@@ -55,41 +44,11 @@ export function useCommentsManagement() {
   } = commentsData || {};
 
   // Mutations
-  const updateCommentMutation = useUpdateComment();
+
   const deleteCommentMutation = useDeleteComment();
   const prefetchComments = usePrefetchComments();
 
   // Handlers
-  const handleEditClick = useCallback(
-    (commentId: string, currentContent: string) => {
-      setEditDialog({
-        open: true,
-        commentId,
-        currentContent,
-      });
-    },
-    []
-  );
-
-  const handleConfirmEdit = useCallback(() => {
-    if (editDialog.commentId && editDialog.currentContent) {
-      updateCommentMutation.mutate(
-        {
-          commentId: editDialog.commentId,
-          content: editDialog.currentContent,
-        },
-        {
-          onSettled: () => {
-            setEditDialog({ open: false, commentId: null, currentContent: null });
-          },
-        }
-      );
-    }
-  }, [editDialog.commentId, editDialog.currentContent, updateCommentMutation]);
-
-  const handleCancelEdit = useCallback(() => {
-    setEditDialog({ open: false, commentId: null, currentContent: null });
-  }, []);
 
   const handleDeleteClick = useCallback(
     (commentId: string, commentContent: string) => {
@@ -178,15 +137,6 @@ export function useCommentsManagement() {
   ]);
 
   // Helpers
-  const isCommentEditing = useCallback(
-    (commentId: string) => {
-      return (
-        updateCommentMutation.isPending &&
-        updateCommentMutation.variables?.commentId === commentId
-      );
-    },
-    [updateCommentMutation.isPending, updateCommentMutation.variables]
-  );
 
   const isCommentDeleting = useCallback(
     (commentId: string) => {
@@ -202,7 +152,6 @@ export function useCommentsManagement() {
     // State
     filters,
     deleteDialog,
-    editDialog,
     comments,
     total,
     page,
@@ -212,15 +161,9 @@ export function useCommentsManagement() {
     error,
     isFetching,
     debouncedSearch,
-
     // Mutations
-    updateCommentMutation,
     deleteCommentMutation,
-
     // Handlers
-    handleEditClick,
-    handleConfirmEdit,
-    handleCancelEdit,
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
@@ -229,15 +172,10 @@ export function useCommentsManagement() {
     handleFiltersChange,
     handleRefresh,
     handlePrefetchNextPage,
-
     // Helpers
-    isCommentEditing,
     isCommentDeleting,
-
     // Actions
     setFilters,
     setDeleteDialog,
-    setEditDialog,
   };
 }
-

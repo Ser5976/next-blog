@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   Calendar,
-  Edit,
   FileText,
   Loader2,
   Mail,
@@ -29,16 +28,10 @@ import { CommentRowProps } from '../model';
 
 const CommentRowComponent = ({
   comment,
-  onEdit,
   onDelete,
   isEditing = false,
   isDeleting = false,
 }: CommentRowProps) => {
-  const handleEdit = useCallback(() => {
-    if (isEditing || isDeleting) return;
-    onEdit(comment.id, comment.content);
-  }, [comment.id, comment.content, isEditing, isDeleting, onEdit]);
-
   const handleDelete = useCallback(() => {
     if (isEditing || isDeleting) return;
     onDelete(comment.id, comment.content);
@@ -210,26 +203,6 @@ const CommentRowComponent = ({
 
       {/* Правая часть: действия */}
       <div className="flex items-center gap-2 flex-shrink-0 ml-4">
-        {/* Кнопка редактирования */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleEdit}
-          disabled={isDisabled}
-          className="h-9"
-          aria-label={`Edit comment by ${authorName}`}
-          data-testid="comment-edit-button"
-        >
-          {isEditing ? (
-            <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-          ) : (
-            <>
-              <Edit className="h-4 w-4 mr-2" aria-hidden="true" />
-              Edit
-            </>
-          )}
-        </Button>
-
         {/* Меню действий */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -257,19 +230,6 @@ const CommentRowComponent = ({
             className="w-48"
             data-testid="comment-actions-menu"
           >
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer"
-              data-testid="comment-view-link"
-            >
-              <Link
-                href={`/posts/${comment.post.slug}#comment-${comment.id}`}
-                target="_blank"
-                className="cursor-pointer"
-              >
-                <span className="flex items-center gap-2">View Comment</span>
-              </Link>
-            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleDelete}
               disabled={isDisabled}

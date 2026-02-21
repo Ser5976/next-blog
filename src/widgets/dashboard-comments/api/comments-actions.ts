@@ -4,13 +4,7 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 
 import { User } from '@/features/user-profile-info';
 import { prisma } from '@/shared/api';
-import {
-  ApiResponse,
-  CommentsFilters,
-  CommentsResponse,
-  DashboardComment,
-  UpdateCommentParams,
-} from '../model';
+import { CommentsFilters, CommentsResponse, DashboardComment } from '../model';
 
 export async function getCommentsAction(
   filters: CommentsFilters
@@ -264,59 +258,6 @@ export async function getCommentsAction(
       page: 1,
       totalPages: 0,
       message: error instanceof Error ? error.message : 'An error occurred',
-    };
-  }
-}
-
-export async function updateCommentAction(
-  params: UpdateCommentParams
-): Promise<ApiResponse> {
-  try {
-    const { userId: currentUserId, sessionClaims } = await auth();
-
-    if (!currentUserId) {
-      throw new Error('Not authorized');
-    }
-
-    if (
-      sessionClaims?.metadata?.role !== 'admin' &&
-      sessionClaims?.metadata?.role !== 'author'
-    ) {
-      throw new Error('Insufficient rights to update comments');
-    }
-
-    const { commentId, content } = params;
-
-    // Валидация содержимого
-    if (!content || content.trim().length === 0) {
-      throw new Error('Comment content cannot be empty');
-    }
-
-    if (content.length > 5000) {
-      throw new Error('Comment content is too long (max 5000 characters)');
-    }
-
-    // Обновляем комментарий
-    await prisma.comment.update({
-      where: { id: commentId },
-      data: {
-        content: content.trim(),
-        updatedAt: new Date(),
-      },
-    });
-
-    return {
-      success: true,
-      message: 'Comment updated successfully',
-    };
-  } catch (error) {
-    console.error('Error updating comment:', error);
-    return {
-      success: false,
-      message:
-        error instanceof Error
-          ? error.message
-          : 'An error occurred while updating the comment',
     };
   }
 }

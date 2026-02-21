@@ -36,12 +36,6 @@ export interface CommentsResponse {
   message?: string;
 }
 
-// Параметры обновления комментария
-export interface UpdateCommentParams {
-  commentId: string;
-  content: string;
-}
-
 // Параметры удаления комментария
 export interface DeleteCommentParams {
   commentId: string;
@@ -56,7 +50,6 @@ export interface ApiResponse {
 // Props для CommentRow
 export interface CommentRowProps {
   comment: DashboardComment;
-  onEdit: (commentId: string, currentContent: string) => void;
   onDelete: (commentId: string, content: string) => void;
   isEditing?: boolean;
   isDeleting?: boolean;

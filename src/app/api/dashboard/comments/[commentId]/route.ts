@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api';
-import { updateCommentAction } from '@/widgets/dashboard-comments/api';
-import { UpdateCommentParams } from '@/widgets/dashboard-comments/model';
 
-export async function PATCH(
+/* export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ commentId: string }> }
 ) {
@@ -48,7 +46,7 @@ export async function PATCH(
       { status: 500 }
     );
   }
-}
+} */
 
 export async function DELETE(
   request: NextRequest,
