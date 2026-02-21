@@ -2,13 +2,8 @@
 
 import { useCallback, useState } from 'react';
 
-import {
-  useCustomDebounce,
-  useDeleteUser,
-  usePrefetchUsers,
-  useUpdateRole,
-  useUsers,
-} from '.';
+import { useCustomDebounce } from '@/shared/hooks';
+import { useDeleteUser, usePrefetchUsers, useUpdateRole, useUsers } from '.';
 import { UsersFilters as FiltersType } from '../model';
 
 export function useUsersManagement() {

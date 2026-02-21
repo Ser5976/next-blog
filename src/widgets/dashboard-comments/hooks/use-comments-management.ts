@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from 'react';
 
-import { useCustomDebounce } from '@/widgets/dashboard-users/hooks/use-custom-debounce';
+import { useCustomDebounce } from '@/shared/hooks';
 import { useComments, useDeleteComment, usePrefetchComments } from '.';
 import { CommentsFilters as FiltersType } from '../model';
 
