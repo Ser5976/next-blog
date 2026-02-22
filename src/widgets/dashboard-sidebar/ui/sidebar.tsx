@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { LayoutDashboard } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 import {
   Button,
@@ -29,7 +29,7 @@ export const Sidebar = () => {
             aria-controls="mobile-sidebar-content"
             aria-haspopup="dialog"
           >
-            <LayoutDashboard className="h-4 w-4" />
+            <Menu className="h-4 w-4" aria-hidden="true" />
           </Button>
         </SheetTrigger>
         <SheetContent

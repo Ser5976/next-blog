@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { UserProfile } from '@/features/auth';
+import { ThemeToggle } from '@/features/theme-toggle';
 import { NAV_ITEMS } from '../lib';
 import { DashboardSidebarProps } from '../model';
 import { NavButton } from './nav-button';
@@ -9,7 +10,7 @@ export const DashboardSidebar = ({ closeSheet }: DashboardSidebarProps) => {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="px-4 py-6 border-b">
+      <div className="px-4 py-6 border-b flex gap-8">
         <Link href="/" onClick={closeSheet}>
           <div className="flex items-center gap-2 px-2">
             <span className="font-semibold text-xl">
@@ -20,6 +21,9 @@ export const DashboardSidebar = ({ closeSheet }: DashboardSidebarProps) => {
             </span>
           </div>
         </Link>
+        <div className="hidden md:block">
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Navigation */}
