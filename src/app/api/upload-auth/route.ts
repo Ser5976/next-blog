@@ -7,11 +7,21 @@ export async function GET() {
     'NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY exists:',
     !!process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY
   );
+  // Проверяем наличие переменных окружения
+  const privateKey = process.env.IMAGEKIT_PRIVATE_KEY as string;
+  const publicKey = process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY as string;
 
+  if (!privateKey || !publicKey) {
+    console.error('Missing required environment variables');
+    return NextResponse.json(
+      { error: 'Server configuration error' },
+      { status: 500 }
+    );
+  }
   try {
     const { token, expire, signature } = getUploadAuthParams({
-      privateKey: process.env.IMAGEKIT_PRIVATE_KEY as string,
-      publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY as string,
+      privateKey,
+      publicKey,
     });
 
     const response = {

@@ -14,7 +14,7 @@ export const NAV_ITEMS = [
     exact: true,
   },
   {
-    href: '/dashboard/posts',
+    href: '/dashboard/articles',
     label: 'Articles',
     icon: FileText,
     exact: false,
