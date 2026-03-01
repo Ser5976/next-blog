@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.32.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@imagekit/next": "^2.1.5",
     "@prisma/client": "6.14.0",
     "@prisma/extension-accelerate": "^2.0.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -35,9 +37,10 @@
     "next": "^15.5.7",
     "react": "^19.1.2",
     "react-dom": "^19.1.2",
+    "react-hook-form": "^7.71.2",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.2.1"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

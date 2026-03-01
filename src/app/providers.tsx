@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
+import { ImageKitProvider } from '@imagekit/next';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'sonner';
 
 import { ThemeProvider } from '@/features/theme-toggle';
+
+const urlEndpoint = process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT;
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   const [queryClient] = useState(
@@ -36,7 +39,9 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
           storageKey="my-app-theme"
         >
           <Toaster />
-          {children}
+          <ImageKitProvider urlEndpoint={urlEndpoint}>
+            {children}
+          </ImageKitProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </ClerkProvider>
