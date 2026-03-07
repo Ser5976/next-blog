@@ -14,8 +14,7 @@ import {
   User,
 } from 'lucide-react';
 
-import { getFullName } from '@/features/user-profile-info';
-import { formatDate } from '@/shared/lib';
+import { formatDate, getFullName } from '@/shared/lib';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import {

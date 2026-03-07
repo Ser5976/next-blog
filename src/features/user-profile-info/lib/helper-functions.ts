@@ -1,18 +1,5 @@
 import { PenTool, Shield, User } from 'lucide-react';
 
-import { UserClerk } from '@/shared/types';
-
-export const getFullName = (user: UserClerk) => {
-  if (user.firstName && user.lastName) {
-    return `${user.firstName} ${user.lastName}`;
-  }
-  if (user.firstName) return user.firstName;
-  if (user.lastName) return user.lastName;
-  // Добавляем проверку на наличие email
-  if (!user.email) return 'User';
-  return user.email.split('@')[0];
-};
-
 export const getRoleInfo = (role: string) => {
   switch (role) {
     case 'admin':

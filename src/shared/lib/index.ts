@@ -6,3 +6,4 @@ export {
   calculateChanges,
 } from './stats-utils';
 export { formatDate, formatDateDay, formatDateTime } from './format-date';
+export { getFullName } from './get-full-name';

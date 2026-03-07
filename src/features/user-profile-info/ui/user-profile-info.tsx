@@ -3,13 +3,12 @@
 import Image from 'next/image';
 import { Hash, Mail, User, UserCog } from 'lucide-react';
 
-import { formatDate } from '@/shared/lib';
+import { formatDate, getFullName } from '@/shared/lib';
 import { ListSkeleton, UniversalError } from '@/shared/ui';
 import { Badge } from '@/shared/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Separator } from '@/shared/ui/separator';
 import { useUserProfile } from '../hooks';
-import { getFullName } from '../lib';
 import { getRoleInfo } from '../lib/helper-functions';
 
 export function UserProfileInfo({ userId }: { userId: string }) {

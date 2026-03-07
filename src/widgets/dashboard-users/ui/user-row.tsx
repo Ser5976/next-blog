@@ -15,8 +15,7 @@ import {
   UserIcon,
 } from 'lucide-react';
 
-import { getFullName } from '@/features/user-profile-info';
-import { formatDate } from '@/shared/lib';
+import { formatDate, getFullName } from '@/shared/lib';
 import { Button } from '@/shared/ui/button';
 import {
   DropdownMenu,

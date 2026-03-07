@@ -1,12 +1,11 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { getFullName } from '@/features/user-profile-info';
 /* ======================================================
    IMPORTS AFTER MOCKS
    ====================================================== */
 
-import { formatDate } from '@/shared/lib';
+import { formatDate, getFullName } from '@/shared/lib';
 import { ROLE_DISPLAY_NAMES } from '../../lib';
 import { UserRow } from '../user-row';
 
@@ -114,17 +113,9 @@ jest.mock('@/shared/lib', () => {
     __esModule: true,
     ...actual,
     formatDate: jest.fn(),
+    getFullName: jest.fn(),
   };
 });
-
-/* ======================================================
-   MOCKS — feature helpers
-   ====================================================== */
-
-jest.mock('@/features/user-profile-info', () => ({
-  __esModule: true,
-  getFullName: jest.fn(),
-}));
 
 /* ======================================================
    TEST DATA

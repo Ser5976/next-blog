@@ -1,4 +1,3 @@
-// user-profile-info.test.tsx
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 
@@ -17,6 +16,15 @@ jest.mock('@/shared/lib', () => ({
   formatDate: jest.fn((date) => {
     if (!date) return 'Not available';
     return 'January 1, 2024';
+  }),
+  getFullName: jest.fn((user) => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user?.firstName) return user.firstName;
+    if (user?.lastName) return user.lastName;
+    if (user?.email) return user.email.split('@')[0];
+    return 'User';
   }),
 }));
 
