@@ -3,7 +3,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { toast } from 'sonner';
 
-import { User, userProfileQueryKeys } from '@/features/user-profile-info';
+import { userProfileQueryKeys } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 import { updateUserRole } from '../../api';
 import type { UsersResponse } from '../../model';
 import { useUpdateRole } from '../use-update-role';
@@ -32,7 +33,7 @@ describe('useUpdateRole', () => {
   const mockNewRole = 'admin';
   const mockParams = { userId: mockUserId, newRole: mockNewRole };
 
-  const mockUser: User = {
+  const mockUser: UserClerk = {
     id: mockUserId,
     email: 'test@example.com',
     firstName: 'John',
@@ -137,7 +138,7 @@ describe('useUpdateRole', () => {
     });
 
     // Проверяем оптимистичное обновление
-    const updatedProfile = queryClient.getQueryData<User>(
+    const updatedProfile = queryClient.getQueryData<UserClerk>(
       userProfileQueryKeys.profile(mockUserId)
     );
     expect(updatedProfile?.role).toBe(mockNewRole);
@@ -204,7 +205,7 @@ describe('useUpdateRole', () => {
     });
 
     // ✅ optimistic update УСПЕВАЕТ примениться
-    const optimisticData = queryClient.getQueryData<User>(
+    const optimisticData = queryClient.getQueryData<UserClerk>(
       userProfileQueryKeys.profile(mockUserId)
     );
     expect(optimisticData?.role).toBe(mockNewRole);
@@ -220,7 +221,7 @@ describe('useUpdateRole', () => {
     });
 
     // 🔁 rollback
-    const rolledBackData = queryClient.getQueryData<User>(
+    const rolledBackData = queryClient.getQueryData<UserClerk>(
       userProfileQueryKeys.profile(mockUserId)
     );
     expect(rolledBackData?.role).toBe(originalRole);

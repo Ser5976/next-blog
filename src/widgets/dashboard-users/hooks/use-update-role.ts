@@ -1,7 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { User, userProfileQueryKeys } from '@/features/user-profile-info';
+import { userProfileQueryKeys } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 import { updateUserRole } from '../api';
 import { UsersResponse } from '../model';
 import { usersQueryKeys } from './use-users';
@@ -48,7 +49,7 @@ export function useUpdateRole() {
 
       // 4. Оптимистично обновляем данные профиля пользователя
       if (previousProfileData) {
-        queryClient.setQueryData<User>(userProfileKey, (old) => {
+        queryClient.setQueryData<UserClerk>(userProfileKey, (old) => {
           if (!old) return old;
           return {
             ...old,

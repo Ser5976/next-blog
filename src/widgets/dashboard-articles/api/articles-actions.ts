@@ -3,8 +3,8 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import slugify from 'slugify';
 
-import { User } from '@/features/user-profile-info';
 import { prisma } from '@/shared/api';
+import { UserClerk } from '@/shared/types';
 import {
   ApiResponse,
   Article,
@@ -111,7 +111,7 @@ export async function getArticlesAction(
 
     const uniqueAuthorIds = [...new Set(authorIds)];
 
-    const authorMap = new Map<string, User>();
+    const authorMap = new Map<string, UserClerk>();
 
     if (uniqueAuthorIds.length > 0) {
       const client = await clerkClient();

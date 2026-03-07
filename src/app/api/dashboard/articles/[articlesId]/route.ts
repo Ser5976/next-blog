@@ -1,4 +1,3 @@
-// app/api/dashboard/articles/[id]/route.ts
 import { NextResponse } from 'next/server';
 
 import {
@@ -8,10 +7,11 @@ import {
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ articlesId: string }> }
 ) {
   try {
-    const result = await deleteArticleAction(params.id);
+    const { articlesId } = await params;
+    const result = await deleteArticleAction(articlesId);
 
     if (!result.success) {
       return NextResponse.json({ error: result.message }, { status: 400 });
@@ -29,12 +29,13 @@ export async function DELETE(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ articlesId: string }> }
 ) {
   try {
     const { published } = await request.json();
+    const { articlesId } = await params;
 
-    const result = await togglePublishArticleAction(params.id, published);
+    const result = await togglePublishArticleAction(articlesId, published);
 
     if (!result.success) {
       return NextResponse.json({ error: result.message }, { status: 400 });

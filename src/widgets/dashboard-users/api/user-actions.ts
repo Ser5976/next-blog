@@ -2,7 +2,7 @@
 
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
-import { User } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 import {
   DeleteUserParams,
   UpdateRoleParams,
@@ -46,7 +46,7 @@ export async function getUsersClerk(
     const usersResponse = await client.users.getUserList(clerkParams);
 
     // 👉 Преобразуем данные
-    const users: User[] = usersResponse.data.map((clerkUser) => ({
+    const users: UserClerk[] = usersResponse.data.map((clerkUser) => ({
       id: clerkUser.id,
       email: clerkUser.emailAddresses[0]?.emailAddress || '',
       firstName: clerkUser.firstName || null,

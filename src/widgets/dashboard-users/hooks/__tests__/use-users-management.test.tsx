@@ -1,12 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 
-import {
-  useCustomDebounce,
-  useDeleteUser,
-  usePrefetchUsers,
-  useUpdateRole,
-  useUsers,
-} from '..';
+import { useCustomDebounce } from '@/shared/hooks';
+import { useDeleteUser, usePrefetchUsers, useUpdateRole, useUsers } from '..';
 import { useUsersManagement } from '../use-users-management';
 
 // mocks
@@ -17,6 +12,9 @@ jest.mock('..', () => ({
   useUpdateRole: jest.fn(),
   useDeleteUser: jest.fn(),
   usePrefetchUsers: jest.fn(),
+}));
+jest.mock('@/shared/hooks', () => ({
+  useCustomDebounce: jest.fn(),
 }));
 
 const mockedUseUsers = useUsers as jest.Mock;

@@ -2,8 +2,8 @@
 
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
-import { User } from '@/features/user-profile-info';
 import { prisma } from '@/shared/api';
+import { UserClerk } from '@/shared/types';
 import { CommentsFilters, CommentsResponse, DashboardComment } from '../model';
 
 export async function getCommentsAction(
@@ -139,7 +139,7 @@ export async function getCommentsAction(
     // Создаем маппинг для пользователей
     // Map - структура данных для хранения пар ключ-значение
     // <string, User> - ключ будет строкой, значение - объектом User
-    const dbIdToUserMap = new Map<string, User>();
+    const dbIdToUserMap = new Map<string, UserClerk>();
 
     if (uniqueUserIds.length > 0) {
       // Получаем пользователей из БД чтобы найти clerkId
@@ -171,7 +171,7 @@ export async function getCommentsAction(
             // Получаем данные пользователя из Clerk по его clerkId
             const clerkUser = await client.users.getUser(clerkId);
 
-            const user: User = {
+            const user: UserClerk = {
               id: clerkUser.id,
               email: clerkUser.emailAddresses[0]?.emailAddress || '',
               firstName: clerkUser.firstName || null,
@@ -190,7 +190,7 @@ export async function getCommentsAction(
         const clerkUsersResults = await Promise.all(clerkUsersPromises);
 
         // Создаем временную мапу clerkId -> User
-        const clerkUsersMap = new Map<string, User>();
+        const clerkUsersMap = new Map<string, UserClerk>();
         clerkUsersResults.forEach((result) => {
           if (result) {
             clerkUsersMap.set(result.clerkId, result.user);

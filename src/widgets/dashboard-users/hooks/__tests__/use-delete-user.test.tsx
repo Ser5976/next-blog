@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { toast } from 'sonner';
 
-import { User } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 import { deleteUser } from '../../api';
 import { useDeleteUser } from '../use-delete-user';
 import { usersQueryKeys } from '../use-users';
@@ -27,7 +27,7 @@ const mockedToast = toast as jest.Mocked<typeof toast>;
 describe('useDeleteUser', () => {
   const mockUserId = 'user_1';
 
-  const mockUsers: User[] = [
+  const mockUsers: UserClerk[] = [
     {
       id: 'user_1',
       email: 'test1@example.com',
@@ -129,7 +129,7 @@ describe('useDeleteUser', () => {
       await new Promise((r) => setTimeout(r, 0));
     });
 
-    const cachedData = queryClient.getQueryData<{ users: User[] }>(
+    const cachedData = queryClient.getQueryData<{ users: UserClerk[] }>(
       usersQueryKeys.all
     );
 
@@ -187,7 +187,7 @@ describe('useDeleteUser', () => {
     });
 
     // optimistic removal
-    let cachedData = queryClient.getQueryData<{ users: User[] }>(
+    let cachedData = queryClient.getQueryData<{ users: UserClerk[] }>(
       usersQueryKeys.all
     );
     expect(cachedData?.users).toHaveLength(1);
@@ -202,7 +202,7 @@ describe('useDeleteUser', () => {
     });
 
     // rollback
-    cachedData = queryClient.getQueryData<{ users: User[] }>(
+    cachedData = queryClient.getQueryData<{ users: UserClerk[] }>(
       usersQueryKeys.all
     );
     expect(cachedData?.users).toHaveLength(2);

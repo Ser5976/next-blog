@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 
+import { UserClerk } from '@/shared/types';
 import { getUserProfile } from '../../api';
-import type { User } from '../../model';
 import { useUserProfile } from '../use-user-profile';
 
 // Мокаем API функцию
@@ -36,7 +36,7 @@ describe('useUserProfile', () => {
   // Тестовые данные
   const userId = 'user-123';
 
-  const mockUser: User = {
+  const mockUser: UserClerk = {
     id: userId,
     email: 'john.doe@example.com',
     firstName: 'John',
@@ -319,7 +319,7 @@ describe('useUserProfile', () => {
 
   // Тест 10: Проверяем работу с null значениями в данных
   it('handles null values in user data correctly', async () => {
-    const userWithNulls: User = {
+    const userWithNulls: UserClerk = {
       id: userId,
       email: 'test@example.com',
       firstName: null,

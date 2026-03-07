@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-import { User } from '../model';
+import { UserClerk } from '@/shared/types';
 
-export async function getUserProfile(userId: string): Promise<User> {
+export async function getUserProfile(userId: string): Promise<UserClerk> {
   try {
-    const { data } = await axios.get<User>(
+    const { data } = await axios.get<UserClerk>(
       `/api/dashboard/users-clerk/${userId}`
     );
     return data;

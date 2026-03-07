@@ -1,4 +1,4 @@
-import { User } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 
 // Фильтры для поиска комментариев
 export interface CommentsFilters {
@@ -13,7 +13,7 @@ export interface DashboardComment {
   content: string;
   createdAt: number | null; // timestamp
   updatedAt: number | null; // timestamp
-  author: User | null;
+  author: UserClerk | null;
   post: {
     id: string;
     title: string;

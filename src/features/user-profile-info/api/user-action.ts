@@ -2,9 +2,9 @@
 
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
-import { User } from '../model';
+import { UserClerk } from '@/shared/types';
 
-export async function getUserClerk(clerkId: string): Promise<User> {
+export async function getUserClerk(clerkId: string): Promise<UserClerk> {
   try {
     const { userId: currentUserId, sessionClaims } = await auth();
 
@@ -22,7 +22,7 @@ export async function getUserClerk(clerkId: string): Promise<User> {
     const userResponse = await client.users.getUser(clerkId);
 
     // 👉 Преобразуем данные
-    const user: User = {
+    const user: UserClerk = {
       id: userResponse.id,
       email: userResponse.emailAddresses[0]?.emailAddress || '',
       firstName: userResponse.firstName || null,

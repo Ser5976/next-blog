@@ -2,7 +2,7 @@
 // МОКИ ДЛЯ ВНЕШНИХ ЗАВИСИМОСТЕЙ
 // ============================================
 
-import { User } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 
 // Мок shared/ui компонентов
 jest.mock('@/shared/ui', () => ({
@@ -242,7 +242,7 @@ jest.mock('../../users-filters', () => ({
   ),
 }));
 
-const mockUsers: User[] = [
+const mockUsers: UserClerk[] = [
   {
     id: 'user-1',
     email: 'admin@example.com',

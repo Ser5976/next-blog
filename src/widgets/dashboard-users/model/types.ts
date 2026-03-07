@@ -1,4 +1,4 @@
-import { User } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 
 export interface UsersFilters {
   page: number;
@@ -8,7 +8,7 @@ export interface UsersFilters {
 
 export interface UsersResponse {
   success: boolean;
-  users: User[];
+  users: UserClerk[];
   total: number;
   page: number;
   totalPages: number;
@@ -30,7 +30,7 @@ export interface ApiResponse {
 }
 
 export interface UserRowProps {
-  user: User;
+  user: UserClerk;
   onRoleChange: (userId: string, newRole: string) => void;
   onDelete: (userId: string, userEmail: string) => void;
   isUpdatingRole?: boolean;

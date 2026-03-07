@@ -1,8 +1,8 @@
 import { PenTool, Shield, User } from 'lucide-react';
 
-import { User as UserFullName } from '../model';
+import { UserClerk } from '@/shared/types';
 
-export const getFullName = (user: UserFullName) => {
+export const getFullName = (user: UserClerk) => {
   if (user.firstName && user.lastName) {
     return `${user.firstName} ${user.lastName}`;
   }

@@ -1,4 +1,4 @@
-import { User } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 import { ArticleFormValues } from './schemas';
 
 export interface Article {
@@ -10,7 +10,7 @@ export interface Article {
   coverImage: string | null;
   published: boolean;
   authorId: string | null;
-  author?: User | null;
+  author?: UserClerk | null;
   categoryId: string | null;
   category?: {
     id: string;

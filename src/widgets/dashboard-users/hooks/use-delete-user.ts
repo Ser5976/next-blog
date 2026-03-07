@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { User } from '@/features/user-profile-info';
+import { UserClerk } from '@/shared/types';
 import { deleteUser } from '../api';
 import { usersQueryKeys } from './use-users';
 
@@ -15,18 +15,21 @@ export function useDeleteUser() {
     onMutate: async (userId) => {
       await queryClient.cancelQueries({ queryKey: usersQueryKeys.all });
 
-      const previousData = queryClient.getQueryData<{ users: User[] }>(
+      const previousData = queryClient.getQueryData<{ users: UserClerk[] }>(
         usersQueryKeys.all
       );
 
-      queryClient.setQueryData<{ users: User[] }>(usersQueryKeys.all, (old) => {
-        if (!old) return old;
+      queryClient.setQueryData<{ users: UserClerk[] }>(
+        usersQueryKeys.all,
+        (old) => {
+          if (!old) return old;
 
-        return {
-          ...old,
-          users: old.users.filter((user) => user.id !== userId),
-        };
-      });
+          return {
+            ...old,
+            users: old.users.filter((user) => user.id !== userId),
+          };
+        }
+      );
 
       return { previousData };
     },
