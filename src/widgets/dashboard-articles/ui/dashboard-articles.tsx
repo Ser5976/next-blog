@@ -76,6 +76,7 @@ export const DashboardArticles = () => {
     deleteArticleMutation,
   } = useArticlesManagement();
   console.log('categories:', categories);
+  console.log('articles:', articles);
   // Load categories and tags
   useEffect(() => {
     const loadData = async () => {
@@ -196,7 +197,7 @@ export const DashboardArticles = () => {
                 totalPages={totalPages}
                 totalItems={total}
                 itemsPerPage={filters.limit}
-                pageSizeOptions={[5, 10, 20, 50, 100]}
+                pageSizeOptions={[1, 3, 5, 10, 20, 50, 100]}
                 onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
                 className="mt-0"

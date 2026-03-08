@@ -6,7 +6,7 @@ export const getPostsStats = async (
 ): Promise<IPostsStats | null> => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/posts?timeRange=${timeRange}`,
+      `${process.env.NEXT_PUBLIC_DOMAIN}/api/dashboard/posts-stats?timeRange=${timeRange}`,
       {
         next: { revalidate: 60 },
       }

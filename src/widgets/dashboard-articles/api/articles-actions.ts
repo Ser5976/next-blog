@@ -4,10 +4,9 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 import slugify from 'slugify';
 
 import { prisma } from '@/shared/api';
-import { UserClerk } from '@/shared/types';
+import { Article, UserClerk } from '@/shared/types';
 import {
   ApiResponse,
-  Article,
   ArticleFormValues,
   ArticlesFilters,
   ArticlesResponse,
@@ -96,7 +95,20 @@ export async function getArticlesAction(
             slug: true,
           },
         },
+        comments: {
+          select: {
+            id: true,
+            content: true,
+            _count: {
+              select: {
+                likes: true,
+                dislikes: true,
+              },
+            },
+          },
+        },
       },
+
       orderBy: {
         [sortBy]: sortOrder,
       },
@@ -148,6 +160,12 @@ export async function getArticlesAction(
       categoryId: post.categoryId,
       category: post.category,
       tags: post.tags,
+      comments: post.comments.map((comment) => ({
+        id: comment.id,
+        content: comment.content,
+        likes: comment._count.likes,
+        dislikes: comment._count.dislikes,
+      })),
       viewCount: post.viewCount,
       averageRating: post.averageRating,
       ratingCount: post.ratingCount,
@@ -182,7 +200,7 @@ export async function getArticlesAction(
 
 export async function createArticleAction(
   data: ArticleFormValues
-): Promise<ApiResponse & { article?: Article }> {
+): Promise<ApiResponse> {
   try {
     const { userId: currentUserId, sessionClaims } = await auth();
 
@@ -190,7 +208,10 @@ export async function createArticleAction(
       throw new Error('Not authorized');
     }
 
-    if (sessionClaims?.metadata?.role !== 'admin') {
+    if (
+      sessionClaims?.metadata?.role !== 'admin' &&
+      sessionClaims?.metadata?.role !== 'author'
+    ) {
       throw new Error('Insufficient rights to create articles');
     }
 
@@ -208,7 +229,7 @@ export async function createArticleAction(
       data.slug || slugify(data.title, { lower: true, strict: true });
 
     // Создаем статью
-    const post = await prisma.post.create({
+    await prisma.post.create({
       data: {
         title: data.title,
         slug,
@@ -231,16 +252,7 @@ export async function createArticleAction(
 
     return {
       success: true,
-      article: {
-        ...post,
-        author: null,
-        viewCount: 0,
-        averageRating: 0,
-        ratingCount: 0,
-        createdAt: post.createdAt.getTime(),
-        updatedAt: post.updatedAt.getTime(),
-        publishedAt: post.publishedAt?.getTime() || null,
-      },
+      message: 'the article has been created',
     };
   } catch (error) {
     console.error('Error creating article:', error);

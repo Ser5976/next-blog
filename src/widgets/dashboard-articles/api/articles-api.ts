@@ -1,19 +1,41 @@
 import axios from 'axios';
 
-import { ApiResponse, ArticlesFilters, ArticlesResponse } from '../model';
+import {
+  ApiResponse,
+  Article,
+  ArticleFormValues,
+  ArticlesFilters,
+  ArticlesResponse,
+} from '../model';
 
 export async function getArticles(
   filters: ArticlesFilters
 ): Promise<ArticlesResponse> {
   try {
-    const { data } = await axios.get<ArticlesResponse>(
-      '/api/dashboard/articles',
-      { params: filters }
-    );
+    const { data } = await axios.get<ArticlesResponse>('/api/posts', {
+      params: filters,
+    });
     return data;
   } catch (error) {
     console.error('getArticles: error:', error);
     throw new Error('Something went wrong, articles were not received');
+  }
+}
+
+export async function createArticle(
+  data: ArticleFormValues
+): Promise<ArticlesResponse & { article?: Article }> {
+  try {
+    const respons = await axios.post<ArticlesResponse & { article?: Article }>(
+      '/api/posts',
+      {
+        data,
+      }
+    );
+    return respons.data;
+  } catch (error) {
+    console.error('createArticle: error:', error);
+    throw new Error('Something went wrong, the article has not been created');
   }
 }
 
