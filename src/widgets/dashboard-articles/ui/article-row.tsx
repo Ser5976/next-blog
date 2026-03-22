@@ -7,6 +7,7 @@ import {
   Eye,
   FileText,
   Loader2,
+  MessageCircle,
   MoreVertical,
   Pencil,
   Star,
@@ -133,7 +134,18 @@ const ArticleRowComponent = ({
                 <Eye className="h-3 w-3" />
                 {article.viewCount.toLocaleString()}
               </span>
-
+              {/* comments */}
+              <div
+                className="flex items-center gap-1 text-sm text-muted-foreground"
+                aria-label={`${article.comments.length} comments`}
+                data-testid="post-comments"
+              >
+                <MessageCircle
+                  className="h-3.5 w-3.5 flex-shrink-0"
+                  aria-hidden="true"
+                />
+                <span>{article.comments.length}</span>
+              </div>
               {/* Rating */}
               {article.averageRating ? (
                 <span className="flex items-center gap-1">
