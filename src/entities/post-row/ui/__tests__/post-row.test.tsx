@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import '@testing-library/jest-dom';
 
-import { Post } from '../../model';
+import { Article } from '@/shared/types';
 import { PostRow } from '../post-row';
 
 // Мокаем зависимости
@@ -106,32 +106,48 @@ jest.mock('@/shared/ui', () => ({
 }));
 
 // Создаем тестовые данные
-const createMockPost = (overrides?: Partial<Post>): Post => ({
+const createMockPost = (overrides?: Partial<Article>): Article => ({
   id: 'post-1',
   title: 'Test Post Title',
   slug: 'test-post-title',
+  content:
+    'This is the full content of the test post. It contains multiple paragraphs and provides detailed information about the topic.',
   excerpt: 'This is a test post excerpt that describes the content.',
   coverImage: 'https://example.com/image.jpg',
   published: true,
-  viewCount: 1500,
-  averageRating: 4.5,
-  ratingCount: 25,
-  createdAt: '2023-10-15T10:30:00Z',
-  publishedAt: '2023-10-16T09:00:00Z',
+  authorId: 'user-1',
+  categoryId: 'cat-1',
   category: {
     id: 'cat-1',
     name: 'Technology',
+    slug: 'technology',
   },
   tags: [
-    { id: 'tag-1', name: 'React' },
-    { id: 'tag-2', name: 'TypeScript' },
+    { id: 'tag-1', name: 'React', slug: 'react' },
+    { id: 'tag-2', name: 'TypeScript', slug: 'typescript' },
   ],
-  stats: {
-    commentsCount: 42,
-  },
+  comments: [
+    {
+      id: 'comment-1',
+      content: 'Great article!',
+      likes: 10,
+      dislikes: 1,
+    },
+    {
+      id: 'comment-2',
+      content: 'Very informative',
+      likes: 5,
+      dislikes: 0,
+    },
+  ],
+  viewCount: 1500,
+  averageRating: 4.5,
+  ratingCount: 25,
+  createdAt: 1697376600000, // 2023-10-15T10:30:00Z в миллисекундах
+  updatedAt: 1697466000000, // 2023-10-16T09:20:00Z
+  publishedAt: 1697461200000, // 2023-10-16T09:00:00Z
   ...overrides,
 });
-
 // Вспомогательная функция для проверки форматированных чисел
 const normalizeNumberFormat = (text: string): string => {
   // Заменяем любые разделители тысяч (пробелы, запятые) на стандартный формат
@@ -195,14 +211,14 @@ describe('PostRow – unit tests', () => {
     expect(ratingElement.textContent).toContain('4.5');
 
     // Проверяем комментарии
-    expect(commentsElement).toHaveTextContent(
-      post.stats.commentsCount.toString()
-    );
+    expect(commentsElement).toHaveTextContent(post.comments.length.toString());
   });
 
   // Test 5: Отображение категории
   it('shows category when present', () => {
-    const post = createMockPost({ category: { id: 'cat-2', name: 'Design' } });
+    const post = createMockPost({
+      category: { id: 'cat-2', name: 'Design', slug: 'Design' },
+    });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
     expect(screen.getByTestId('post-category')).toHaveTextContent('Design');

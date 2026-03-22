@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import { Post } from '@/entities/post-row';
+import { Article } from '@/shared/types';
 import { deleteUserPost } from '../api';
 import { userPostsQueryKeys } from './use-user-posts';
 
@@ -15,11 +15,11 @@ export function useUserPostDelete() {
     onMutate: async (postId) => {
       await queryClient.cancelQueries({ queryKey: userPostsQueryKeys.all });
 
-      const previousData = queryClient.getQueryData<{ posts: Post[] }>(
+      const previousData = queryClient.getQueryData<{ posts: Article[] }>(
         userPostsQueryKeys.all
       );
 
-      queryClient.setQueryData<{ posts: Post[] }>(
+      queryClient.setQueryData<{ posts: Article[] }>(
         userPostsQueryKeys.all,
         (old) => {
           if (!old) return old;

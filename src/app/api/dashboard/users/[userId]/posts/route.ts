@@ -55,33 +55,38 @@ export async function GET(
     // Получаем посты пользователя
     const posts = await prisma.post.findMany({
       where: { authorId: dbUser.id },
-      select: {
-        id: true,
-        slug: true,
-        title: true,
-        excerpt: true,
-        coverImage: true,
-        published: true,
-        viewCount: true,
-        averageRating: true,
-        ratingCount: true,
-        createdAt: true,
-        publishedAt: true,
-        tags: {
+      include: {
+        author: {
           select: {
             id: true,
-            name: true,
+            clerkId: true,
           },
         },
         category: {
           select: {
             id: true,
             name: true,
+            slug: true,
           },
         },
-        _count: {
+        tags: {
           select: {
-            comments: true,
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+
+        comments: {
+          select: {
+            id: true,
+            content: true,
+            _count: {
+              select: {
+                likes: true,
+                dislikes: true,
+              },
+            },
           },
         },
       },
@@ -133,25 +138,27 @@ export async function GET(
       id: post.id,
       title: post.title,
       slug: post.slug,
+      content: post.content,
       excerpt: post.excerpt,
       coverImage: post.coverImage,
       published: post.published,
+      categoryId: post.categoryId,
+      category: post.category,
+      tags: post.tags,
+      comments: post.comments.map((comment) => ({
+        id: comment.id,
+        content: comment.content,
+        likes: comment._count.likes,
+        dislikes: comment._count.dislikes,
+      })),
       viewCount: post.viewCount,
       averageRating: post.averageRating,
       ratingCount: post.ratingCount,
-      createdAt: post.createdAt,
-      publishedAt: post.publishedAt,
-      tags: post.tags,
-      category: post.category
-        ? {
-            id: post.category.id,
-            name: post.category.name,
-          }
+      createdAt: post.createdAt ? new Date(post.createdAt).getTime() : null,
+      updatedAt: post.updatedAt ? new Date(post.updatedAt).getTime() : null,
+      publishedAt: post.publishedAt
+        ? new Date(post.publishedAt).getTime()
         : null,
-
-      stats: {
-        commentsCount: post._count.comments,
-      },
     }));
 
     return NextResponse.json({

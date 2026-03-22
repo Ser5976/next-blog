@@ -1,1 +1,1 @@
-export type { Post, PostRowProps } from './types';
+export type { PostRowProps } from './types';
