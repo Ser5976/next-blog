@@ -1,19 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { format } from 'date-fns';
-import { CalendarIcon, Loader2 } from 'lucide-react';
-import slugify from 'slugify';
+import { Loader2 } from 'lucide-react';
 
+import { deleteImageFromImageKit } from '@/shared/api/deleteImageFromImageKit';
 import { ImageUpload, RichTextEditor } from '@/shared/components';
-import { cn } from '@/shared/lib';
 import { Button } from '@/shared/ui/button';
-import { Calendar } from '@/shared/ui/calendar';
 import { Card, CardContent } from '@/shared/ui/card';
-import { Checkbox } from '@/shared/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -24,7 +20,6 @@ import {
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
 import {
   Select,
   SelectContent,
@@ -33,7 +28,11 @@ import {
   SelectValue,
 } from '@/shared/ui/select';
 import { Textarea } from '@/shared/ui/textarea';
-import { ArticleFormProps, articleFormSchema } from '../model';
+import {
+  ArticleFormProps,
+  articleFormSchema,
+  ArticleFormValues,
+} from '../model';
 
 export function ArticleForm({
   initialData,
@@ -46,7 +45,7 @@ export function ArticleForm({
   const [selectedTags, setSelectedTags] = useState<string[]>(
     initialData?.tags || []
   );
-  console.log('canegories form:', categories);
+
   const form = useForm({
     resolver: zodResolver(articleFormSchema),
     defaultValues: {
@@ -55,23 +54,25 @@ export function ArticleForm({
       content: initialData?.content || '',
       excerpt: initialData?.excerpt || '',
       coverImage: initialData?.coverImage || null,
-      published: initialData?.published || false,
-      categoryId: initialData?.categoryId || null,
+      categoryId: initialData?.categoryId || '',
       tags: initialData?.tags || [],
-      publishedAt: initialData?.publishedAt || null,
     },
   });
 
-  // Генерация slug из title
-  const watchTitle = form.watch('title');
-  useEffect(() => {
-    if (watchTitle && !form.getValues('slug')) {
-      const slug = slugify(watchTitle, { lower: true, strict: true });
-      form.setValue('slug', slug);
-    }
-  }, [watchTitle, form]);
+  const deleteImage = async (field: any) => {
+    const imageUrl = field.value;
+    field.onChange(null);
 
-  const handleSubmit = async (data: any) => {
+    if (imageUrl) {
+      try {
+        await deleteImageFromImageKit(imageUrl);
+      } catch (error) {
+        console.error('Failed to delete image:', error);
+      }
+    }
+  };
+  const handleSubmit = async (data: ArticleFormValues) => {
+    console.log('data form:', data);
     await onSubmit({
       ...data,
       tags: selectedTags,
@@ -195,7 +196,7 @@ export function ArticleForm({
                         <ImageUpload
                           value={field.value}
                           onChange={field.onChange}
-                          onRemove={() => field.onChange(null)}
+                          onRemove={() => deleteImage(field)}
                           disabled={isSubmitting}
                         />
                       </FormControl>
@@ -206,82 +207,6 @@ export function ArticleForm({
                     </FormItem>
                   )}
                 />
-              </CardContent>
-            </Card>
-
-            {/* Publishing Options */}
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <FormField
-                  control={form.control}
-                  name="published"
-                  render={({ field }) => (
-                    <FormItem className="flex items-center gap-2">
-                      <FormControl>
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          disabled={isSubmitting}
-                        />
-                      </FormControl>
-                      <div className="space-y-0 leading-none">
-                        <FormLabel>Published</FormLabel>
-                        <FormDescription>
-                          Make this article public
-                        </FormDescription>
-                      </div>
-                    </FormItem>
-                  )}
-                />
-
-                {form.watch('published') && (
-                  <FormField
-                    control={form.control}
-                    name="publishedAt"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Publish Date</FormLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <FormControl>
-                              <Button
-                                variant="outline"
-                                className={cn(
-                                  'w-full pl-3 text-left font-normal',
-                                  !field.value && 'text-muted-foreground'
-                                )}
-                                disabled={isSubmitting}
-                              >
-                                {field.value ? (
-                                  format(field.value, 'PPP')
-                                ) : (
-                                  <span>Pick a date</span>
-                                )}
-                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                              </Button>
-                            </FormControl>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value || undefined}
-                              onSelect={field.onChange}
-                              disabled={(date) =>
-                                date > new Date() ||
-                                date < new Date('1900-01-01')
-                              }
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <FormDescription>
-                          When to publish the article
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
               </CardContent>
             </Card>
 

@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server';
-import { clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api';
 import { Article, UserClerk } from '@/shared/types';
+import { articleFormSchema } from '@/widgets/dashboard-articles/model';
 
 export async function GET(request: Request) {
   try {
@@ -190,6 +191,86 @@ export async function GET(request: Request) {
     console.error('Error in GET /api/dashboard/articles:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * Создание новой статьи
+ * Требует прав администратора или автора
+ */
+export async function POST(request: NextRequest) {
+  try {
+    // Получаем ID текущего пользователя и его claims из Clerk
+    const { userId: currentUserId, sessionClaims } = await auth();
+
+    // Парсим тело запроса
+    const body = await request.json();
+
+    // Проверка авторизации
+    if (!currentUserId) {
+      return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
+    }
+
+    // Проверка прав (только admin или author могут создавать статьи)
+    if (
+      sessionClaims?.metadata?.role !== 'admin' &&
+      sessionClaims?.metadata?.role !== 'author'
+    ) {
+      return NextResponse.json(
+        { error: 'Insufficient rights to create articles' },
+        { status: 403 }
+      );
+    }
+    // валидация body при помощи zod
+    const { data, success, error } = articleFormSchema.safeParse(body.data);
+    // console.log('validation:', validation);
+    if (!success) return NextResponse.json(error, { status: 400 });
+
+    // Находим пользователя в нашей базе данных по clerkId
+    const dbUser = await prisma.user.findUnique({
+      where: { clerkId: currentUserId },
+    });
+
+    if (!dbUser) {
+      return NextResponse.json(
+        { error: 'User not found in database' },
+        { status: 404 }
+      );
+    }
+
+    // Создаем статью в базе данных
+    await prisma.post.create({
+      data: {
+        title: data.title,
+        slug: data.slug,
+        content: data.content,
+        excerpt: data.excerpt,
+        coverImage: data.coverImage,
+        published: false, // Всегда создаем как черновик
+        authorId: dbUser.id,
+        categoryId: data.categoryId,
+        // Связываем с тегами (connect - потому что теги уже существуют)
+        tags: {
+          connect: data.tags.map((tagId: string) => ({ id: tagId })),
+        },
+      },
+    });
+
+    // Возвращаем успешный ответ с созданной статьей
+    return NextResponse.json({
+      success: true,
+      message: 'the article has been created',
+    });
+  } catch (error) {
+    console.error('Error creating article:', error);
+    NextResponse.json(
+      {
+        success: false,
+        message:
+          error instanceof Error ? error.message : 'Failed to create article',
+      },
       { status: 500 }
     );
   }

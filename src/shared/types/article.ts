@@ -11,7 +11,7 @@ export interface Article {
   authorId: string | null;
   author?: UserClerk | null;
   categoryId: string | null;
-  category?: {
+  category: {
     id: string;
     name: string;
     slug: string;

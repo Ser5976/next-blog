@@ -1,9 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText, Loader2, Plus, RefreshCw } from 'lucide-react';
 
+import { useCategories } from '@/entities/dashboard-get-categories';
+import { useTags } from '@/entities/dashboard-get-tags';
 import {
   ConfirmDialog,
   ListSkeleton,
@@ -26,29 +28,20 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/shared/ui/sheet';
-import {
-  createArticleAction,
-  getCategoriesAction,
-  getTagsAction,
-  updateArticleAction,
-} from '../api/articles-actions';
 import { useArticlesManagement } from '../hooks';
 import { DASHBOARD_ARTICLES_CONFIG } from '../lib';
+import { ArticleFormValues } from '../model';
 import { ArticleForm } from './article-form';
 import { ArticleRow } from './article-row';
 import { ArticlesFiltersComponent } from './articles-filters';
 
 export const DashboardArticles = () => {
   const router = useRouter();
-  const [categories, setCategories] = useState<
-    { id: string; name: string; slug: string }[]
-  >([]);
-  const [tags, setTags] = useState<
-    { id: string; name: string; slug: string }[]
-  >([]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
+    article,
     filters,
     deleteDialog,
     editDialog,
@@ -61,6 +54,9 @@ export const DashboardArticles = () => {
     error,
     isFetching,
     debouncedSearch,
+    createArticlesMutation,
+    deleteArticleMutation,
+    updateArticlMutation,
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
@@ -71,40 +67,33 @@ export const DashboardArticles = () => {
     handleFiltersChange,
     handleRefresh,
     handlePrefetchNextPage,
+    setEditDialog,
     isArticleDeleting,
     isArticleToggling,
-    deleteArticleMutation,
   } = useArticlesManagement();
-  console.log('categories:', categories);
-  console.log('articles:', articles);
-  // Load categories and tags
-  useEffect(() => {
-    const loadData = async () => {
-      const [categoriesData, tagsData] = await Promise.all([
-        getCategoriesAction(),
-        getTagsAction(),
-      ]);
-      setCategories(categoriesData);
-      setTags(tagsData);
-    };
-    loadData();
-  }, []);
+  const isArticle = editDialog.articleId ? !!article : true;
+
+  const { data: categories } = useCategories(editDialog.open);
+  const { data: tags } = useTags(editDialog.open);
 
   const handleCreateArticle = () => {
-    router.push('/dashboard/articles/new');
+    setEditDialog({ open: true, articleId: null });
   };
 
   const handleEditArticle = (id: string) => {
-    router.push(`/dashboard/articles/edit/${id}`);
+    setEditDialog({ open: true, articleId: id });
   };
 
-  const handleSubmitArticle = async (data: any) => {
+  const handleSubmitArticle = async (data: ArticleFormValues) => {
     setIsSubmitting(true);
     try {
       if (editDialog.articleId) {
-        await updateArticleAction(editDialog.articleId, data);
+        await updateArticlMutation.mutateAsync({
+          id: editDialog.articleId,
+          data,
+        });
       } else {
-        await createArticleAction(data);
+        await createArticlesMutation.mutateAsync(data);
       }
       handleCloseEdit();
       handleRefresh();
@@ -304,10 +293,10 @@ export const DashboardArticles = () => {
       />
 
       {/* Article Form Sheet */}
-      <Sheet open={editDialog.open} onOpenChange={handleCloseEdit}>
+      <Sheet open={editDialog.open && isArticle} onOpenChange={handleCloseEdit}>
         <SheetContent
           side="right"
-          className="w-full sm:max-w-4xl overflow-y-auto"
+          className="w-full sm:max-w-7xl overflow-y-auto p-2"
         >
           <SheetHeader>
             <SheetTitle>
@@ -323,27 +312,16 @@ export const DashboardArticles = () => {
           <div className="mt-6">
             <ArticleForm
               initialData={
-                editDialog.articleId
-                  ? (() => {
-                      const article = articles.find(
-                        (a) => a.id === editDialog.articleId
-                      );
-                      if (!article) return undefined;
-
-                      return {
-                        title: article.title,
-                        slug: article.slug,
-                        content: article.content,
-                        excerpt: article.excerpt || '',
-                        coverImage: article.coverImage,
-                        published: article.published,
-                        categoryId: article.category?.id || null,
-                        tags: article.tags.map((tag) => tag.id),
-                        publishedAt: article.publishedAt
-                          ? new Date(article.publishedAt)
-                          : null,
-                      };
-                    })()
+                article
+                  ? {
+                      title: article.title,
+                      slug: article.slug,
+                      content: article.content,
+                      excerpt: article.excerpt || '',
+                      coverImage: article.coverImage,
+                      categoryId: article.categoryId,
+                      tags: article.tags.map((tag) => tag.id),
+                    }
                   : undefined
               }
               onSubmit={handleSubmitArticle}

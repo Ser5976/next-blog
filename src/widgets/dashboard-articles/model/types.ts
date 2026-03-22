@@ -1,34 +1,5 @@
-import { UserClerk } from '@/shared/types';
+import { Article } from '@/shared/types';
 import { ArticleFormValues } from './schemas';
-
-export interface Article {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt: string | null;
-  coverImage: string | null;
-  published: boolean;
-  authorId: string | null;
-  author?: UserClerk | null;
-  categoryId: string | null;
-  category?: {
-    id: string;
-    name: string;
-    slug: string;
-  } | null;
-  tags: {
-    id: string;
-    name: string;
-    slug: string;
-  }[];
-  viewCount: number;
-  averageRating: number | null;
-  ratingCount: number;
-  createdAt: number | null;
-  updatedAt: number | null;
-  publishedAt: number | null;
-}
 
 export interface ArticlesFilters {
   page: number;

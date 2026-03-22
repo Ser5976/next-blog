@@ -75,8 +75,8 @@ export function ImageUpload({
         folder: '/article-covers',
         useUniqueFileName: true,
       });
-
-      onChange(response.url ?? '');
+      console.log('img:', response);
+      onChange(response.url ? `${response.url}?id=${response.fileId}` : '');
     } catch (err) {
       console.error('Upload error:', err);
       setError(err instanceof Error ? err.message : 'Upload failed');

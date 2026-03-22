@@ -1,5 +1,4 @@
 export type {
-  Article,
   ArticlesFilters,
   ArticlesResponse,
   ApiResponse,

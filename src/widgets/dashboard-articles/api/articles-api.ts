@@ -1,13 +1,25 @@
 import axios from 'axios';
 
+import { Article } from '@/shared/types';
 import {
   ApiResponse,
-  Article,
   ArticleFormValues,
   ArticlesFilters,
   ArticlesResponse,
 } from '../model';
 
+export async function getArticle(
+  articleId: string | null
+): Promise<Article | null> {
+  if (!articleId) return null;
+  try {
+    const { data } = await axios.get<Article>(`/api/posts/${articleId}`);
+    return data;
+  } catch (error) {
+    console.error('getArticle: error:', error);
+    throw new Error('Something went wrong, article was not received');
+  }
+}
 export async function getArticles(
   filters: ArticlesFilters
 ): Promise<ArticlesResponse> {
@@ -24,26 +36,35 @@ export async function getArticles(
 
 export async function createArticle(
   data: ArticleFormValues
-): Promise<ArticlesResponse & { article?: Article }> {
+): Promise<ApiResponse> {
   try {
-    const respons = await axios.post<ArticlesResponse & { article?: Article }>(
-      '/api/posts',
-      {
-        data,
-      }
-    );
+    const respons = await axios.post<ApiResponse>('/api/posts', {
+      data,
+    });
     return respons.data;
   } catch (error) {
     console.error('createArticle: error:', error);
     throw new Error('Something went wrong, the article has not been created');
   }
 }
+export async function updateArticle(
+  articleId: string,
+  data: ArticleFormValues
+): Promise<ApiResponse> {
+  try {
+    const respons = await axios.put<ApiResponse>(`/api/posts/${articleId}`, {
+      data,
+    });
+    return respons.data;
+  } catch (error) {
+    console.error('updateArticle: error:', error);
+    throw new Error('Something went wrong, the article has not been created');
+  }
+}
 
 export async function deleteArticle(articleId: string): Promise<ApiResponse> {
   try {
-    const { data } = await axios.delete<ApiResponse>(
-      `/api/dashboard/articles/${articleId}`
-    );
+    const { data } = await axios.delete<ApiResponse>(`/api/posts/${articleId}`);
     return data;
   } catch (error) {
     console.error('deleteArticle: error:', error);
@@ -57,7 +78,7 @@ export async function togglePublishArticle(
 ): Promise<ApiResponse> {
   try {
     const { data } = await axios.patch<ApiResponse>(
-      `/api/dashboard/articles/${articleId}`,
+      `/api/posts/${articleId}/publish`,
       { published }
     );
     return data;

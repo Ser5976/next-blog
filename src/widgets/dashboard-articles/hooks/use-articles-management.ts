@@ -4,10 +4,13 @@ import { useCallback, useState } from 'react';
 
 import { useCustomDebounce } from '@/shared/hooks';
 import {
+  useArticle,
   useArticles,
+  useCreateArticle,
   useDeleteArticle,
   usePrefetchArticles,
   useTogglePublish,
+  useUpdateArticle,
 } from '.';
 import { ArticlesFilters } from '../model';
 
@@ -55,8 +58,14 @@ export function useArticlesManagement() {
     totalPages = 1,
   } = articlesData || {};
 
-  const deleteArticleMutation = useDeleteArticle();
+  if (editDialog.articleId) {
+  }
+  const { data: article } = useArticle(editDialog.articleId);
+
+  const createArticlesMutation = useCreateArticle();
+  const updateArticlMutation = useUpdateArticle();
   const togglePublishMutation = useTogglePublish();
+  const deleteArticleMutation = useDeleteArticle();
   const prefetchArticles = usePrefetchArticles();
 
   const handleDeleteClick = useCallback(
@@ -177,6 +186,7 @@ export function useArticlesManagement() {
 
   return {
     filters,
+    article,
     deleteDialog,
     editDialog,
     articles,
@@ -190,6 +200,8 @@ export function useArticlesManagement() {
     debouncedSearch,
     deleteArticleMutation,
     togglePublishMutation,
+    createArticlesMutation,
+    updateArticlMutation,
     handleDeleteClick,
     handleEditClick,
     handleConfirmDelete,

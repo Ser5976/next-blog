@@ -17,6 +17,7 @@
     "@clerk/nextjs": "^6.32.0",
     "@hookform/resolvers": "^5.2.2",
     "@imagekit/next": "^2.1.5",
+    "@imagekit/nodejs": "^7.3.0",
     "@prisma/client": "6.14.0",
     "@prisma/extension-accelerate": "^2.0.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",
