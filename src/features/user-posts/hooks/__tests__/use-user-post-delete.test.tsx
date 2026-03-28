@@ -26,11 +26,11 @@ const mockedDeleteUserPost = deleteUserPost as jest.MockedFunction<
 const mockedToast = toast as jest.Mocked<typeof toast>;
 
 describe('useUserPostDelete', () => {
+  const mockUserId = 'user-1';
   const mockPostId = 'post_1';
 
   // Мок данных для постов в кэше - правильная структура
   const mockPostsData = {
-    success: true,
     posts: [
       {
         id: 'post_1',
@@ -52,9 +52,7 @@ describe('useUserPostDelete', () => {
           { id: 'tag_1', name: 'React' },
           { id: 'tag_2', name: 'TypeScript' },
         ],
-        stats: {
-          commentsCount: 5,
-        },
+        comments: [],
       },
       {
         id: 'post_2',
@@ -70,19 +68,16 @@ describe('useUserPostDelete', () => {
         publishedAt: null,
         category: null,
         tags: [{ id: 'tag_3', name: 'JavaScript' }],
-        stats: {
-          commentsCount: 2,
-        },
+        comments: [],
       },
     ],
     stats: {
-      totalPosts: 2,
-      publishedPosts: 1,
-      totalViews: 150,
+      total: 2,
+      published: 1,
+      views: 150,
       averageRating: 4.3,
       totalRatings: 15,
     },
-    message: undefined,
   };
 
   // Мок ответа от API при успешном удалении
@@ -96,15 +91,18 @@ describe('useUserPostDelete', () => {
     // Создаем новый QueryClient перед каждым тестом
     queryClient = new QueryClient({
       defaultOptions: {
-        queries: { retry: false }, // Отключаем повторные попытки для тестов
+        queries: { retry: false },
       },
     });
 
     // Очищаем все моки перед каждым тестом
     jest.clearAllMocks();
 
-    // Устанавливаем тестовые данные в кэш QueryClient
-    queryClient.setQueryData(userPostsQueryKeys.all, mockPostsData);
+    // Устанавливаем тестовые данные в кэш QueryClient с правильным ключом
+    queryClient.setQueryData(
+      userPostsQueryKeys.list(mockUserId),
+      mockPostsData
+    );
   });
 
   // Создаем обертку для провайдеров
@@ -120,10 +118,9 @@ describe('useUserPostDelete', () => {
 
   // Test 1: Basic API call
   it('should call API with correct postId and return success response', async () => {
-    // Проверяем базовый сценарий работы хука - успешный вызов API с правильными параметрами
     mockedDeleteUserPost.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserPostDelete(), {
+    const { result } = renderHook(() => useUserPostDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -145,7 +142,6 @@ describe('useUserPostDelete', () => {
 
   // Test 2: Optimistic update
   it('should optimistically remove post from cache before API resolves', async () => {
-    //  Проверяем оптимистичное обновление - пост должен удалиться из UI до получения ответа от сервера
     let resolvePromise!: (value: typeof mockApiResponse) => void;
 
     const promise = new Promise<typeof mockApiResponse>((resolve) => {
@@ -154,7 +150,7 @@ describe('useUserPostDelete', () => {
 
     mockedDeleteUserPost.mockImplementation(() => promise);
 
-    const { result } = renderHook(() => useUserPostDelete(), {
+    const { result } = renderHook(() => useUserPostDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -165,7 +161,7 @@ describe('useUserPostDelete', () => {
 
     // Проверяем оптимистичное обновление
     const cachedData = queryClient.getQueryData<{ posts: any[] }>(
-      userPostsQueryKeys.all
+      userPostsQueryKeys.list(mockUserId)
     );
 
     // Должно остаться 1 пост (было 2, удалили 1)
@@ -187,10 +183,9 @@ describe('useUserPostDelete', () => {
 
   // Test 3: Success side effects
   it('should show success toast on successful deletion', async () => {
-    // Комментарий: Проверяем side effects при успешном удалении - должен показаться toast с сообщением об успехе
     mockedDeleteUserPost.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserPostDelete(), {
+    const { result } = renderHook(() => useUserPostDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -198,14 +193,14 @@ describe('useUserPostDelete', () => {
       await result.current.mutateAsync(mockPostId);
     });
 
+    // Исправляем текст тоста на "Post deleted successfully"
     expect(mockedToast.success).toHaveBeenCalledWith(
-      'User deleted successfully'
+      'Post deleted successfully'
     );
   });
 
   // Test 4: Rollback on error
   it('should rollback optimistic update and show error toast when API fails', async () => {
-    // Проверяем rollback оптимистичного обновления при ошибке API и показ toast с ошибкой
     const mockError = new Error('Failed to delete post');
 
     let rejectPromise!: (reason?: unknown) => void;
@@ -216,7 +211,7 @@ describe('useUserPostDelete', () => {
 
     mockedDeleteUserPost.mockImplementation(() => promise);
 
-    const { result } = renderHook(() => useUserPostDelete(), {
+    const { result } = renderHook(() => useUserPostDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -227,7 +222,7 @@ describe('useUserPostDelete', () => {
 
     // Проверяем оптимистичное удаление - должен остаться 1 пост
     let cachedData = queryClient.getQueryData<{ posts: any[] }>(
-      userPostsQueryKeys.all
+      userPostsQueryKeys.list(mockUserId)
     );
     expect(cachedData?.posts).toHaveLength(1);
 
@@ -245,7 +240,7 @@ describe('useUserPostDelete', () => {
     // Проверяем, что данные были восстановлены (откат оптимистичного обновления)
     // Должно быть 2 поста снова
     cachedData = queryClient.getQueryData<{ posts: any[] }>(
-      userPostsQueryKeys.all
+      userPostsQueryKeys.list(mockUserId)
     );
     expect(cachedData?.posts).toHaveLength(2);
 
@@ -255,7 +250,6 @@ describe('useUserPostDelete', () => {
 
   // Test 5: Mutation states
   it('should correctly update mutation states', async () => {
-    //  Проверяем корректное обновление состояний мутации (pending, success)
     let resolvePromise!: (value: typeof mockApiResponse) => void;
 
     const promise = new Promise<typeof mockApiResponse>((resolve) => {
@@ -264,7 +258,7 @@ describe('useUserPostDelete', () => {
 
     mockedDeleteUserPost.mockImplementation(() => promise);
 
-    const { result } = renderHook(() => useUserPostDelete(), {
+    const { result } = renderHook(() => useUserPostDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -291,11 +285,10 @@ describe('useUserPostDelete', () => {
 
   // Test 6: Empty cache safety
   it('should not crash when cache is empty', async () => {
-    //  Проверяем что хук не падает при пустом кэше (граничный случай)
     queryClient.clear();
     mockedDeleteUserPost.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserPostDelete(), {
+    const { result } = renderHook(() => useUserPostDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -310,10 +303,9 @@ describe('useUserPostDelete', () => {
 
   // Test 7: Toast messages verification
   it('should show correct toast message on success', async () => {
-    // Проверяем корректность сообщения в toast при успешном удалении
     mockedDeleteUserPost.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserPostDelete(), {
+    const { result } = renderHook(() => useUserPostDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -322,19 +314,19 @@ describe('useUserPostDelete', () => {
     });
 
     expect(mockedToast.success).toHaveBeenCalledTimes(1);
+    // Исправляем текст тоста на "Post deleted successfully"
     expect(mockedToast.success).toHaveBeenCalledWith(
-      'User deleted successfully'
+      'Post deleted successfully'
     );
     expect(mockedToast.error).not.toHaveBeenCalled();
   });
 
   // Test 8: Error toast verification
   it('should show correct toast message on error', async () => {
-    //  Проверяем корректность сообщения в toast при ошибке удаления
     const errorMessage = 'Failed to delete post';
     mockedDeleteUserPost.mockRejectedValue(new Error(errorMessage));
 
-    const { result } = renderHook(() => useUserPostDelete(), {
+    const { result } = renderHook(() => useUserPostDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -353,9 +345,9 @@ describe('useUserPostDelete', () => {
 
   // Test 9: Verify cache structure
   it('should have correct cache structure', async () => {
-    //  Проверяем структуру данных в кэше перед тестами
-    const cachedData = queryClient.getQueryData(userPostsQueryKeys.all);
-    expect(cachedData).toHaveProperty('success');
+    const cachedData = queryClient.getQueryData(
+      userPostsQueryKeys.list(mockUserId)
+    );
     expect(cachedData).toHaveProperty('posts');
     expect(cachedData).toHaveProperty('stats');
     expect(Array.isArray((cachedData as any).posts)).toBe(true);

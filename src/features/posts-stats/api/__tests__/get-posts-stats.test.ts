@@ -39,7 +39,7 @@ describe('getPostsStats', () => {
 
     // Assert: Проверяем результаты
     expect(global.fetch).toHaveBeenCalledWith(
-      `http://localhost:3000/api/dashboard/posts?timeRange=${timeRange}`,
+      `http://localhost:3000/api/dashboard/posts-stats?timeRange=${timeRange}`,
       {
         next: { revalidate: 60 },
       }
@@ -62,7 +62,7 @@ describe('getPostsStats', () => {
 
     // Assert: Проверяем
     expect(global.fetch).toHaveBeenCalledWith(
-      `http://localhost:3000/api/dashboard/posts?timeRange=${timeRange}`,
+      `http://localhost:3000/api/dashboard/posts-stats?timeRange=${timeRange}`,
       {
         next: { revalidate: 60 },
       }
@@ -103,7 +103,7 @@ describe('getPostsStats', () => {
 
       // Assert: Проверяем, что каждый раз вызывается с правильным timeRange
       expect(global.fetch).toHaveBeenCalledWith(
-        `http://localhost:3000/api/dashboard/posts?timeRange=${timeRange}`,
+        `http://localhost:3000/api/dashboard/posts-stats?timeRange=${timeRange}`,
         {
           next: { revalidate: 60 },
         }

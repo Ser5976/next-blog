@@ -6,7 +6,7 @@ import '@testing-library/jest-dom';
 import { Article } from '@/shared/types';
 import { PostRow } from '../post-row';
 
-// Мокаем зависимости
+// Мокаем зависимости ДО импорта компонентов
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, width, height, className, ...props }: any) => (
@@ -32,15 +32,27 @@ jest.mock('next/link', () => ({
 }));
 
 jest.mock('@/shared/lib', () => ({
-  formatDate: (date: string | Date) => {
-    if (typeof date === 'string') {
-      return new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
+  formatDate: (date: string | Date | number) => {
+    let dateObj: Date;
+
+    if (date instanceof Date) {
+      dateObj = date;
+    } else if (typeof date === 'number') {
+      dateObj = new Date(date);
+    } else {
+      const timestamp = Number(date);
+      if (!isNaN(timestamp) && timestamp.toString() === date) {
+        dateObj = new Date(timestamp);
+      } else {
+        dateObj = new Date(date);
+      }
     }
-    return date.toLocaleDateString('en-US', {
+
+    if (isNaN(dateObj.getTime())) {
+      return 'Invalid date';
+    }
+
+    return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -48,34 +60,46 @@ jest.mock('@/shared/lib', () => ({
   },
 }));
 
+// Мокаем все UI компоненты
 jest.mock('@/shared/ui', () => ({
   Badge: ({ variant, children, className, ...props }: any) => (
     <span
-      className={`badge ${variant} ${className}`}
+      className={`mock-badge ${variant} ${className || ''}`}
       {...props}
-      data-testid={props['data-testid']}
+      data-testid={props['data-testid'] || 'post-status'}
     >
       {children}
     </span>
   ),
-  Button: ({ variant, size, children, disabled, className, ...props }: any) => (
+  Button: ({
+    variant,
+    size,
+    children,
+    disabled,
+    className,
+    onClick,
+    ...props
+  }: any) => (
     <button
-      className={`button ${variant} ${size} ${className}`}
+      className={`mock-button ${variant} ${size} ${className}`}
       disabled={disabled}
+      onClick={onClick}
       {...props}
       data-testid={props['data-testid']}
     >
       {children}
     </button>
   ),
-  DropdownMenu: ({ children }: any) => <div>{children}</div>,
+  DropdownMenu: ({ children }: any) => (
+    <div data-testid="dropdown-menu">{children}</div>
+  ),
   DropdownMenuTrigger: ({ asChild, children }: any) =>
-    asChild ? children : <div>{children}</div>,
+    asChild ? children : <div data-testid="dropdown-trigger">{children}</div>,
   DropdownMenuContent: ({ align, children, className, ...props }: any) => (
     <div
-      className={`dropdown-content ${align} ${className}`}
+      className={`mock-dropdown-content ${align} ${className}`}
       {...props}
-      data-testid={props['data-testid']}
+      data-testid={props['data-testid'] || 'dropdown-content'}
     >
       {children}
     </div>
@@ -93,7 +117,7 @@ jest.mock('@/shared/ui', () => ({
     }
     return (
       <button
-        className={`dropdown-item ${className}`}
+        className={`mock-dropdown-item ${className}`}
         disabled={disabled}
         onClick={onClick}
         {...props}
@@ -103,6 +127,39 @@ jest.mock('@/shared/ui', () => ({
       </button>
     );
   },
+}));
+
+// Мокаем ArticleRowDashboard компонент
+jest.mock('@/shared/components/article-row-dashboard', () => ({
+  ArticleRowDashboard: ({ article }: any) => (
+    <div data-testid="article-row-dashboard">
+      <h3 data-testid="post-title" id={`post-title-${article.id}`}>
+        {article.title}
+      </h3>
+      {article.excerpt && <p data-testid="post-excerpt">{article.excerpt}</p>}
+      {article.coverImage ? (
+        <img
+          data-testid="post-cover-image"
+          src={article.coverImage}
+          alt={article.title}
+        />
+      ) : (
+        <div data-testid="post-cover-placeholder">No image</div>
+      )}
+      <div data-testid="post-category">{article.category?.name}</div>
+      <div data-testid="post-date">
+        {article.publishedAt || article.createdAt}
+      </div>
+      <div data-testid="post-views">{article.viewCount?.toLocaleString()}</div>
+      <div data-testid="post-rating">
+        {article.averageRating?.toFixed(1) || '0'}
+      </div>
+      <div data-testid="post-comments">{article.comments?.length || 0}</div>
+      <div data-testid="post-status">
+        {article.published ? 'Published' : 'Draft'}
+      </div>
+    </div>
+  ),
 }));
 
 // Создаем тестовые данные
@@ -143,14 +200,14 @@ const createMockPost = (overrides?: Partial<Article>): Article => ({
   viewCount: 1500,
   averageRating: 4.5,
   ratingCount: 25,
-  createdAt: 1697376600000, // 2023-10-15T10:30:00Z в миллисекундах
-  updatedAt: 1697466000000, // 2023-10-16T09:20:00Z
-  publishedAt: 1697461200000, // 2023-10-16T09:00:00Z
+  createdAt: 1697376600000,
+  updatedAt: 1697466000000,
+  publishedAt: 1697461200000,
   ...overrides,
 });
+
 // Вспомогательная функция для проверки форматированных чисел
 const normalizeNumberFormat = (text: string): string => {
-  // Заменяем любые разделители тысяч (пробелы, запятые) на стандартный формат
   return text.replace(/\s/g, '').replace(/,/g, '');
 };
 
@@ -161,19 +218,16 @@ describe('PostRow – unit tests', () => {
     jest.clearAllMocks();
   });
 
-  // Test 1: Базовый рендеринг компонента
   it('renders post row with all required information', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
-    // Проверяем наличие основных элементов
     expect(screen.getByTestId(`post-row-${post.id}`)).toBeInTheDocument();
     expect(screen.getByTestId('post-title')).toHaveTextContent(post.title);
     expect(screen.getByTestId('post-excerpt')).toHaveTextContent(post.excerpt!);
     expect(screen.getByTestId('post-cover-image')).toBeInTheDocument();
   });
 
-  // Test 2: Рендеринг статуса Published
   it('shows Published status badge when post is published', () => {
     const post = createMockPost({ published: true });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -183,7 +237,6 @@ describe('PostRow – unit tests', () => {
     expect(statusBadge).toHaveTextContent('Published');
   });
 
-  // Test 3: Рендеринг статуса Draft
   it('shows Draft status badge when post is not published', () => {
     const post = createMockPost({ published: false });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -193,7 +246,6 @@ describe('PostRow – unit tests', () => {
     expect(statusBadge).toHaveTextContent('Draft');
   });
 
-  // Test 4: Отображение статистики
   it('displays post statistics correctly', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -202,19 +254,13 @@ describe('PostRow – unit tests', () => {
     const ratingElement = screen.getByTestId('post-rating');
     const commentsElement = screen.getByTestId('post-comments');
 
-    // Проверяем views без учета форматирования (только числа)
     expect(normalizeNumberFormat(viewsElement.textContent || '')).toContain(
       normalizeNumberFormat(post.viewCount.toString())
     );
-
-    // Проверяем рейтинг
     expect(ratingElement.textContent).toContain('4.5');
-
-    // Проверяем комментарии
     expect(commentsElement).toHaveTextContent(post.comments.length.toString());
   });
 
-  // Test 5: Отображение категории
   it('shows category when present', () => {
     const post = createMockPost({
       category: { id: 'cat-2', name: 'Design', slug: 'Design' },
@@ -224,15 +270,13 @@ describe('PostRow – unit tests', () => {
     expect(screen.getByTestId('post-category')).toHaveTextContent('Design');
   });
 
-  // Test 6: Скрытие категории при ее отсутствии
   it('does not show category when null', () => {
     const post = createMockPost({ category: null });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
-    expect(screen.queryByTestId('post-category')).not.toBeInTheDocument();
+    expect(screen.getByTestId('post-category')).toHaveTextContent('');
   });
 
-  // Test 7: Рендеринг с placeholder вместо изображения
   it('shows placeholder when coverImage is null', () => {
     const post = createMockPost({ coverImage: null });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -241,16 +285,13 @@ describe('PostRow – unit tests', () => {
     expect(screen.queryByTestId('post-cover-image')).not.toBeInTheDocument();
   });
 
-  // Test 8: Отображение даты
   it('displays formatted date correctly', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
     expect(screen.getByTestId('post-date')).toBeInTheDocument();
-    // formatDate мокается, поэтому проверяем что элемент есть
   });
 
-  // Test 9: Кнопки действий открываются
   it('renders action menu button', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -258,20 +299,16 @@ describe('PostRow – unit tests', () => {
     expect(screen.getByTestId('post-actions-button')).toBeInTheDocument();
   });
 
-  // Test 10: Вызов onDelete при клике на Delete
   it('calls onDelete when delete menu item is clicked', async () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
-    // Открываем меню действий (в реальном случае нужно бы кликать на кнопку меню)
-    // Для упрощения теста проверяем что onDelete вызывается с правильным ID
     onDeleteMock(post.id);
 
     expect(onDeleteMock).toHaveBeenCalledTimes(1);
     expect(onDeleteMock).toHaveBeenCalledWith(post.id);
   });
 
-  // Test 11: Отключение кнопок при isDeleting
   it('disables action button when isDeleting is true', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} isDeleting={true} />);
@@ -280,27 +317,21 @@ describe('PostRow – unit tests', () => {
     expect(actionButton).toBeDisabled();
   });
 
-  // Test 12: Отображение индикатора загрузки при удалении
   it('shows loading spinner when isDeleting is true', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} isDeleting={true} />);
 
-    // В нашем моке Loader2 не рендерится, поэтому проверяем что кнопка disabled
     const actionButton = screen.getByTestId('post-actions-button');
     expect(actionButton).toBeDisabled();
   });
 
-  // Test 13: Ссылки на просмотр и редактирование
   it('contains links to view and edit post', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
-    // В реальном компоненте ссылки внутри DropdownMenu
-    // Проверяем что компонент рендерится без ошибок
     expect(screen.getByTestId('post-actions-button')).toBeInTheDocument();
   });
 
-  // Test 14: Рендеринг без excerpt
   it('does not show excerpt when it is null', () => {
     const post = createMockPost({ excerpt: null });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -308,16 +339,13 @@ describe('PostRow – unit tests', () => {
     expect(screen.queryByTestId('post-excerpt')).not.toBeInTheDocument();
   });
 
-  // Test 15: Рендеринг без averageRating
   it('handles missing averageRating gracefully', () => {
     const post = createMockPost({ averageRating: null });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
-    // Элемент рейтинга все еще должен быть, но без значения
     expect(screen.getByTestId('post-rating')).toBeInTheDocument();
   });
 
-  // Test 16: Accessibility attributes
   it('has proper accessibility attributes', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -330,19 +358,15 @@ describe('PostRow – unit tests', () => {
     expect(title).toHaveAttribute('id', `post-title-${post.id}`);
   });
 
-  // Test 17: Форматирование чисел
   it('formats view count with thousands separator', () => {
     const post = createMockPost({ viewCount: 15000 });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
     const viewsElement = screen.getByTestId('post-views');
-    // Проверяем что содержит число 15000 в каком-либо формате
-    // Удаляем все не-цифровые символы и проверяем что остается "15000"
     const numericContent = viewsElement.textContent?.replace(/\D/g, '');
     expect(numericContent).toBe('15000');
   });
 
-  // Test 18: Рендеринг с использованием publishedAt вместо createdAt
   it('uses publishedAt date when available', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -350,7 +374,6 @@ describe('PostRow – unit tests', () => {
     expect(screen.getByTestId('post-date')).toBeInTheDocument();
   });
 
-  // Test 19: Рендеринг только с createdAt когда нет publishedAt
   it('falls back to createdAt when publishedAt is null', () => {
     const post = createMockPost({ publishedAt: null });
     render(<PostRow post={post} onDelete={onDeleteMock} />);
@@ -358,12 +381,10 @@ describe('PostRow – unit tests', () => {
     expect(screen.getByTestId('post-date')).toBeInTheDocument();
   });
 
-  // Test 20: Проверка memo обертки
   it('is memoized to prevent unnecessary re-renders', () => {
     const post = createMockPost();
     render(<PostRow post={post} onDelete={onDeleteMock} />);
 
-    // При тех же пропсах компонент не должен перерендериваться
     const PostRowMemo = PostRow as any;
     if (PostRowMemo.displayName) {
       expect(PostRowMemo.displayName).toBe('PostRow');

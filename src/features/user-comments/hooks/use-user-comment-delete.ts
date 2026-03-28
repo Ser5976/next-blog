@@ -1,3 +1,4 @@
+// use-user-comment-delete.ts
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -6,7 +7,6 @@ import { deleteUserComment } from '../api';
 import { userCommentsQueryKeys } from './use-user-comments';
 
 export function useUserCommentDelete(userId: string) {
-  //  Добавляем userId как параметр
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -15,14 +15,13 @@ export function useUserCommentDelete(userId: string) {
 
     // Оптимистичное удаление
     onMutate: async ({ commentId }) => {
-      // Используем специфичный ключ для этого пользователя
       const queryKey = userCommentsQueryKeys.list(userId);
 
       await queryClient.cancelQueries({ queryKey });
 
       const previousData = queryClient.getQueryData<{
         comments: Comment[];
-        stats?: any; // Добавляем stats, если они есть в ответе
+        stats?: any;
       }>(queryKey);
 
       queryClient.setQueryData<{ comments: Comment[]; stats?: any }>(
@@ -30,19 +29,41 @@ export function useUserCommentDelete(userId: string) {
         (old) => {
           if (!old) return old;
 
+          // Находим удаляемый комментарий, чтобы обновить статистику
+          const deletedComment = old.comments.find(
+            (comment) => comment.id === commentId
+          );
+
+          // Фильтруем комментарии
+          const filteredComments = old.comments.filter(
+            (comment) => comment.id !== commentId
+          );
+
+          // Обновляем статистику, если она есть
+          let updatedStats = old.stats;
+          if (old.stats && deletedComment) {
+            updatedStats = {
+              ...old.stats,
+              totalComments: Math.max(0, (old.stats.totalComments || 0) - 1),
+              totalLikes: Math.max(
+                0,
+                (old.stats.totalLikes || 0) -
+                  (deletedComment.stats?.likesCount || 0)
+              ),
+              totalDislikes: Math.max(
+                0,
+                (old.stats.totalDislikes || 0) -
+                  (deletedComment.stats?.dislikesCount || 0)
+              ),
+              // Обновляем количество уникальных постов
+              postsCommented: Math.max(0, (old.stats.postsCommented || 0) - 1),
+            };
+          }
+
           return {
             ...old,
-            comments: old.comments.filter(
-              (comment) => comment.id !== commentId
-            ),
-            // 👇 Если есть статистика, обновляем и её
-            stats: old.stats
-              ? {
-                  ...old.stats,
-                  total: old.stats.total - 1,
-                  // Обновите другие поля статистики при необходимости
-                }
-              : undefined,
+            comments: filteredComments,
+            stats: updatedStats,
           };
         }
       );
@@ -62,13 +83,11 @@ export function useUserCommentDelete(userId: string) {
       toast.success('Comment deleted successfully');
     },
 
-    onSettled: (data, error, _variables, context) => {
-      // 👇 Инвалидируем только данные этого пользователя
+    onSettled: (_data, _error, _variables, context) => {
       if (context?.queryKey) {
         queryClient.invalidateQueries({ queryKey: context.queryKey });
       }
 
-      // Также инвалидируем статистику, если она кэшируется отдельно
       queryClient.invalidateQueries({
         queryKey: userCommentsQueryKeys.stats(userId),
       });

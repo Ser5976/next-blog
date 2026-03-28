@@ -19,18 +19,13 @@ jest.mock('../../api', () => ({
   deleteUserComment: jest.fn(),
 }));
 
-jest.mock('../use-user-comments', () => ({
-  userCommentsQueryKeys: {
-    all: ['user-comments'],
-  },
-}));
-
 const mockedDeleteUserComment = deleteUserComment as jest.MockedFunction<
   typeof deleteUserComment
 >;
 const mockedToast = toast as jest.Mocked<typeof toast>;
 
 describe('useUserCommentDelete', () => {
+  const mockUserId = 'user-1';
   const mockCommentId = 'comment_1';
 
   // Подготавливаем тестовые данные для кэша
@@ -73,7 +68,6 @@ describe('useUserCommentDelete', () => {
       totalDislikes: 1,
       postsCommented: 2,
     },
-    success: true,
   };
 
   const mockApiResponse = {
@@ -92,7 +86,10 @@ describe('useUserCommentDelete', () => {
 
     jest.clearAllMocks();
 
-    queryClient.setQueryData(userCommentsQueryKeys.all, mockPreviousData);
+    queryClient.setQueryData(
+      userCommentsQueryKeys.list(mockUserId),
+      JSON.parse(JSON.stringify(mockPreviousData)) // Deep copy to avoid mutations
+    );
   });
 
   const createWrapper = () => {
@@ -105,11 +102,10 @@ describe('useUserCommentDelete', () => {
     };
   };
 
-  // 1. Базовый тест
   it('should call API with correct commentId and return success response', async () => {
     mockedDeleteUserComment.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -124,13 +120,11 @@ describe('useUserCommentDelete', () => {
 
     expect(response!).toEqual(mockApiResponse);
 
-    // ✅ ждём обновления состояния мутации
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });
   });
 
-  // 2. Оптимистичное обновление
   it('should optimistically remove comment from cache before API resolves', async () => {
     let resolvePromise!: (value: typeof mockApiResponse) => void;
 
@@ -140,7 +134,7 @@ describe('useUserCommentDelete', () => {
 
     mockedDeleteUserComment.mockImplementation(() => promise);
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -150,7 +144,7 @@ describe('useUserCommentDelete', () => {
     });
 
     const cachedData = queryClient.getQueryData<{ comments: any[] }>(
-      userCommentsQueryKeys.all
+      userCommentsQueryKeys.list(mockUserId)
     );
 
     expect(cachedData?.comments).toHaveLength(1);
@@ -168,11 +162,10 @@ describe('useUserCommentDelete', () => {
     });
   });
 
-  // 3. Success side effects
   it('should show success toast on successful deletion', async () => {
     mockedDeleteUserComment.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -185,7 +178,6 @@ describe('useUserCommentDelete', () => {
     );
   });
 
-  // 4. Rollback on error
   it('should rollback optimistic update and show error toast when API fails', async () => {
     const mockError = new Error('Failed to delete comment');
 
@@ -197,7 +189,7 @@ describe('useUserCommentDelete', () => {
 
     mockedDeleteUserComment.mockImplementation(() => promise);
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -206,9 +198,8 @@ describe('useUserCommentDelete', () => {
       await new Promise((r) => setTimeout(r, 0));
     });
 
-    // optimistic removal
     let cachedData = queryClient.getQueryData<{ comments: any[] }>(
-      userCommentsQueryKeys.all
+      userCommentsQueryKeys.list(mockUserId)
     );
     expect(cachedData?.comments).toHaveLength(1);
 
@@ -221,16 +212,14 @@ describe('useUserCommentDelete', () => {
       expect(result.current.isError).toBe(true);
     });
 
-    // rollback
     cachedData = queryClient.getQueryData<{ comments: any[] }>(
-      userCommentsQueryKeys.all
+      userCommentsQueryKeys.list(mockUserId)
     );
     expect(cachedData?.comments).toHaveLength(2);
 
     expect(mockedToast.error).toHaveBeenCalledWith(mockError.message);
   });
 
-  // 5. Mutation states
   it('should correctly update mutation states', async () => {
     let resolvePromise!: (value: typeof mockApiResponse) => void;
 
@@ -240,7 +229,7 @@ describe('useUserCommentDelete', () => {
 
     mockedDeleteUserComment.mockImplementation(() => promise);
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -265,12 +254,11 @@ describe('useUserCommentDelete', () => {
     });
   });
 
-  // 6. Empty cache safety
   it('should not crash when cache is empty', async () => {
     queryClient.clear();
     mockedDeleteUserComment.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -283,11 +271,10 @@ describe('useUserCommentDelete', () => {
     expect(mockedToast.success).toHaveBeenCalled();
   });
 
-  // 7. Проверка параметров мутации
   it('should accept object with commentId as parameter', async () => {
     mockedDeleteUserComment.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -298,13 +285,12 @@ describe('useUserCommentDelete', () => {
     expect(mockedDeleteUserComment).toHaveBeenCalledWith('test-comment-id');
   });
 
-  // 8. Проверка onSettled инвалидации
   it('should invalidate queries on settled', async () => {
     mockedDeleteUserComment.mockResolvedValue(mockApiResponse);
 
     const invalidateQueriesSpy = jest.spyOn(queryClient, 'invalidateQueries');
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -312,17 +298,19 @@ describe('useUserCommentDelete', () => {
       await result.current.mutateAsync({ commentId: mockCommentId });
     });
 
-    // Проверяем что invalidateQueries был вызван
     expect(invalidateQueriesSpy).toHaveBeenCalledWith({
-      queryKey: userCommentsQueryKeys.all,
+      queryKey: userCommentsQueryKeys.list(mockUserId),
+    });
+
+    expect(invalidateQueriesSpy).toHaveBeenCalledWith({
+      queryKey: userCommentsQueryKeys.stats(mockUserId),
     });
   });
 
-  // 9. Проверка toast messages
   it('should show correct toast message on success', async () => {
     mockedDeleteUserComment.mockResolvedValue(mockApiResponse);
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -341,7 +329,7 @@ describe('useUserCommentDelete', () => {
     const errorMessage = 'Failed to delete comment';
     mockedDeleteUserComment.mockRejectedValue(new Error(errorMessage));
 
-    const { result } = renderHook(() => useUserCommentDelete(), {
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
       wrapper: createWrapper(),
     });
 
@@ -356,5 +344,46 @@ describe('useUserCommentDelete', () => {
     expect(mockedToast.error).toHaveBeenCalledTimes(1);
     expect(mockedToast.error).toHaveBeenCalledWith(errorMessage);
     expect(mockedToast.success).not.toHaveBeenCalled();
+  });
+
+  // Обновленный тест для проверки статистики
+  it('should update stats optimistically', async () => {
+    let resolvePromise!: (value: typeof mockApiResponse) => void;
+
+    const promise = new Promise<typeof mockApiResponse>((resolve) => {
+      resolvePromise = resolve;
+    });
+
+    mockedDeleteUserComment.mockImplementation(() => promise);
+
+    const { result } = renderHook(() => useUserCommentDelete(mockUserId), {
+      wrapper: createWrapper(),
+    });
+
+    await act(async () => {
+      result.current.mutate({ commentId: mockCommentId });
+      // Ждем немного, чтобы optimistic update применился
+      await new Promise((r) => setTimeout(r, 100));
+    });
+
+    const cachedData = queryClient.getQueryData<{ stats: any }>(
+      userCommentsQueryKeys.list(mockUserId)
+    );
+
+    console.log(
+      'Cached data after optimistic update:',
+      JSON.stringify(cachedData, null, 2)
+    );
+
+    // Проверяем, что статистика обновилась
+    expect(cachedData?.stats.totalComments).toBe(1); // было 2, стало 1
+    expect(cachedData?.stats.totalLikes).toBe(3); // было 8, вычли 5
+    expect(cachedData?.stats.totalDislikes).toBe(0); // было 1, вычли 1
+    expect(cachedData?.stats.postsCommented).toBe(1); // было 2, стало 1
+
+    await act(async () => {
+      resolvePromise(mockApiResponse);
+      await new Promise((r) => setTimeout(r, 0));
+    });
   });
 });
