@@ -32,7 +32,7 @@ export function UserCommentsList({ userId }: { userId: string }) {
     refetch();
   };
 
-  const deleteUserCommentMutation = useUserCommentDelete();
+  const deleteUserCommentMutation = useUserCommentDelete(userId);
 
   const handleDeleteClick = useCallback(
     (commentId: string, content: string) => {

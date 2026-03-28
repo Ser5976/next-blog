@@ -1,1 +1,1 @@
-export type { UserPostsResponse } from './types';
+export type { UserPostsResponse, PostRowProps } from './types';

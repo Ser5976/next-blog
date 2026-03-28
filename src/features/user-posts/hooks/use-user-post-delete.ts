@@ -5,7 +5,7 @@ import { Article } from '@/shared/types';
 import { deleteUserPost } from '../api';
 import { userPostsQueryKeys } from './use-user-posts';
 
-export function useUserPostDelete() {
+export function useUserPostDelete(userId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -13,41 +13,59 @@ export function useUserPostDelete() {
 
     // Оптимистичное удаление
     onMutate: async (postId) => {
-      await queryClient.cancelQueries({ queryKey: userPostsQueryKeys.all });
+      // 👇 Используем специфичный ключ для этого пользователя
+      const queryKey = userPostsQueryKeys.list(userId);
 
-      const previousData = queryClient.getQueryData<{ posts: Article[] }>(
-        userPostsQueryKeys.all
-      );
+      await queryClient.cancelQueries({ queryKey });
 
-      queryClient.setQueryData<{ posts: Article[] }>(
-        userPostsQueryKeys.all,
+      const previousData = queryClient.getQueryData<{
+        posts: Article[];
+        stats: any;
+      }>(queryKey);
+
+      queryClient.setQueryData<{ posts: Article[]; stats: any }>(
+        queryKey,
         (old) => {
           if (!old) return old;
 
           return {
             ...old,
             posts: old.posts.filter((post) => post.id !== postId),
+            // 👇 Также нужно обновить статистику
+            stats: {
+              ...old.stats,
+              total: old.stats.total - 1,
+              // Обновите другие поля статистики при необходимости
+            },
           };
         }
       );
 
-      return { previousData };
+      return { previousData, queryKey };
     },
 
     onError: (error, postId, context) => {
-      toast.error(error.message || 'Failed to delete user');
+      toast.error(error.message || 'Failed to delete post');
 
-      if (context?.previousData) {
-        queryClient.setQueryData(userPostsQueryKeys.all, context.previousData);
+      if (context?.previousData && context?.queryKey) {
+        queryClient.setQueryData(context.queryKey, context.previousData);
       }
     },
 
     onSuccess: () => {
-      toast.success('User deleted successfully');
+      toast.success('Post deleted successfully');
     },
 
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: userPostsQueryKeys.all });
+    onSettled: (data, error, postId, context) => {
+      // 👇 Инвалидируем только данные этого пользователя
+      if (context?.queryKey) {
+        queryClient.invalidateQueries({ queryKey: context.queryKey });
+      }
+
+      // Также инвалидируем статистику, если она кэшируется отдельно
+      queryClient.invalidateQueries({
+        queryKey: userPostsQueryKeys.stats(userId),
+      });
     },
   });
 }

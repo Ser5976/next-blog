@@ -6,6 +6,8 @@ import { UserCommentsResponse } from '../model';
 // Ключи для кэширования
 export const userCommentsQueryKeys = {
   all: ['user-comments'] as const,
+  list: (userId: string) =>
+    [...userCommentsQueryKeys.all, 'list', userId] as const,
   stats: (userId: string) =>
     [...userCommentsQueryKeys.all, 'stats', userId] as const,
 } as const;
@@ -13,7 +15,7 @@ export const userCommentsQueryKeys = {
 // Хук для получения комментариев пользователя
 export function useUserComments(userId: string) {
   return useQuery<UserCommentsResponse, Error>({
-    queryKey: userCommentsQueryKeys.all,
+    queryKey: userCommentsQueryKeys.list(userId),
     queryFn: () => getUserComments(userId),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 минут

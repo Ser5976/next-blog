@@ -8,3 +8,8 @@ export interface UserPostsResponse {
   stats: IPostsStats;
   message?: string;
 }
+export interface PostRowProps {
+  post: Article;
+  onDelete: (postId: string) => void;
+  isDeleting?: boolean;
+}

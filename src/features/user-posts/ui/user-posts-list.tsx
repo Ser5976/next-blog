@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react';
 import { FileText } from 'lucide-react';
 
-import { PostRow } from '@/entities/post-row';
 import { PostsStats } from '@/entities/posts-stats';
 import {
   ConfirmDialog,
@@ -12,6 +11,7 @@ import {
   UniversalError,
 } from '@/shared/ui';
 import { useUserPostDelete, useUserPosts } from '../hooks';
+import { PostRow } from './post-row';
 
 export function UserPostsList({ userId }: { userId: string }) {
   const [deleteDialog, setDeleteDialog] = useState<{
@@ -32,7 +32,7 @@ export function UserPostsList({ userId }: { userId: string }) {
     refetch();
   };
 
-  const deleteUserPostMutation = useUserPostDelete();
+  const deleteUserPostMutation = useUserPostDelete(userId);
 
   const handleDeleteClick = useCallback((postId: string, title: string) => {
     setDeleteDialog({

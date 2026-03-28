@@ -6,6 +6,8 @@ import { UserPostsResponse } from '../model';
 // Ключи для кэширования
 export const userPostsQueryKeys = {
   all: ['user-posts'] as const,
+  list: (userId: string) =>
+    [...userPostsQueryKeys.all, 'list', userId] as const,
   stats: (userId: string) =>
     [...userPostsQueryKeys.all, 'stats', userId] as const,
 } as const;
@@ -13,7 +15,7 @@ export const userPostsQueryKeys = {
 // Хук для получения постов пользователя
 export function useUserPosts(userId: string) {
   return useQuery<UserPostsResponse, Error>({
-    queryKey: userPostsQueryKeys.all,
+    queryKey: userPostsQueryKeys.list(userId),
     queryFn: () => getUserPosts(userId),
     enabled: !!userId,
     staleTime: 1000 * 60 * 5, // 5 минут
