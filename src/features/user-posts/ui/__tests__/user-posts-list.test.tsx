@@ -37,7 +37,7 @@ jest.mock('../post-row', () => ({
   ),
 }));
 
-jest.mock('@/entities/posts-stats', () => ({
+jest.mock('../posts-stats', () => ({
   PostsStats: ({ stats }: { stats: any }) => (
     <div data-testid="posts-stats">
       <span>Total Posts: {stats.totalPosts}</span>

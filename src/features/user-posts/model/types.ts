@@ -1,4 +1,3 @@
-import { IPostsStats } from '@/entities/posts-stats';
 import { Article } from '@/shared/types';
 
 // Основной response для постов
@@ -12,4 +11,15 @@ export interface PostRowProps {
   post: Article;
   onDelete: (postId: string) => void;
   isDeleting?: boolean;
+}
+export interface IPostsStats {
+  totalPosts: number;
+  publishedPosts: number;
+  totalViews: number;
+  averageRating: number;
+  totalRatings: number;
+}
+
+export interface PostsStatsProps {
+  stats: IPostsStats;
 }

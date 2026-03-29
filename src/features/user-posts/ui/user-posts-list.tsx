@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react';
 import { FileText } from 'lucide-react';
 
-import { PostsStats } from '@/entities/posts-stats';
 import {
   ConfirmDialog,
   ListSkeleton,
@@ -12,6 +11,7 @@ import {
 } from '@/shared/ui';
 import { useUserPostDelete, useUserPosts } from '../hooks';
 import { PostRow } from './post-row';
+import { PostsStats } from './posts-stats';
 
 export function UserPostsList({ userId }: { userId: string }) {
   const [deleteDialog, setDeleteDialog] = useState<{

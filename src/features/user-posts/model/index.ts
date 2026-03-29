@@ -1,1 +1,6 @@
-export type { UserPostsResponse, PostRowProps } from './types';
+export type {
+  UserPostsResponse,
+  PostRowProps,
+  IPostsStats,
+  PostsStatsProps,
+} from './types';
