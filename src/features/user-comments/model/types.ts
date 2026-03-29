@@ -1,5 +1,3 @@
-import { ICommentsStats } from '@/entities/comments-stats';
-
 export interface Comment {
   id: string;
   content: string;
@@ -32,4 +30,14 @@ export interface UserCommentsResponse {
 export interface DeleteCommentResponse {
   success: boolean;
   message: string;
+}
+export interface ICommentsStats {
+  totalComments: number;
+  totalDislikes: number;
+  totalLikes: number;
+  postsCommented: number;
+}
+
+export interface CommentsStatsProps {
+  stats: ICommentsStats;
 }

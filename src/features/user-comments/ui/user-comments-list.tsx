@@ -3,7 +3,6 @@
 import { useCallback, useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 
-import { CommentsStats } from '@/entities/comments-stats';
 import {
   ConfirmDialog,
   ListSkeleton,
@@ -12,6 +11,7 @@ import {
 } from '@/shared/ui';
 import { useUserCommentDelete, useUserComments } from '../hooks';
 import { CommentRow } from './comment-row';
+import { CommentsStats } from './comments-stats';
 
 export function UserCommentsList({ userId }: { userId: string }) {
   const [deleteDialog, setDeleteDialog] = useState<{
