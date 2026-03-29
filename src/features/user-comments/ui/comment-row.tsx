@@ -20,7 +20,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/shared/ui';
-import { CommentRowProps } from '../model';
+import { CommentRowProps } from '../model/types';
 
 const CommentRowComponent = ({
   comment,

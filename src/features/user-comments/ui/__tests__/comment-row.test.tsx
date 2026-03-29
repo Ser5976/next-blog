@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import '@testing-library/jest-dom';
 
-import { Comment } from '../../model';
+import { Comment } from '../../model/types';
 import { CommentRow } from '../comment-row';
 
 // Мокаем зависимости

@@ -14,7 +14,7 @@ jest.mock('../../hooks', () => ({
 }));
 
 // Мокаем компоненты
-jest.mock('@/entities/coment-row', () => ({
+jest.mock('../comment-row', () => ({
   CommentRow: ({
     comment,
     onDelete,
