@@ -1,4 +1,5 @@
 import {
+  ChartColumnStacked,
   FileText,
   LayoutDashboard,
   MessageCircle,
@@ -36,6 +37,12 @@ export const NAV_ITEMS = [
     href: '/dashboard/settings',
     label: 'Settings',
     icon: Settings,
+    exact: false,
+  },
+  {
+    href: '/dashboard/categories',
+    label: 'Categories',
+    icon: ChartColumnStacked,
     exact: false,
   },
 ] as const;

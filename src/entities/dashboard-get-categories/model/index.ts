@@ -1,2 +1,3 @@
 export type { Category } from './types';
-export { useCategories } from './use-categories';
+export type { CategoryFormValues } from './schemas';
+export { categoryFormSchema } from './schemas';
