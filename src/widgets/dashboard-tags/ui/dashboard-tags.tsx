@@ -1,16 +1,16 @@
 'use client';
 
 import { useState } from 'react';
-import { ChartColumnStacked, Loader2, Plus, RefreshCw } from 'lucide-react';
+import { Loader2, Plus, RefreshCw, Tags } from 'lucide-react';
 
 import {
-  CategoryFormValues,
-  useCategories,
-  useCategory,
-  useCreateCategory,
-  useDeleteCategory,
-  useUpdateCategory,
-} from '@/entities/dashboard-get-categories';
+  TagFormValues,
+  useCreateTag,
+  useDeleteTag,
+  useTag,
+  useTags,
+  useUpdateTag,
+} from '@/entities/dashboard-get-tags';
 import { ConfirmDialog, UniversalEmpty, UniversalError } from '@/shared/ui';
 import { Button } from '@/shared/ui/button';
 import {
@@ -27,64 +27,64 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/shared/ui/sheet';
-import { CategoryForm } from './category-form';
-import { CategoryRow } from './category-row';
+import { TagForm } from './tag-form';
+import { TagRow } from './tag-row';
 
-const DASHBOARD_CATEGORIES_CONFIG = {
-  title: 'Categories Management',
-  subtitle: 'Create, edit, and manage your blog categories',
+const DASHBOARD_TAGS_CONFIG = {
+  title: 'Tags Management',
+  subtitle: 'Create, edit, and manage your blog tags',
 } as const;
 
-export const DashboardCategories = () => {
+export const DashboardTags = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [editDialog, setEditDialog] = useState<{
     open: boolean;
-    categoryId: string | null;
-  }>({ open: false, categoryId: null });
+    tagId: string | null;
+  }>({ open: false, tagId: null });
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
-    categoryId: string | null;
-    categoryName: string | null;
-  }>({ open: false, categoryId: null, categoryName: null });
+    tagId: string | null;
+    tagName: string | null;
+  }>({ open: false, tagId: null, tagName: null });
 
   const {
-    data: categories,
+    data: tags,
     isLoading,
     isError,
     error,
     refetch,
     isFetching,
-  } = useCategories();
+  } = useTags();
 
-  const { data: category } = useCategory(editDialog.categoryId);
-  const createCategoryMutation = useCreateCategory();
-  const updateCategoryMutation = useUpdateCategory();
-  const deleteCategoryMutation = useDeleteCategory();
+  const { data: tag } = useTag(editDialog.tagId);
+  const createTagMutation = useCreateTag();
+  const updateTagMutation = useUpdateTag();
+  const deleteTagMutation = useDeleteTag();
 
-  const handleCreateCategory = () => {
-    setEditDialog({ open: true, categoryId: null });
+  const handleCreateTag = () => {
+    setEditDialog({ open: true, tagId: null });
   };
 
-  const handleEditCategory = (id: string) => {
-    setEditDialog({ open: true, categoryId: id });
+  const handleEditTag = (id: string) => {
+    setEditDialog({ open: true, tagId: id });
   };
 
-  const handleDeleteClick = (categoryId: string, categoryName: string) => {
+  const handleDeleteClick = (tagId: string, tagName: string) => {
     setDeleteDialog({
       open: true,
-      categoryId,
-      categoryName,
+      tagId,
+      tagName,
     });
   };
 
   const handleConfirmDelete = () => {
-    if (deleteDialog.categoryId) {
-      deleteCategoryMutation.mutate(deleteDialog.categoryId, {
+    if (deleteDialog.tagId) {
+      deleteTagMutation.mutate(deleteDialog.tagId, {
         onSettled: () => {
           setDeleteDialog({
             open: false,
-            categoryId: null,
-            categoryName: null,
+            tagId: null,
+            tagName: null,
           });
         },
       });
@@ -92,38 +92,35 @@ export const DashboardCategories = () => {
   };
 
   const handleCancelDelete = () => {
-    setDeleteDialog({ open: false, categoryId: null, categoryName: null });
+    setDeleteDialog({ open: false, tagId: null, tagName: null });
   };
 
   const handleCloseEdit = () => {
-    setEditDialog({ open: false, categoryId: null });
+    setEditDialog({ open: false, tagId: null });
   };
 
-  const handleSubmitCategory = async (data: CategoryFormValues) => {
+  const handleSubmitTag = async (data: TagFormValues) => {
     setIsSubmitting(true);
     try {
-      if (editDialog.categoryId) {
-        await updateCategoryMutation.mutateAsync({
-          id: editDialog.categoryId,
+      if (editDialog.tagId) {
+        await updateTagMutation.mutateAsync({
+          id: editDialog.tagId,
           data,
         });
       } else {
-        await createCategoryMutation.mutateAsync(data);
+        await createTagMutation.mutateAsync(data);
       }
       handleCloseEdit();
       refetch();
     } catch (error) {
-      console.error('Error saving category:', error);
+      console.error('Error saving tag:', error);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const isCategoryDeleting = (categoryId: string) => {
-    return (
-      deleteCategoryMutation.isPending &&
-      deleteCategoryMutation.variables === categoryId
-    );
+  const isTagDeleting = (tagId: string) => {
+    return deleteTagMutation.isPending && deleteTagMutation.variables === tagId;
   };
 
   if (isError) {
@@ -131,9 +128,9 @@ export const DashboardCategories = () => {
       <UniversalError
         error={error}
         onRetry={refetch}
-        title="Error loading categories"
-        icon={<ChartColumnStacked className="h-12 w-12 mx-auto" />}
-        data-testid="categories-error-state"
+        title="Error loading tags"
+        icon={<Tags className="h-12 w-12 mx-auto" />}
+        data-testid="tags-error-state"
       />
     );
   }
@@ -141,17 +138,17 @@ export const DashboardCategories = () => {
   return (
     <div
       className="min-h-screen bg-background p-4 md:p-6"
-      data-testid="dashboard-categories"
+      data-testid="dashboard-tags"
     >
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {DASHBOARD_CATEGORIES_CONFIG.title}
+              {DASHBOARD_TAGS_CONFIG.title}
             </h1>
             <p className="text-muted-foreground mt-1">
-              {DASHBOARD_CATEGORIES_CONFIG.subtitle}
+              {DASHBOARD_TAGS_CONFIG.subtitle}
             </p>
           </div>
 
@@ -162,7 +159,7 @@ export const DashboardCategories = () => {
               size="sm"
               disabled={isLoading || isFetching}
               className="gap-2"
-              aria-label="Refresh categories list"
+              aria-label="Refresh tags list"
             >
               {isLoading || isFetching ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -173,13 +170,13 @@ export const DashboardCategories = () => {
             </Button>
 
             <Button
-              onClick={handleCreateCategory}
+              onClick={handleCreateTag}
               size="sm"
               className="gap-2"
-              data-testid="create-category-button"
+              data-testid="create-tag-button"
             >
               <Plus className="h-4 w-4" />
-              New Category
+              New Tag
             </Button>
           </div>
         </div>
@@ -188,47 +185,47 @@ export const DashboardCategories = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ChartColumnStacked className="h-5 w-5" />
-              Categories
+              <Tags className="h-5 w-5" />
+              Tags
             </CardTitle>
             <CardDescription>
               {isLoading
-                ? 'Loading categories...'
-                : `${categories?.length || 0} total categories`}
+                ? 'Loading tags...'
+                : `${tags?.length || 0} total tags`}
             </CardDescription>
           </CardHeader>
 
           <CardContent>
             {isLoading ? (
               <div className="space-y-3">
-                {[...Array(3)].map((_, i) => (
+                {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
                     className="h-20 bg-muted animate-pulse rounded-lg"
                   />
                 ))}
               </div>
-            ) : categories?.length === 0 ? (
+            ) : tags?.length === 0 ? (
               <UniversalEmpty
-                icon={<ChartColumnStacked className="h-12 w-12" />}
-                title="No categories found"
-                description="Get started by creating your first category"
-                data-testid="categories-empty-state"
+                icon={<Tags className="h-12 w-12" />}
+                title="No tags found"
+                description="Get started by creating your first tag"
+                data-testid="tags-empty-state"
               >
-                <Button onClick={handleCreateCategory} className="mt-4">
+                <Button onClick={handleCreateTag} className="mt-4">
                   <Plus className="h-4 w-4 mr-2" />
-                  Create Category
+                  Create Tag
                 </Button>
               </UniversalEmpty>
             ) : (
               <div className="space-y-3">
-                {categories?.map((category) => (
-                  <CategoryRow
-                    key={category.id}
-                    category={category}
-                    onEdit={handleEditCategory}
+                {tags?.map((tag) => (
+                  <TagRow
+                    key={tag.id}
+                    tag={tag}
+                    onEdit={handleEditTag}
                     onDelete={handleDeleteClick}
-                    isDeleting={isCategoryDeleting(category.id)}
+                    isDeleting={isTagDeleting(tag.id)}
                   />
                 ))}
               </div>
@@ -243,21 +240,21 @@ export const DashboardCategories = () => {
         onOpenChange={(open) => {
           if (!open) handleCancelDelete();
         }}
-        title="Delete Category"
-        description={`Are you sure you want to delete "${deleteDialog.categoryName}"? This action cannot be undone.`}
+        title="Delete Tag"
+        description={`Are you sure you want to delete "${deleteDialog.tagName}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         variant="destructive"
         onConfirm={handleConfirmDelete}
         onCancel={handleCancelDelete}
         isLoading={
-          deleteCategoryMutation.isPending &&
-          deleteDialog.categoryId === deleteCategoryMutation.variables
+          deleteTagMutation.isPending &&
+          deleteDialog.tagId === deleteTagMutation.variables
         }
-        data-testid="delete-category-dialog"
+        data-testid="delete-tag-dialog"
       />
 
-      {/* Category Form Sheet */}
+      {/* Tag Form Sheet */}
       <Sheet open={editDialog.open} onOpenChange={handleCloseEdit}>
         <SheetContent
           side="right"
@@ -265,19 +262,19 @@ export const DashboardCategories = () => {
         >
           <SheetHeader>
             <SheetTitle>
-              {editDialog.categoryId ? 'Edit Category' : 'Create Category'}
+              {editDialog.tagId ? 'Edit Tag' : 'Create Tag'}
             </SheetTitle>
             <SheetDescription>
-              {editDialog.categoryId
-                ? 'Make changes to your category'
-                : 'Create a new category for your blog posts'}
+              {editDialog.tagId
+                ? 'Make changes to your tag'
+                : 'Create a new tag for your blog posts'}
             </SheetDescription>
           </SheetHeader>
 
           <div className="mt-6">
-            <CategoryForm
-              initialData={category}
-              onSubmit={handleSubmitCategory}
+            <TagForm
+              initialData={tag}
+              onSubmit={handleSubmitTag}
               isSubmitting={isSubmitting}
             />
           </div>

@@ -3,7 +3,7 @@ import {
   FileText,
   LayoutDashboard,
   MessageCircle,
-  Settings,
+  Tags,
   Users,
 } from 'lucide-react';
 
@@ -34,9 +34,9 @@ export const NAV_ITEMS = [
   },
 
   {
-    href: '/dashboard/settings',
-    label: 'Settings',
-    icon: Settings,
+    href: '/dashboard/tags',
+    label: 'Tags',
+    icon: Tags,
     exact: false,
   },
   {

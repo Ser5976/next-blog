@@ -1,9 +1,9 @@
 'use client';
 
 import { memo, useCallback } from 'react';
-import { ChartColumnStacked, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import { MoreVertical, Pencil, Tags, Trash2 } from 'lucide-react';
 
-import { Category } from '@/entities/dashboard-get-categories/model';
+import { Tag } from '@/entities/dashboard-get-tags';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import {
@@ -13,47 +13,46 @@ import {
   DropdownMenuTrigger,
 } from '@/shared/ui/dropdown-menu';
 
-interface CategoryRowProps {
-  category: Category;
+interface TagRowProps {
+  tag: Tag;
   onEdit: (id: string) => void;
   onDelete: (id: string, name: string) => void;
   isDeleting?: boolean;
 }
 
-const CategoryRowComponent = ({
-  category,
+const TagRowComponent = ({
+  tag,
   onEdit,
   onDelete,
   isDeleting = false,
-}: CategoryRowProps) => {
+}: TagRowProps) => {
   const handleDelete = useCallback(() => {
     if (isDeleting) return;
-    onDelete(category.id, category.name);
-  }, [category.id, category.name, isDeleting, onDelete]);
+    onDelete(tag.id, tag.name);
+  }, [tag.id, tag.name, isDeleting, onDelete]);
 
   const handleEdit = useCallback(() => {
     if (isDeleting) return;
-    onEdit(category.id);
-  }, [category.id, isDeleting, onEdit]);
-  console.log('category:', category);
+    onEdit(tag.id);
+  }, [tag.id, isDeleting, onEdit]);
 
   return (
     <div
       className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors group"
       role="row"
-      aria-label={`Category: ${category.name}`}
-      data-testid={`category-row-${category.id}`}
+      aria-label={`Tag: ${tag.name}`}
+      data-testid={`tag-row-${tag.id}`}
     >
       <div className="flex items-center gap-4 flex-1 min-w-0">
-        <ChartColumnStacked className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+        <Tags className="h-5 w-5 text-muted-foreground flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-medium truncate">{category.name}</h3>
+            <h3 className="font-medium truncate">{tag.name}</h3>
             <Badge variant="secondary" className="text-xs">
-              {category._count?.posts || 0} posts
+              {tag._count?.posts || 0} posts
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground mt-1">/{category.slug}</p>
+          <p className="text-sm text-muted-foreground mt-1">/{tag.slug}</p>
         </div>
       </div>
 
@@ -65,7 +64,7 @@ const CategoryRowComponent = ({
               size="icon"
               disabled={isDeleting}
               className="h-8 w-8 cursor-pointer"
-              aria-label={`Actions for ${category.name}`}
+              aria-label={`Actions for ${tag.name}`}
             >
               <MoreVertical className="h-4 w-4" />
             </Button>
@@ -81,7 +80,7 @@ const CategoryRowComponent = ({
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleDelete}
-              disabled={isDeleting || (category._count?.posts || 0) > 0}
+              disabled={isDeleting || (tag._count?.posts || 0) > 0}
               className="text-red-600 focus:text-red-600 cursor-pointer"
             >
               <Trash2 className="h-4 w-4 mr-2" />
@@ -94,5 +93,5 @@ const CategoryRowComponent = ({
   );
 };
 
-export const CategoryRow = memo(CategoryRowComponent);
-CategoryRow.displayName = 'CategoryRow';
+export const TagRow = memo(TagRowComponent);
+TagRow.displayName = 'TagRow';

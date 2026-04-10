@@ -1,2 +1,3 @@
 export type { Tag } from './types';
-export { useTags } from './use-tags';
+export type { TagFormValues } from './schemas';
+export { tagFormSchema } from './schemas';

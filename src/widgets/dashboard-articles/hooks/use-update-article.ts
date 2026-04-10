@@ -16,7 +16,9 @@ export function useUpdateArticle() {
 
     onSuccess: () => {
       toast.success('Article updated successfully');
-      queryClient.invalidateQueries({ queryKey: articlesQueryKeys.all });
+      queryClient.invalidateQueries({
+        queryKey: articlesQueryKeys.all,
+      });
       router.push('/dashboard/articles');
     },
 
