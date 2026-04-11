@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { ArticlesFilters, articlesQueryKeys } from '@/shared/api';
 import { getArticles } from '../api';
@@ -15,4 +15,16 @@ export function useArticles(filters: ArticlesFilters) {
     refetchOnWindowFocus: false,
     placeholderData: undefined,
   });
+}
+export function usePrefetchArticles() {
+  const queryClient = useQueryClient();
+
+  return (filters: ArticlesFilters) => {
+    return queryClient.prefetchQuery({
+      queryKey: articlesQueryKeys.list(filters),
+      queryFn: () => getArticles(filters),
+      staleTime: 1000 * 30,
+      gcTime: 1000 * 60 * 5,
+    });
+  };
 }

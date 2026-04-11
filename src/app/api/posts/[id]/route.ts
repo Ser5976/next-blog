@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
-import { prisma } from '@/shared/api';
+import { prisma } from '@/shared/api/prisma';
 import { deleteImageFromImageKit } from '@/shared/api/deleteImageFromImageKit';
 import { articleFormSchema } from '@/widgets/dashboard-articles/model';
 

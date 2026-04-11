@@ -2,7 +2,7 @@
 
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
-import { prisma } from '@/shared/api';
+import { prisma } from '@/shared/api/prisma';
 import { UserClerk } from '@/shared/types';
 import { CommentsFilters, CommentsResponse, DashboardComment } from '../model';
 

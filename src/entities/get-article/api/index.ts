@@ -1,8 +1,1 @@
-export {
-  getArticle,
-  getArticles,
-  createArticle,
-  updateArticle,
-  deleteArticle,
-  togglePublishArticle,
-} from './articles-api';
+export { getArticle } from './article-api';

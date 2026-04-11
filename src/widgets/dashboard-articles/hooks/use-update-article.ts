@@ -2,9 +2,9 @@ import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { articlesQueryKeys } from '@/shared/api';
 import { updateArticle } from '../api';
 import { ArticleFormValues } from '../model';
-import { articlesQueryKeys } from './use-articles';
 
 export function useUpdateArticle() {
   const queryClient = useQueryClient();

@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { ArticlesResponse } from '@/entities/get-articles/model';
+import { articlesQueryKeys } from '@/shared/api';
 import { togglePublishArticle } from '../api';
-import { ArticlesResponse } from '../model';
-import { articlesQueryKeys } from './use-articles';
 
 export function useTogglePublish() {
   const queryClient = useQueryClient();

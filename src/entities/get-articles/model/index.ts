@@ -1,2 +1,2 @@
 export type { ArticlesResponse } from './types';
-export { useArticles } from './use-articles';
+export { useArticles, usePrefetchArticles } from './use-articles';

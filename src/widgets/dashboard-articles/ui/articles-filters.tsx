@@ -107,7 +107,7 @@ export function ArticlesFiltersComponent({
               </SheetDescription>
             </SheetHeader>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 space-y-4 p-4">
               {/* Category Filter */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Category</label>

@@ -1,1 +1,1 @@
-export { useArticles } from './model';
+export { useArticles, usePrefetchArticles } from './model';

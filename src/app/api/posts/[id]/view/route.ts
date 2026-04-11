@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { prisma } from '@/shared/api';
+import { prisma } from '@/shared/api/prisma';
 
 /**
  * Увеличение счетчика просмотров статьи

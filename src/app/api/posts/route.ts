@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
-import { prisma } from '@/shared/api';
+import { prisma } from '@/shared/api/prisma';
 import { Article, UserClerk } from '@/shared/types';
 import { articleFormSchema } from '@/widgets/dashboard-articles/model';
 

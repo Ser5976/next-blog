@@ -1,6 +1,4 @@
 export type {
-  ArticlesFilters,
-  ArticlesResponse,
   ApiResponse,
   ArticleRowProps,
   ArticlesFiltersProps,

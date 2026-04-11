@@ -2,17 +2,14 @@
 
 import { useCallback, useState } from 'react';
 
+import { useArticle } from '@/entities/get-article';
+import { useArticles, usePrefetchArticles } from '@/entities/get-articles';
+import { ArticlesFilters } from '@/shared/api';
 import { useCustomDebounce } from '@/shared/hooks';
-import {
-  useArticle,
-  useArticles,
-  useCreateArticle,
-  useDeleteArticle,
-  usePrefetchArticles,
-  useTogglePublish,
-  useUpdateArticle,
-} from '.';
-import { ArticlesFilters } from '../model';
+import { useCreateArticle } from './use-create-article';
+import { useDeleteArticle } from './use-delete-articles';
+import { useTogglePublish } from './use-toggle-publish';
+import { useUpdateArticle } from './use-update-article';
 
 export function useArticlesManagement() {
   const [filters, setFilters] = useState<ArticlesFilters>({

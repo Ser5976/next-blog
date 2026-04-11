@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { prisma } from '@/shared/api';
+import { prisma } from '@/shared/api/prisma';
 import { calculateChange, getDateFilter } from '@/shared/lib';
 import { getCommentsAction } from '@/widgets/dashboard-comments/api';
 import { CommentsFilters } from '@/widgets/dashboard-comments/model';

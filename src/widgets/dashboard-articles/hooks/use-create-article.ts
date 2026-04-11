@@ -2,8 +2,8 @@ import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { articlesQueryKeys } from '@/shared/api';
 import { createArticle } from '../api';
-import { articlesQueryKeys } from './use-articles';
 
 /**
  * Хук для создания статьи с мутацией

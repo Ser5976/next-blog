@@ -3,7 +3,7 @@ import { verifyWebhook } from '@clerk/nextjs/webhooks';
 
 import { SyncUserService } from '@/features/sync-user';
 import { ClerkUserWebhookEvent } from '@/features/sync-user/model';
-import { prisma } from '@/shared/api';
+import { prisma } from '@/shared/api/prisma';
 
 /**
  * Обработка webhook от Clerk

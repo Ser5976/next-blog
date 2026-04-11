@@ -1,38 +1,6 @@
 import axios from 'axios';
 
-import { Article } from '@/shared/types';
-import {
-  ApiResponse,
-  ArticleFormValues,
-  ArticlesFilters,
-  ArticlesResponse,
-} from '../model';
-
-export async function getArticle(
-  articleId: string | null
-): Promise<Article | null> {
-  if (!articleId) return null;
-  try {
-    const { data } = await axios.get<Article>(`/api/posts/${articleId}`);
-    return data;
-  } catch (error) {
-    console.error('getArticle: error:', error);
-    throw new Error('Something went wrong, article was not received');
-  }
-}
-export async function getArticles(
-  filters: ArticlesFilters
-): Promise<ArticlesResponse> {
-  try {
-    const { data } = await axios.get<ArticlesResponse>('/api/posts', {
-      params: filters,
-    });
-    return data;
-  } catch (error) {
-    console.error('getArticles: error:', error);
-    throw new Error('Something went wrong, articles were not received');
-  }
-}
+import { ApiResponse, ArticleFormValues } from '../model';
 
 export async function createArticle(
   data: ArticleFormValues

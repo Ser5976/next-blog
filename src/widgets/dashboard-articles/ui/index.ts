@@ -1,1 +1,1 @@
-export { ArticleForm } from './article-form';
+export { DashboardArticles } from './dashboard-articles';

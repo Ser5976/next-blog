@@ -1,30 +1,6 @@
+import { ArticlesFilters } from '@/shared/api';
 import { Article } from '@/shared/types';
 import { ArticleFormValues } from './schemas';
-
-export interface ArticlesFilters {
-  page: number;
-  limit: number;
-  search?: string;
-  category?: string;
-  tag?: string;
-  published?: boolean;
-  sortBy?:
-    | 'createdAt'
-    | 'updatedAt'
-    | 'publishedAt'
-    | 'viewCount'
-    | 'averageRating';
-  sortOrder?: 'asc' | 'desc';
-}
-
-export interface ArticlesResponse {
-  success: boolean;
-  articles: Article[];
-  total: number;
-  page: number;
-  totalPages: number;
-  message?: string;
-}
 
 export interface ApiResponse {
   success: boolean;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { prisma } from '@/shared/api';
+import { prisma } from '@/shared/api/prisma';
 import { calculateChanges, getDateFilter } from '@/shared/lib';
 
 export async function GET(request: NextRequest) {

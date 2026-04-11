@@ -1,6 +1,4 @@
 export {
-  getArticle,
-  getArticles,
   createArticle,
   updateArticle,
   deleteArticle,
