@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Article } from '@/shared/types';
 import { getArticle } from '../api';
+import { articlesQueryKeys } from './use-articles';
 
 export function useArticle(articleId: string | null) {
   return useQuery<Article | null, Error>({
-    queryKey: ['article', articleId],
+    queryKey: articlesQueryKeys.detail(articleId || ''),
     queryFn: () => getArticle(articleId),
     enabled: !!articleId,
     staleTime: 1000 * 30,
