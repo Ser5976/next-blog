@@ -3,14 +3,7 @@
 import { useState } from 'react';
 import { ChartColumnStacked, Loader2, Plus, RefreshCw } from 'lucide-react';
 
-import {
-  CategoryFormValues,
-  useCategories,
-  useCategory,
-  useCreateCategory,
-  useDeleteCategory,
-  useUpdateCategory,
-} from '@/entities/dashboard-get-categories';
+import { useCategories } from '@/entities/dashboard-get-categories';
 import { ConfirmDialog, UniversalEmpty, UniversalError } from '@/shared/ui';
 import { Button } from '@/shared/ui/button';
 import {
@@ -27,6 +20,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/shared/ui/sheet';
+import {
+  useCategory,
+  useCreateCategory,
+  useDeleteCategory,
+  useUpdateCategory,
+} from '../hooks';
+import { CategoryFormValues } from '../model';
 import { CategoryForm } from './category-form';
 import { CategoryRow } from './category-row';
 
@@ -261,7 +261,7 @@ export const DashboardCategories = () => {
       <Sheet open={editDialog.open} onOpenChange={handleCloseEdit}>
         <SheetContent
           side="right"
-          className="w-full sm:max-w-lg overflow-y-auto"
+          className="w-full sm:max-w-lg overflow-y-auto p-4"
         >
           <SheetHeader>
             <SheetTitle>

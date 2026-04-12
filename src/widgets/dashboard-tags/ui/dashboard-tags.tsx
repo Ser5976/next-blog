@@ -258,7 +258,7 @@ export const DashboardTags = () => {
       <Sheet open={editDialog.open} onOpenChange={handleCloseEdit}>
         <SheetContent
           side="right"
-          className="w-full sm:max-w-lg overflow-y-auto"
+          className="w-full sm:max-w-lg overflow-y-auto p-4"
         >
           <SheetHeader>
             <SheetTitle>

@@ -1,7 +1,1 @@
-export {
-  useCategories,
-  useCategory,
-  useCreateCategory,
-  useDeleteCategory,
-  useUpdateCategory,
-} from './use-catigories';
+export { useCategories } from './use-catigories';

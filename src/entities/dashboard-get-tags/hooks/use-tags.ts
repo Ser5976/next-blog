@@ -12,11 +12,10 @@ export const tagsQueryKeys = {
   detail: (id: string) => [...tagsQueryKeys.details(), id] as const,
 };
 
-export function useTags(enabled: boolean = true) {
+export function useTags() {
   return useQuery<Tag[], Error>({
     queryKey: tagsQueryKeys.list(),
     queryFn: () => getTags(),
-    enabled: enabled,
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
     retry: 1,

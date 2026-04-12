@@ -73,8 +73,8 @@ export const DashboardArticles = () => {
   } = useArticlesManagement();
   const isArticle = editDialog.articleId ? !!article : true;
 
-  const { data: categories } = useCategories(editDialog.open);
-  const { data: tags } = useTags(editDialog.open);
+  const { data: categories } = useCategories();
+  const { data: tags } = useTags();
 
   const handleCreateArticle = () => {
     setEditDialog({ open: true, articleId: null });

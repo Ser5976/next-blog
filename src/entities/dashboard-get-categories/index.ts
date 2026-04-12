@@ -1,9 +1,2 @@
-export {
-  useCategories,
-  useCategory,
-  useCreateCategory,
-  useUpdateCategory,
-  useDeleteCategory,
-} from './hooks';
-export type { Category, CategoryFormValues } from './model';
-export { categoryFormSchema } from './model';
+export { useCategories } from './hooks';
+export type { Category } from './model';
