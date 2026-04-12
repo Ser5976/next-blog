@@ -1,1 +1,1 @@
-export { getTags, getTag, createTag, updateTag, deleteTag } from './tags-api';
+export { getTags } from './tags-api';

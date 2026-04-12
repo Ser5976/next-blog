@@ -5,11 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 
-import {
-  Tag,
-  tagFormSchema,
-  TagFormValues,
-} from '@/entities/dashboard-get-tags';
+import { Tag } from '@/entities/dashboard-get-tags';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import {
@@ -22,6 +18,7 @@ import {
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
+import { tagFormSchema, TagFormValues } from '../model';
 
 interface TagFormProps {
   initialData?: Tag | null;

@@ -3,14 +3,7 @@
 import { useState } from 'react';
 import { Loader2, Plus, RefreshCw, Tags } from 'lucide-react';
 
-import {
-  TagFormValues,
-  useCreateTag,
-  useDeleteTag,
-  useTag,
-  useTags,
-  useUpdateTag,
-} from '@/entities/dashboard-get-tags';
+import { useTags } from '@/entities/dashboard-get-tags';
 import { ConfirmDialog, UniversalEmpty, UniversalError } from '@/shared/ui';
 import { Button } from '@/shared/ui/button';
 import {
@@ -27,6 +20,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/shared/ui/sheet';
+import { useCreateTag, useDeleteTag, useTag, useUpdateTag } from '../hooks';
+import { TagFormValues } from '../model';
 import { TagForm } from './tag-form';
 import { TagRow } from './tag-row';
 
