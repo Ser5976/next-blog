@@ -1,3 +1,4 @@
+import { ArticleFormValues } from '../schemas';
 import { UserClerk } from './user-clerk';
 
 export interface Article {
@@ -33,4 +34,15 @@ export interface Article {
   createdAt: number | null;
   updatedAt: number | null;
   publishedAt: number | null;
+}
+export interface ArticleFormProps {
+  initialData?: ArticleFormValues;
+  onSubmit: (data: ArticleFormValues) => Promise<void>;
+  isSubmitting?: boolean;
+  categories?: { id: string; name: string; slug: string }[];
+  availableTags?: { id: string; name: string; slug: string }[];
+}
+export interface ApiResponse {
+  success: boolean;
+  message?: string;
 }

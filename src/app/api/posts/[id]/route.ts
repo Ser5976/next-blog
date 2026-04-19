@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
-import { prisma } from '@/shared/api/prisma';
 import { deleteImageFromImageKit } from '@/shared/api/deleteImageFromImageKit';
+import { prisma } from '@/shared/api/prisma';
 import { articleFormSchema } from '@/widgets/dashboard-articles/model';
 
 /**
@@ -116,7 +116,7 @@ export async function PUT(
         excerpt: data.excerpt,
         coverImage: data.coverImage,
         // НЕ обновляем published - это делается отдельным endpoint'ом
-        categoryId: data.categoryId,
+        categoryId: data.categoryId || null,
         // Для тегов используем set - заменяем все существующие связи
         tags: {
           set: data.tags.map((tagId: string) => ({ id: tagId })),

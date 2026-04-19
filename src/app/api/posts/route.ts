@@ -250,7 +250,7 @@ export async function POST(request: NextRequest) {
         coverImage: data.coverImage,
         published: false, // Всегда создаем как черновик
         authorId: dbUser.id,
-        categoryId: data.categoryId,
+        categoryId: data.categoryId || null,
         // Связываем с тегами (connect - потому что теги уже существуют)
         tags: {
           connect: data.tags.map((tagId: string) => ({ id: tagId })),
@@ -265,7 +265,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error creating article:', error);
-    NextResponse.json(
+    return NextResponse.json(
+      // Добавьте return здесь
       {
         success: false,
         message:

@@ -77,7 +77,8 @@ export const DashboardArticles = () => {
   const { data: tags } = useTags();
 
   const handleCreateArticle = () => {
-    setEditDialog({ open: true, articleId: null });
+    router.push('/create-article');
+    // setEditDialog({ open: true, articleId: null });
   };
 
   const handleEditArticle = (id: string) => {
@@ -140,7 +141,7 @@ export const DashboardArticles = () => {
               variant="outline"
               size="sm"
               disabled={isLoading || isFetching}
-              className="gap-2"
+              className="gap-2 cursor-pointer"
               aria-label="Refresh articles list"
               data-testid="refresh-articles-button"
             >
@@ -155,7 +156,7 @@ export const DashboardArticles = () => {
             <Button
               onClick={handleCreateArticle}
               size="sm"
-              className="gap-2"
+              className="gap-2 cursor-pointer"
               data-testid="create-article-button"
             >
               <Plus className="h-4 w-4" />
