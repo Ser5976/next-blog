@@ -85,6 +85,16 @@ export function RichTextEditor({
     // Отключаем немедленный рендеринг для SSR
     immediatelyRender: false,
   });
+  // Синхронизируем editor с пропсом content
+  useEffect(() => {
+    if (editor && content !== undefined && editor.getHTML() !== content) {
+      // Проверяем, нужно ли обновлять
+      const currentContent = editor.getHTML();
+      if (currentContent !== content) {
+        editor.commands.setContent(content);
+      }
+    }
+  }, [editor, content]);
 
   // Показываем заглушку до монтирования на клиенте
   if (!isMounted) {

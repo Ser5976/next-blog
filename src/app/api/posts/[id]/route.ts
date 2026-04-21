@@ -3,7 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 
 import { deleteImageFromImageKit } from '@/shared/api/deleteImageFromImageKit';
 import { prisma } from '@/shared/api/prisma';
-import { articleFormSchema } from '@/widgets/dashboard-articles/model';
+import { articleFormSchema } from '@/shared/schemas';
 
 /**
  * GET /api/posts/[id]
@@ -92,6 +92,23 @@ export async function PUT(
     // console.log('validation:', validation);
     if (!success) return NextResponse.json(error, { status: 400 });
 
+    // Проверка уникальности slug
+    const existingPost = await prisma.post.findUnique({
+      where: { slug: data.slug },
+    });
+
+    if (existingPost) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'SLUG_ALREADY_EXISTS',
+          message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
+          field: 'slug',
+        },
+        { status: 409 } // 409 Conflict
+      );
+    }
+
     // Получаем текущую статью, чтобы проверить, изменилось ли картинка
     const currentArticle = await prisma.post.findUnique({
       where: { id },
@@ -130,6 +147,19 @@ export async function PUT(
     });
   } catch (error) {
     console.error('Error updating article:', error);
+    // Проверка на ошибку уникальности slug (на случай, если проверка пропустила)
+    if (error instanceof Error && error.message.includes('slug')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'SLUG_ALREADY_EXISTS',
+          message:
+            'An article with this slug already exists. Please choose a different slug.',
+          field: 'slug',
+        },
+        { status: 409 }
+      );
+    }
     return NextResponse.json(
       { error: 'Failed to update the article' },
       { status: 500 }

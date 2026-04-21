@@ -82,7 +82,8 @@ export const DashboardArticles = () => {
   };
 
   const handleEditArticle = (id: string) => {
-    setEditDialog({ open: true, articleId: id });
+    // setEditDialog({ open: true, articleId: id });
+    router.push(`/edit-article/${id}`);
   };
 
   const handleSubmitArticle = async (data: ArticleFormValues) => {

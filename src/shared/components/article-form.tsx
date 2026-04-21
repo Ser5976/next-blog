@@ -68,8 +68,8 @@ export function ArticleForm({
       }
     }
   };
+
   const handleSubmit = async (data: ArticleFormValues) => {
-    console.log('data form:', data);
     await onSubmit({
       ...data,
       tags: selectedTags,
@@ -78,11 +78,17 @@ export function ArticleForm({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-8"
+        noValidate
+        data-testid="article-form"
+        aria-label="Article edit form"
+      >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content - Left Column */}
           <div className="lg:col-span-2 space-y-6">
-            <Card>
+            <Card data-testid="article-form-main-card">
               <CardContent className="pt-6">
                 {/* Title */}
                 <FormField
@@ -90,10 +96,16 @@ export function ArticleForm({
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Title</FormLabel>
+                      <FormLabel htmlFor="title">Title</FormLabel>
                       <FormControl>
                         <Input
+                          id="title"
+                          type="text"
                           placeholder="Enter article title"
+                          aria-label="Article title"
+                          aria-required="true"
+                          aria-disabled={isSubmitting}
+                          data-testid="article-title-input"
                           {...field}
                           disabled={isSubmitting}
                         />
@@ -101,7 +113,7 @@ export function ArticleForm({
                       <FormDescription>
                         A good title helps readers find your article
                       </FormDescription>
-                      <FormMessage />
+                      <FormMessage data-testid="title-error" />
                     </FormItem>
                   )}
                 />
@@ -112,10 +124,16 @@ export function ArticleForm({
                   name="slug"
                   render={({ field }) => (
                     <FormItem className="mt-4">
-                      <FormLabel>Slug</FormLabel>
+                      <FormLabel htmlFor="slug">Slug</FormLabel>
                       <FormControl>
                         <Input
+                          id="slug"
+                          type="text"
                           placeholder="article-url-slug"
+                          aria-label="Article URL slug"
+                          aria-required="true"
+                          aria-disabled={isSubmitting}
+                          data-testid="article-slug-input"
                           {...field}
                           disabled={isSubmitting}
                         />
@@ -123,7 +141,7 @@ export function ArticleForm({
                       <FormDescription>
                         URL-friendly version of the title
                       </FormDescription>
-                      <FormMessage />
+                      <FormMessage data-testid="slug-error" />
                     </FormItem>
                   )}
                 />
@@ -134,20 +152,25 @@ export function ArticleForm({
                   name="excerpt"
                   render={({ field }) => (
                     <FormItem className="mt-4">
-                      <FormLabel>Excerpt</FormLabel>
+                      <FormLabel htmlFor="excerpt">Excerpt</FormLabel>
                       <FormControl>
                         <Textarea
+                          id="excerpt"
                           placeholder="Brief summary of the article (optional)"
                           className="resize-none"
+                          aria-label="Article excerpt"
+                          aria-describedby="excerpt-description"
+                          aria-disabled={isSubmitting}
+                          data-testid="article-excerpt-input"
                           {...field}
                           value={field.value || ''}
                           disabled={isSubmitting}
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription id="excerpt-description">
                         Max 500 characters. Appears in article previews.
                       </FormDescription>
-                      <FormMessage />
+                      <FormMessage data-testid="excerpt-error" />
                     </FormItem>
                   )}
                 />
@@ -155,22 +178,27 @@ export function ArticleForm({
             </Card>
 
             {/* Content Editor */}
-            <Card>
+            <Card data-testid="article-form-content-card">
               <CardContent className="pt-6">
                 <FormField
                   control={form.control}
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Content</FormLabel>
+                      <FormLabel htmlFor="content">Content</FormLabel>
                       <FormControl>
-                        <RichTextEditor
-                          content={field.value}
-                          onChange={field.onChange}
-                          placeholder="Write your article content here..."
-                        />
+                        <div
+                          data-testid="rich-text-editor"
+                          aria-label="Article content editor"
+                        >
+                          <RichTextEditor
+                            content={field.value}
+                            onChange={field.onChange}
+                            placeholder="Write your article content here..."
+                          />
+                        </div>
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage data-testid="content-error" />
                     </FormItem>
                   )}
                 />
@@ -181,7 +209,7 @@ export function ArticleForm({
           {/* Sidebar - Right Column */}
           <div className="space-y-6">
             {/* Cover Image */}
-            <Card>
+            <Card data-testid="article-form-image-card">
               <CardContent className="pt-6">
                 <FormField
                   control={form.control}
@@ -200,7 +228,7 @@ export function ArticleForm({
                       <FormDescription>
                         Featured image for the article
                       </FormDescription>
-                      <FormMessage />
+                      <FormMessage data-testid="cover-image-error" />
                     </FormItem>
                   )}
                 />
@@ -208,21 +236,25 @@ export function ArticleForm({
             </Card>
 
             {/* Category & Tags */}
-            <Card>
+            <Card data-testid="article-form-category-card">
               <CardContent className="pt-6 space-y-4">
                 <FormField
                   control={form.control}
                   name="categoryId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Category</FormLabel>
+                      <FormLabel htmlFor="category">Category</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value || undefined}
                         disabled={isSubmitting}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger
+                            id="category"
+                            aria-label="Select category"
+                            data-testid="category-select"
+                          >
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
                         </FormControl>
@@ -235,14 +267,19 @@ export function ArticleForm({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage />
+                      <FormMessage data-testid="category-error" />
                     </FormItem>
                   )}
                 />
 
                 <FormItem>
-                  <FormLabel>Tags</FormLabel>
-                  <div className="flex flex-wrap gap-2">
+                  <FormLabel id="tags-label">Tags</FormLabel>
+                  <div
+                    className="flex flex-wrap gap-2"
+                    role="group"
+                    aria-labelledby="tags-label"
+                    data-testid="tags-container"
+                  >
                     {availableTags.map((tag) => (
                       <Button
                         key={tag.id}
@@ -251,6 +288,9 @@ export function ArticleForm({
                           selectedTags.includes(tag.id) ? 'default' : 'outline'
                         }
                         size="sm"
+                        aria-pressed={selectedTags.includes(tag.id)}
+                        aria-label={`Toggle tag: ${tag.name}`}
+                        data-testid={`tag-button-${tag.id}`}
                         onClick={() => {
                           setSelectedTags((prev) =>
                             prev.includes(tag.id)
@@ -278,14 +318,36 @@ export function ArticleForm({
           <Button
             type="button"
             variant="outline"
+            aria-label="Cancel editing and go back"
+            data-testid="cancel-button"
             onClick={() => router.back()}
             disabled={isSubmitting}
+            className="cursor-pointer min-w-[120px]"
           >
             Cancel
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {initialData ? 'Update Article' : 'Create Article'}
+          <Button
+            type="submit"
+            aria-label={initialData ? 'Update article' : 'Create article'}
+            aria-disabled={isSubmitting}
+            data-testid="submit-button"
+            disabled={isSubmitting}
+            className="cursor-pointer min-w-[160px] relative"
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2
+                  className="h-4 w-4 animate-spin absolute left-4"
+                  aria-hidden="true"
+                  data-testid="submit-spinner"
+                />
+                <span className="ml-6">
+                  {initialData ? 'Updating...' : 'Creating...'}
+                </span>
+              </>
+            ) : (
+              <span>{initialData ? 'Update Article' : 'Create Article'}</span>
+            )}
           </Button>
         </div>
       </form>

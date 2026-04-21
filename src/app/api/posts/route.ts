@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api/prisma';
+import { articleFormSchema } from '@/shared/schemas';
 import { Article, UserClerk } from '@/shared/types';
-import { articleFormSchema } from '@/widgets/dashboard-articles/model';
 
 export async function GET(request: Request) {
   try {
@@ -200,6 +200,7 @@ export async function GET(request: Request) {
  * Создание новой статьи
  * Требует прав администратора или автора
  */
+
 export async function POST(request: NextRequest) {
   try {
     // Получаем ID текущего пользователя и его claims из Clerk
@@ -223,10 +224,20 @@ export async function POST(request: NextRequest) {
         { status: 403 }
       );
     }
+
     // валидация body при помощи zod
     const { data, success, error } = articleFormSchema.safeParse(body.data);
-    // console.log('validation:', validation);
-    if (!success) return NextResponse.json(error, { status: 400 });
+
+    if (!success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Validation failed',
+          details: error,
+        },
+        { status: 400 }
+      );
+    }
 
     // Находим пользователя в нашей базе данных по clerkId
     const dbUser = await prisma.user.findUnique({
@@ -240,8 +251,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Проверка уникальности slug
+    const existingPost = await prisma.post.findUnique({
+      where: { slug: data.slug },
+    });
+
+    if (existingPost) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'SLUG_ALREADY_EXISTS',
+          message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
+          field: 'slug',
+        },
+        { status: 409 } // 409 Conflict
+      );
+    }
+
     // Создаем статью в базе данных
-    await prisma.post.create({
+    const newPost = await prisma.post.create({
       data: {
         title: data.title,
         slug: data.slug,
@@ -256,19 +284,51 @@ export async function POST(request: NextRequest) {
           connect: data.tags.map((tagId: string) => ({ id: tagId })),
         },
       },
+      include: {
+        category: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+        tags: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+          },
+        },
+      },
     });
 
     // Возвращаем успешный ответ с созданной статьей
     return NextResponse.json({
       success: true,
-      message: 'the article has been created',
+      message: 'The article has been created successfully',
+      data: newPost,
     });
   } catch (error) {
     console.error('Error creating article:', error);
+
+    // Проверка на ошибку уникальности slug (на случай, если проверка пропустила)
+    if (error instanceof Error && error.message.includes('slug')) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'SLUG_ALREADY_EXISTS',
+          message:
+            'An article with this slug already exists. Please choose a different slug.',
+          field: 'slug',
+        },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
-      // Добавьте return здесь
       {
         success: false,
+        error: 'INTERNAL_SERVER_ERROR',
         message:
           error instanceof Error ? error.message : 'Failed to create article',
       },

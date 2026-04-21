@@ -4,37 +4,37 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { articlesQueryKeys } from '@/shared/api';
-import { createArticle } from '../api';
+import { ArticleFormValues } from '@/shared/schemas';
+import { updateArticle } from '../api';
 
-/**
- * Хук для создания статьи с мутацией
- * Автоматически инвалидирует кэш и показывает уведомления
- */
-export function useCreateArticle() {
+export function useUpdateArticle() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { userId, sessionClaims } = useAuth();
+  const { userId, sessionClaims } = useAuth(); // Получаем  пользователя
 
   return useMutation({
-    mutationFn: createArticle,
+    mutationFn: ({ id, data }: { id: string; data: ArticleFormValues }) =>
+      updateArticle(id, data),
 
     onSuccess: () => {
-      toast.success('The article has been successfully created.');
-      queryClient.invalidateQueries({ queryKey: articlesQueryKeys.all });
-
+      toast.success('Article updated successfully');
+      queryClient.invalidateQueries({
+        queryKey: articlesQueryKeys.all,
+      });
+      // Получение роли из sessionClaims (если настроено в Clerk)
       const role = sessionClaims?.metadata?.role as string;
 
+      // Перенаправление в зависимости от роли
       if (role === 'admin') {
-        router.push('/dashboard/articles');
+        router.push('/dashboard/articles'); // Страница статей в дашборде
       } else if (role === 'author') {
-        router.push(`/profile/${userId}`);
+        router.push(`/profile/${userId}`); // Профиль пользователя
       } else {
-        router.push('/');
+        router.push('/'); // Дефолтное перенаправление
       }
     },
 
     onError: (error: any) => {
-      console.log('error:', error);
       // Проверяем на ошибку уникальности slug
       if (error?.response?.data?.error === 'SLUG_ALREADY_EXISTS') {
         toast.error(
