@@ -2,14 +2,11 @@
 
 import { useCallback, useState } from 'react';
 
-import { useArticle } from '@/entities/get-article';
 import { useArticles, usePrefetchArticles } from '@/entities/get-articles';
 import { ArticlesFilters } from '@/shared/api';
 import { useCustomDebounce } from '@/shared/hooks';
-import { useCreateArticle } from './use-create-article';
 import { useDeleteArticle } from './use-delete-articles';
 import { useTogglePublish } from './use-toggle-publish';
-import { useUpdateArticle } from './use-update-article';
 
 export function useArticlesManagement() {
   const [filters, setFilters] = useState<ArticlesFilters>({
@@ -22,11 +19,6 @@ export function useArticlesManagement() {
     articleId: string | null;
     articleTitle: string | null;
   }>({ open: false, articleId: null, articleTitle: null });
-
-  const [editDialog, setEditDialog] = useState<{
-    open: boolean;
-    articleId: string | null;
-  }>({ open: false, articleId: null });
 
   const debouncedSearch = useCustomDebounce(filters.search || '', 500);
 
@@ -55,12 +47,6 @@ export function useArticlesManagement() {
     totalPages = 1,
   } = articlesData || {};
 
-  if (editDialog.articleId) {
-  }
-  const { data: article } = useArticle(editDialog.articleId);
-
-  const createArticlesMutation = useCreateArticle();
-  const updateArticlMutation = useUpdateArticle();
   const togglePublishMutation = useTogglePublish();
   const deleteArticleMutation = useDeleteArticle();
   const prefetchArticles = usePrefetchArticles();
@@ -75,13 +61,6 @@ export function useArticlesManagement() {
     },
     []
   );
-
-  const handleEditClick = useCallback((articleId: string) => {
-    setEditDialog({
-      open: true,
-      articleId,
-    });
-  }, []);
 
   const handleConfirmDelete = useCallback(() => {
     if (deleteDialog.articleId) {
@@ -99,10 +78,6 @@ export function useArticlesManagement() {
 
   const handleCancelDelete = useCallback(() => {
     setDeleteDialog({ open: false, articleId: null, articleTitle: null });
-  }, []);
-
-  const handleCloseEdit = useCallback(() => {
-    setEditDialog({ open: false, articleId: null });
   }, []);
 
   const handleTogglePublish = useCallback(
@@ -183,9 +158,7 @@ export function useArticlesManagement() {
 
   return {
     filters,
-    article,
     deleteDialog,
-    editDialog,
     articles,
     total,
     page,
@@ -197,13 +170,9 @@ export function useArticlesManagement() {
     debouncedSearch,
     deleteArticleMutation,
     togglePublishMutation,
-    createArticlesMutation,
-    updateArticlMutation,
     handleDeleteClick,
-    handleEditClick,
     handleConfirmDelete,
     handleCancelDelete,
-    handleCloseEdit,
     handleTogglePublish,
     handlePageChange,
     handleItemsPerPageChange,
@@ -214,6 +183,5 @@ export function useArticlesManagement() {
     isArticleToggling,
     setFilters,
     setDeleteDialog,
-    setEditDialog,
   };
 }

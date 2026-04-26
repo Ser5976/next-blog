@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { FileText, Loader2, Plus, RefreshCw } from 'lucide-react';
 
@@ -21,30 +20,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/card';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/shared/ui/sheet';
 import { useArticlesManagement } from '../hooks';
 import { DASHBOARD_ARTICLES_CONFIG } from '../lib';
-import { ArticleFormValues } from '../model';
-import { ArticleForm } from './article-form';
 import { ArticleRow } from './article-row';
 import { ArticlesFiltersComponent } from './articles-filters';
 
 export const DashboardArticles = () => {
   const router = useRouter();
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const {
-    article,
     filters,
     deleteDialog,
-    editDialog,
     articles,
     total,
     page,
@@ -54,57 +40,29 @@ export const DashboardArticles = () => {
     error,
     isFetching,
     debouncedSearch,
-    createArticlesMutation,
     deleteArticleMutation,
-    updateArticlMutation,
     handleDeleteClick,
     handleConfirmDelete,
     handleCancelDelete,
-    handleCloseEdit,
     handleTogglePublish,
     handlePageChange,
     handleItemsPerPageChange,
     handleFiltersChange,
     handleRefresh,
     handlePrefetchNextPage,
-    setEditDialog,
     isArticleDeleting,
     isArticleToggling,
   } = useArticlesManagement();
-  const isArticle = editDialog.articleId ? !!article : true;
 
   const { data: categories } = useCategories();
   const { data: tags } = useTags();
 
   const handleCreateArticle = () => {
     router.push('/create-article');
-    // setEditDialog({ open: true, articleId: null });
   };
 
   const handleEditArticle = (id: string) => {
-    // setEditDialog({ open: true, articleId: id });
     router.push(`/edit-article/${id}`);
-  };
-
-  const handleSubmitArticle = async (data: ArticleFormValues) => {
-    setIsSubmitting(true);
-    try {
-      if (editDialog.articleId) {
-        await updateArticlMutation.mutateAsync({
-          id: editDialog.articleId,
-          data,
-        });
-      } else {
-        await createArticlesMutation.mutateAsync(data);
-      }
-      handleCloseEdit();
-      handleRefresh();
-      router.push('/dashboard/articles');
-    } catch (error) {
-      console.error('Error saving article:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   if (isError) {
@@ -293,47 +251,6 @@ export const DashboardArticles = () => {
         }
         data-testid="delete-article-dialog"
       />
-
-      {/* Article Form Sheet */}
-      <Sheet open={editDialog.open && isArticle} onOpenChange={handleCloseEdit}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-7xl overflow-y-auto p-2"
-        >
-          <SheetHeader>
-            <SheetTitle>
-              {editDialog.articleId ? 'Edit Article' : 'Create Article'}
-            </SheetTitle>
-            <SheetDescription>
-              {editDialog.articleId
-                ? 'Make changes to your article'
-                : 'Create a new article for your blog'}
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="mt-6">
-            <ArticleForm
-              initialData={
-                article
-                  ? {
-                      title: article.title,
-                      slug: article.slug,
-                      content: article.content,
-                      excerpt: article.excerpt || '',
-                      coverImage: article.coverImage,
-                      categoryId: article.categoryId,
-                      tags: article.tags.map((tag) => tag.id),
-                    }
-                  : undefined
-              }
-              onSubmit={handleSubmitArticle}
-              isSubmitting={isSubmitting}
-              categories={categories}
-              availableTags={tags}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   );
 };
