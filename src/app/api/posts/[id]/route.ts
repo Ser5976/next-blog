@@ -92,32 +92,32 @@ export async function PUT(
     // console.log('validation:', validation);
     if (!success) return NextResponse.json(error, { status: 400 });
 
-    // Получаем текущую статью, чтобы проверить, изменилось ли картинка и slug
+    // Получаем текущую статью, чтобы проверить, изменилось ли картинка
     const currentArticle = await prisma.post.findUnique({
       where: { id },
       select: {
         coverImage: true,
-        slug: true,
       },
     });
 
     // Проверка уникальности slug
-    if (currentArticle?.slug !== data.slug) {
-      const existingPost = await prisma.post.findUnique({
-        where: { slug: data.slug },
-      });
+    const existingPost = await prisma.post.findFirst({
+      where: {
+        slug: data.slug,
+        NOT: { id },
+      },
+    });
 
-      if (existingPost) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'SLUG_ALREADY_EXISTS',
-            message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
-            field: 'slug',
-          },
-          { status: 409 } // 409 Conflict
-        );
-      }
+    if (existingPost) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'SLUG_ALREADY_EXISTS',
+          message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
+          field: 'slug',
+        },
+        { status: 409 } // 409 Conflict
+      );
     }
 
     // Если если изменилась и старая существовала - удаляем старую из ImageKit

@@ -8,11 +8,7 @@ export const tagFormSchema = z.object({
   slug: z
     .string()
     .min(2, 'Slug must be at least 2 characters')
-    .max(30, 'Slug must not exceed 30 characters')
-    .regex(
-      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
-      'Slug must contain only lowercase letters, numbers, and hyphens'
-    ),
+    .max(30, 'Slug must not exceed 30 characters'),
 });
 
 export type TagFormValues = z.infer<typeof tagFormSchema>;

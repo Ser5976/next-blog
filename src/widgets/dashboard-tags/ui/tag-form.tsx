@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
 
 import { Tag } from '@/entities/dashboard-get-tags';
+import { tagFormSchema, TagFormValues } from '@/shared/schemas';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent } from '@/shared/ui/card';
 import {
@@ -18,7 +19,6 @@ import {
   FormMessage,
 } from '@/shared/ui/form';
 import { Input } from '@/shared/ui/input';
-import { tagFormSchema, TagFormValues } from '../model';
 
 interface TagFormProps {
   initialData?: Tag | null;
@@ -53,29 +53,20 @@ export function TagForm({
     }
   }, [initialData, form]);
 
-  // Автоматическая генерация slug из названия
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const name = e.target.value;
-    form.setValue('name', name);
-    if (!form.getValues('slug') || !form.formState.dirtyFields.slug) {
-      form.setValue('slug', generateSlug(name));
-    }
-  };
-
   const handleSubmit = async (data: TagFormValues) => {
     await onSubmit(data);
   };
 
+  const isEditMode = !!initialData;
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+      <form
+        onSubmit={form.handleSubmit(handleSubmit)}
+        className="space-y-6"
+        aria-label={isEditMode ? 'Edit tag form' : 'Create tag form'}
+        data-testid="tag-form"
+      >
         <Card>
           <CardContent className="pt-6 space-y-4">
             <FormField
@@ -83,17 +74,27 @@ export function TagForm({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tag Name</FormLabel>
+                  <FormLabel id="tag-name-label">Tag Name</FormLabel>
                   <FormControl>
                     <Input
+                      id="tag-name"
                       placeholder="e.g., JavaScript"
+                      aria-labelledby="tag-name-label"
+                      aria-describedby="tag-name-description tag-name-error"
+                      aria-required="true"
+                      aria-invalid={!!form.formState.errors.name}
+                      data-testid="tag-name-input"
                       {...field}
-                      onChange={handleNameChange}
                       disabled={isSubmitting}
                     />
                   </FormControl>
-                  <FormDescription>The display name of the tag</FormDescription>
-                  <FormMessage />
+                  <FormDescription id="tag-name-description">
+                    The display name of the tag
+                  </FormDescription>
+                  <FormMessage
+                    id="tag-name-error"
+                    data-testid="tag-name-error"
+                  />
                 </FormItem>
               )}
             />
@@ -103,19 +104,28 @@ export function TagForm({
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Slug</FormLabel>
+                  <FormLabel id="tag-slug-label">Slug</FormLabel>
                   <FormControl>
                     <Input
+                      id="tag-slug"
                       placeholder="e.g., javascript"
+                      aria-labelledby="tag-slug-label"
+                      aria-describedby="tag-slug-description tag-slug-error"
+                      aria-required="true"
+                      aria-invalid={!!form.formState.errors.slug}
+                      data-testid="tag-slug-input"
                       {...field}
                       disabled={isSubmitting}
                     />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription id="tag-slug-description">
                     URL-friendly version of the tag name (e.g.,
                     /blog/tag/javascript)
                   </FormDescription>
-                  <FormMessage />
+                  <FormMessage
+                    id="tag-slug-error"
+                    data-testid="tag-slug-error"
+                  />
                 </FormItem>
               )}
             />
@@ -128,14 +138,65 @@ export function TagForm({
             variant="outline"
             onClick={() => form.reset()}
             disabled={isSubmitting}
+            className="cursor-pointer"
+            aria-label="Reset form to initial values"
+            data-testid="tag-form-reset-button"
           >
             Reset
           </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {initialData ? 'Update Tag' : 'Create Tag'}
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="cursor-pointer min-w-[160px]"
+            aria-label={isEditMode ? 'Update tag' : 'Create tag'}
+            aria-disabled={isSubmitting}
+            data-testid="tag-form-submit-button"
+          >
+            <span className="relative inline-flex items-center justify-center gap-2">
+              <span
+                className="w-4 h-4 flex items-center justify-center"
+                aria-hidden="true"
+              >
+                {isSubmitting ? (
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    data-testid="submit-spinner"
+                  />
+                ) : (
+                  <span className="w-4 h-4" />
+                )}
+              </span>
+              {isEditMode ? 'Update Tag' : 'Create Tag'}
+            </span>
           </Button>
         </div>
+
+        {/* Сообщение о статусе для screen readers */}
+        {isSubmitting && (
+          <div
+            className="sr-only"
+            role="status"
+            aria-live="polite"
+            data-testid="submitting-status"
+          >
+            {isEditMode
+              ? 'Updating tag, please wait...'
+              : 'Creating tag, please wait...'}
+          </div>
+        )}
+
+        {/* Сообщение об ошибке формы, если есть общая ошибка */}
+        {form.formState.isSubmitted &&
+          Object.keys(form.formState.errors).length > 0 && (
+            <div
+              className="sr-only"
+              role="alert"
+              aria-live="assertive"
+              data-testid="form-errors-status"
+            >
+              Please fix the errors in the form before submitting.
+            </div>
+          )}
       </form>
     </Form>
   );

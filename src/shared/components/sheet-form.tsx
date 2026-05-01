@@ -15,42 +15,102 @@ import {
 interface SheetFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  categoryId: string | null;
+  id: string | null;
   isLoading: boolean;
   error: Error | null;
   slugError?: string | null;
   onRetry: () => void;
   children: ReactNode;
+  title?: {
+    create: string;
+    edit: string;
+  };
+  description?: {
+    create: string;
+    edit: string;
+  };
+  entityType?: 'category' | 'tag';
 }
+
+const DEFAULT_TITLES = {
+  category: {
+    create: 'Create Category',
+    edit: 'Edit Category',
+  },
+  tag: {
+    create: 'Create Tag',
+    edit: 'Edit Tag',
+  },
+} as const;
+
+const DEFAULT_DESCRIPTIONS = {
+  category: {
+    create: 'Create a new category for your blog posts',
+    edit: 'Make changes to your category',
+  },
+  tag: {
+    create: 'Create a new tag for your blog posts',
+    edit: 'Make changes to your tag',
+  },
+} as const;
 
 export const SheetForm = ({
   open,
   onOpenChange,
-  categoryId,
+  id,
   isLoading,
   error,
   slugError,
   onRetry,
   children,
+  title,
+  description,
+  entityType = 'category',
 }: SheetFormProps) => {
-  const isEditing = !!categoryId;
+  const isEditing = !!id;
+
+  const finalTitle = title
+    ? isEditing
+      ? title.edit
+      : title.create
+    : isEditing
+      ? DEFAULT_TITLES[entityType].edit
+      : DEFAULT_TITLES[entityType].create;
+
+  const finalDescription = description
+    ? isEditing
+      ? description.edit
+      : description.create
+    : isEditing
+      ? DEFAULT_DESCRIPTIONS[entityType].edit
+      : DEFAULT_DESCRIPTIONS[entityType].create;
+
+  const getAriaLabel = () => {
+    if (entityType === 'tag') {
+      return isEditing ? 'Edit tag form' : 'Create tag form';
+    }
+    return isEditing ? 'Edit category form' : 'Create category form';
+  };
+
+  const getTestId = () => {
+    if (entityType === 'tag') {
+      return 'tag-sheet-content';
+    }
+    return 'category-sheet-content';
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
         className="w-full sm:max-w-lg overflow-y-auto p-4"
-        aria-label={isEditing ? 'Edit category form' : 'Create category form'}
-        data-testid="category-sheet-content"
+        aria-label={getAriaLabel()}
+        data-testid={getTestId()}
       >
         <SheetHeader>
-          <SheetTitle data-testid="sheet-title">
-            {isEditing ? 'Edit Category' : 'Create Category'}
-          </SheetTitle>
+          <SheetTitle data-testid="sheet-title">{finalTitle}</SheetTitle>
           <SheetDescription data-testid="sheet-description">
-            {isEditing
-              ? 'Make changes to your category'
-              : 'Create a new category for your blog posts'}
+            {finalDescription}
           </SheetDescription>
         </SheetHeader>
 
@@ -76,36 +136,36 @@ export const SheetForm = ({
           <div
             role="status"
             aria-live="polite"
-            aria-label="Loading category data"
+            aria-label={`Loading ${entityType} data`}
             data-testid="loading-state"
           >
             <LoadingScreen
-              title="Loading category..."
-              text="Please wait while we fetch the category data"
+              title={`Loading ${entityType}...`}
+              text={`Please wait while we fetch the ${entityType} data`}
             />
           </div>
         ) : error ? (
           /* Error State */
           <div
-            className="min-h-screen bg-background p-4 md:p-6"
+            className="min-h-[400px] bg-background p-4 md:p-6"
             role="alert"
             aria-live="assertive"
-            aria-label="Error loading category"
+            aria-label={`Error loading ${entityType}`}
             data-testid="error-state"
           >
             <UniversalError
               error={error}
               message={error.message}
-              title="Failed to Load Category"
+              title={`Failed to Load ${entityType === 'tag' ? 'Tag' : 'Category'}`}
               onRetry={onRetry}
               variant="card"
               data-testid="load-error"
             >
               <p
                 className="text-xs text-muted-foreground mt-4"
-                data-testid="error-category-id"
+                data-testid="error-id"
               >
-                Category ID: {categoryId}
+                {entityType === 'tag' ? 'Tag' : 'Category'} ID: {id}
               </p>
             </UniversalError>
           </div>

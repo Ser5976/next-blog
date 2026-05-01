@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Loader2, Plus, RefreshCw, Tags } from 'lucide-react';
 
 import { useTags } from '@/entities/dashboard-get-tags';
+import { SheetForm } from '@/shared/components';
+import { TagFormValues } from '@/shared/schemas';
 import { ConfirmDialog, UniversalEmpty, UniversalError } from '@/shared/ui';
 import { Button } from '@/shared/ui/button';
 import {
@@ -13,15 +15,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shared/ui/card';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/shared/ui/sheet';
 import { useCreateTag, useDeleteTag, useTag, useUpdateTag } from '../hooks';
-import { TagFormValues } from '../model';
 import { TagForm } from './tag-form';
 import { TagRow } from './tag-row';
 
@@ -41,6 +35,7 @@ export const DashboardTags = () => {
     tagId: string | null;
     tagName: string | null;
   }>({ open: false, tagId: null, tagName: null });
+  const [slugError, setSlugError] = useState<string | null>(null);
 
   const {
     data: tags,
@@ -51,16 +46,23 @@ export const DashboardTags = () => {
     isFetching,
   } = useTags();
 
-  const { data: tag } = useTag(editDialog.tagId);
+  const {
+    data: tag,
+    isLoading: isLoadingTag,
+    error: tagError,
+    refetch: refetchTag,
+  } = useTag(editDialog.tagId);
   const createTagMutation = useCreateTag();
   const updateTagMutation = useUpdateTag();
   const deleteTagMutation = useDeleteTag();
 
   const handleCreateTag = () => {
+    setSlugError(null);
     setEditDialog({ open: true, tagId: null });
   };
 
   const handleEditTag = (id: string) => {
+    setSlugError(null);
     setEditDialog({ open: true, tagId: id });
   };
 
@@ -91,11 +93,13 @@ export const DashboardTags = () => {
   };
 
   const handleCloseEdit = () => {
+    setSlugError(null);
     setEditDialog({ open: false, tagId: null });
   };
 
   const handleSubmitTag = async (data: TagFormValues) => {
     setIsSubmitting(true);
+    setSlugError(null);
     try {
       if (editDialog.tagId) {
         await updateTagMutation.mutateAsync({
@@ -107,8 +111,12 @@ export const DashboardTags = () => {
       }
       handleCloseEdit();
       refetch();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving tag:', error);
+      // Обработка ошибки slug для тегов
+      if (error?.response?.data?.error === 'SLUG_ALREADY_EXISTS') {
+        setSlugError(error.response.data.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -134,10 +142,16 @@ export const DashboardTags = () => {
     <div
       className="min-h-screen bg-background p-4 md:p-6"
       data-testid="dashboard-tags"
+      role="main"
+      aria-label="Tags management dashboard"
     >
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+          role="region"
+          aria-label="Page header"
+        >
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
               {DASHBOARD_TAGS_CONFIG.title}
@@ -153,13 +167,21 @@ export const DashboardTags = () => {
               variant="outline"
               size="sm"
               disabled={isLoading || isFetching}
-              className="gap-2"
+              className="gap-2 cursor-pointer"
               aria-label="Refresh tags list"
+              aria-busy={isLoading || isFetching}
+              data-testid="refresh-tags-button"
             >
               {isLoading || isFetching ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    aria-hidden="true"
+                  />
+                  <span className="sr-only">Refreshing...</span>
+                </>
               ) : (
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className="h-4 w-4" aria-hidden="true" />
               )}
               Refresh
             </Button>
@@ -167,10 +189,11 @@ export const DashboardTags = () => {
             <Button
               onClick={handleCreateTag}
               size="sm"
-              className="gap-2"
+              className="gap-2 cursor-pointer"
+              aria-label="Create new tag"
               data-testid="create-tag-button"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" aria-hidden="true" />
               New Tag
             </Button>
           </div>
@@ -179,11 +202,14 @@ export const DashboardTags = () => {
         {/* Main Content */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Tags className="h-5 w-5" />
+            <CardTitle
+              className="flex items-center gap-2"
+              id="tags-section-title"
+            >
+              <Tags className="h-5 w-5" aria-hidden="true" />
               Tags
             </CardTitle>
-            <CardDescription>
+            <CardDescription aria-live="polite">
               {isLoading
                 ? 'Loading tags...'
                 : `${tags?.length || 0} total tags`}
@@ -192,13 +218,21 @@ export const DashboardTags = () => {
 
           <CardContent>
             {isLoading ? (
-              <div className="space-y-3">
+              <div
+                className="space-y-3"
+                aria-label="Loading tags"
+                aria-busy="true"
+                data-testid="tags-loading-state"
+              >
                 {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
                     className="h-20 bg-muted animate-pulse rounded-lg"
+                    aria-hidden="true"
+                    data-testid={`skeleton-row-${i}`}
                   />
                 ))}
+                <span className="sr-only">Loading tags, please wait</span>
               </div>
             ) : tags?.length === 0 ? (
               <UniversalEmpty
@@ -206,21 +240,35 @@ export const DashboardTags = () => {
                 title="No tags found"
                 description="Get started by creating your first tag"
                 data-testid="tags-empty-state"
+                aria-live="polite"
               >
-                <Button onClick={handleCreateTag} className="mt-4">
-                  <Plus className="h-4 w-4 mr-2" />
+                <Button
+                  onClick={handleCreateTag}
+                  className="mt-4"
+                  aria-label="Create your first tag"
+                >
+                  <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
                   Create Tag
                 </Button>
               </UniversalEmpty>
             ) : (
-              <div className="space-y-3">
-                {tags?.map((tag) => (
+              <div
+                className="space-y-3"
+                role="feed"
+                aria-label="Tags list"
+                aria-busy={deleteTagMutation.isPending}
+                data-testid="tags-list"
+                data-tags-count={tags?.length}
+              >
+                {tags?.map((tag, index) => (
                   <TagRow
                     key={tag.id}
                     tag={tag}
                     onEdit={handleEditTag}
                     onDelete={handleDeleteClick}
                     isDeleting={isTagDeleting(tag.id)}
+                    aria-posinset={index + 1}
+                    aria-setsize={tags.length}
                   />
                 ))}
               </div>
@@ -247,34 +295,31 @@ export const DashboardTags = () => {
           deleteDialog.tagId === deleteTagMutation.variables
         }
         data-testid="delete-tag-dialog"
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
       />
 
       {/* Tag Form Sheet */}
-      <Sheet open={editDialog.open} onOpenChange={handleCloseEdit}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-lg overflow-y-auto p-4"
-        >
-          <SheetHeader>
-            <SheetTitle>
-              {editDialog.tagId ? 'Edit Tag' : 'Create Tag'}
-            </SheetTitle>
-            <SheetDescription>
-              {editDialog.tagId
-                ? 'Make changes to your tag'
-                : 'Create a new tag for your blog posts'}
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="mt-6">
-            <TagForm
-              initialData={tag}
-              onSubmit={handleSubmitTag}
-              isSubmitting={isSubmitting}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
+      <SheetForm
+        open={editDialog.open}
+        onOpenChange={handleCloseEdit}
+        id={editDialog.tagId}
+        isLoading={isLoadingTag}
+        error={tagError}
+        slugError={slugError}
+        onRetry={() => refetchTag()}
+        entityType="tag"
+        aria-label={editDialog.tagId ? 'Edit tag form' : 'Create tag form'}
+        data-testid="tag-form-sheet"
+        data-mode={editDialog.tagId ? 'edit' : 'create'}
+        data-tag-id={editDialog.tagId || undefined}
+      >
+        <TagForm
+          initialData={tag}
+          onSubmit={handleSubmitTag}
+          isSubmitting={isSubmitting}
+        />
+      </SheetForm>
     </div>
   );
 };

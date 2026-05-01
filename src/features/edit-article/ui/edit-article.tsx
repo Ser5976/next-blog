@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useCategories } from '@/entities/dashboard-get-categories';
 import { useTags } from '@/entities/dashboard-get-tags';
 import { useArticle } from '@/entities/get-article';
-import { ArticleForm } from '@/shared/components/article-form';
+import { ArticleForm } from '@/shared/components';
 import { ArticleFormValues } from '@/shared/schemas';
 import { UniversalError } from '@/shared/ui';
 import { LoadingScreen } from '@/shared/ui/loading-screen';

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { Tag } from '@/entities/dashboard-get-tags';
-import { TagFormValues } from '../model';
+import { TagFormValues } from '@/shared/schemas';
 
 export async function getTag(id: string): Promise<Tag> {
   try {
@@ -24,7 +24,7 @@ export async function createTag(data: TagFormValues): Promise<Tag> {
     return response.data.tag;
   } catch (error) {
     console.error('createTag: error:', error);
-    throw new Error('Failed to create tag');
+    throw error;
   }
 }
 
@@ -37,7 +37,7 @@ export async function updateTag(id: string, data: TagFormValues): Promise<Tag> {
     return response.data.tag;
   } catch (error) {
     console.error('updateTag: error:', error);
-    throw new Error('Failed to update tag');
+    throw error;
   }
 }
 

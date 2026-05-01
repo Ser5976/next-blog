@@ -3,8 +3,8 @@ import { toast } from 'sonner';
 
 import { Tag } from '@/entities/dashboard-get-tags';
 import { tagsQueryKeys } from '@/entities/dashboard-get-tags/hooks/use-tags';
+import { TagFormValues } from '@/shared/schemas';
 import { createTag, deleteTag, getTag, updateTag } from '../api';
-import { TagFormValues } from '../model';
 
 export function useTag(id: string | null) {
   return useQuery<Tag | null, Error>({
@@ -28,8 +28,16 @@ export function useCreateTag() {
       toast.success('Tag created successfully');
       queryClient.invalidateQueries({ queryKey: tagsQueryKeys.all });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create tag');
+    onError: (error: any) => {
+      // Проверяем на ошибку уникальности slug
+      if (error?.response?.data?.error === 'SLUG_ALREADY_EXISTS') {
+        toast.error(
+          error.response.data.message ||
+            'This slug is already taken. Please choose a different one.'
+        );
+      } else {
+        toast.error(error?.message || 'Failed to create article');
+      }
     },
   });
 }
@@ -44,8 +52,16 @@ export function useUpdateTag() {
       toast.success('Tag updated successfully');
       queryClient.invalidateQueries({ queryKey: tagsQueryKeys.all });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to update tag');
+    onError: (error: any) => {
+      // Проверяем на ошибку уникальности slug
+      if (error?.response?.data?.error === 'SLUG_ALREADY_EXISTS') {
+        toast.error(
+          error.response.data.message ||
+            'This slug is already taken. Please choose a different one.'
+        );
+      } else {
+        toast.error(error?.message || 'Failed to create article');
+      }
     },
   });
 }

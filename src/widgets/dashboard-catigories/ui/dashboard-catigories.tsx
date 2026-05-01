@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChartColumnStacked, Loader2, Plus, RefreshCw } from 'lucide-react';
 
 import { useCategories } from '@/entities/dashboard-get-categories';
+import { SheetForm } from '@/shared/components';
 import { CategoryFormValues } from '@/shared/schemas';
 import { ConfirmDialog, UniversalEmpty, UniversalError } from '@/shared/ui';
 import { Button } from '@/shared/ui/button';
@@ -22,7 +23,6 @@ import {
 } from '../hooks';
 import { CategoryForm } from './category-form';
 import { CategoryRow } from './category-row';
-import { SheetForm } from './sheet-form';
 
 const DASHBOARD_CATEGORIES_CONFIG = {
   title: 'Categories Management',
@@ -308,7 +308,7 @@ export const DashboardCategories = () => {
       <SheetForm
         open={editDialog.open}
         onOpenChange={handleCloseEdit}
-        categoryId={editDialog.categoryId}
+        id={editDialog.categoryId}
         isLoading={isLoadingCategory}
         error={categoryError}
         slugError={slugError}

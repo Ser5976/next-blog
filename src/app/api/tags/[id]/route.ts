@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api/prisma';
+import { tagFormSchema } from '@/shared/schemas';
 
 // GET - получение тега по ID
 export async function GET(
@@ -52,11 +53,16 @@ export async function PUT(
       );
     }
 
-    const { name, slug } = body;
+    // валидация body при помощи zod
+    const { data, success, error } = tagFormSchema.safeParse(body);
 
-    if (!name || !slug) {
+    if (!success) {
       return NextResponse.json(
-        { error: 'Name and slug are required' },
+        {
+          success: false,
+          error: 'Validation failed',
+          details: error,
+        },
         { status: 400 }
       );
     }
@@ -64,21 +70,26 @@ export async function PUT(
     // Проверка на уникальность slug (исключая текущий тег)
     const existingTag = await prisma.tag.findFirst({
       where: {
-        slug,
+        slug: data.slug,
         NOT: { id },
       },
     });
 
     if (existingTag) {
       return NextResponse.json(
-        { error: 'Tag with this slug already exists' },
-        { status: 409 }
+        {
+          success: false,
+          error: 'SLUG_ALREADY_EXISTS',
+          message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
+          field: 'slug',
+        },
+        { status: 409 } // 409 Conflict
       );
     }
 
     const tag = await prisma.tag.update({
       where: { id },
-      data: { name, slug },
+      data: { name: data.name, slug: data.slug },
     });
 
     return NextResponse.json({ success: true, tag });

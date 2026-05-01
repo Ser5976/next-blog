@@ -72,31 +72,24 @@ export async function PUT(
       );
     }
 
-    // Получаем текущую категорию, чтобы проверить slug
-    const currentCategory = await prisma.category.findUnique({
-      where: { id },
-      select: {
-        slug: true,
+    // Проверка на уникальность slug
+    const existingCategory = await prisma.category.findFirst({
+      where: {
+        slug: data.slug,
+        NOT: { id },
       },
     });
 
-    // Проверка на уникальность slug
-    if (currentCategory?.slug !== data.slug) {
-      const existingCategory = await prisma.category.findUnique({
-        where: { slug: data.slug },
-      });
-
-      if (existingCategory) {
-        return NextResponse.json(
-          {
-            success: false,
-            error: 'SLUG_ALREADY_EXISTS',
-            message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
-            field: 'slug',
-          },
-          { status: 409 } // 409 Conflict
-        );
-      }
+    if (existingCategory) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'SLUG_ALREADY_EXISTS',
+          message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
+          field: 'slug',
+        },
+        { status: 409 } // 409 Conflict
+      );
     }
 
     const category = await prisma.category.update({

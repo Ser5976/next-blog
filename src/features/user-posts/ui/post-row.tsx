@@ -4,7 +4,7 @@ import { memo } from 'react';
 import Link from 'next/link';
 import { Loader2, MoreVertical } from 'lucide-react';
 
-import { ArticleRowDashboard } from '@/shared/components/article-row-dashboard';
+import { ArticleRowDashboard } from '@/shared/components';
 import {
   Button,
   DropdownMenu,

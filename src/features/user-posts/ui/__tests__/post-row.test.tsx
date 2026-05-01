@@ -130,7 +130,7 @@ jest.mock('@/shared/ui', () => ({
 }));
 
 // Мокаем ArticleRowDashboard компонент
-jest.mock('@/shared/components/article-row-dashboard', () => ({
+jest.mock('@/shared/components', () => ({
   ArticleRowDashboard: ({ article }: any) => (
     <div data-testid="article-row-dashboard">
       <h3 data-testid="post-title" id={`post-title-${article.id}`}>

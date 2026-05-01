@@ -3,7 +3,7 @@
 import { memo, useCallback } from 'react';
 import { Loader2, MoreVertical, Pencil, Trash2 } from 'lucide-react';
 
-import { ArticleRowDashboard } from '@/shared/components/article-row-dashboard';
+import { ArticleRowDashboard } from '@/shared/components';
 import { Button } from '@/shared/ui/button';
 import {
   DropdownMenu,
