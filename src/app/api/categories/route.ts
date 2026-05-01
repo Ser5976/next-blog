@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api/prisma';
+import { categoryFormSchema } from '@/shared/schemas';
 
 export async function GET() {
   try {
@@ -21,11 +22,13 @@ export async function GET() {
     return NextResponse.json('Something went wrong', { status: 500 });
   }
 }
+
 // создание категории
 export async function POST(request: NextRequest) {
   try {
     const { userId, sessionClaims } = await auth();
     const body = await request.json();
+    console.log('body:', body);
 
     if (!userId) {
       return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
@@ -38,29 +41,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, slug } = body;
+    // валидация body при помощи zod
+    const { data, success, error } = categoryFormSchema.safeParse(body);
 
-    if (!name || !slug) {
+    if (!success) {
       return NextResponse.json(
-        { error: 'Name and slug are required' },
+        {
+          success: false,
+          error: 'Validation failed',
+          details: error,
+        },
         { status: 400 }
       );
     }
 
     // Проверка на уникальность slug
     const existingCategory = await prisma.category.findUnique({
-      where: { slug },
+      where: { slug: data.slug },
     });
 
     if (existingCategory) {
       return NextResponse.json(
-        { error: 'Category with this slug already exists' },
-        { status: 409 }
+        {
+          success: false,
+          error: 'SLUG_ALREADY_EXISTS',
+          message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
+          field: 'slug',
+        },
+        { status: 409 } // 409 Conflict
       );
     }
 
     const category = await prisma.category.create({
-      data: { name, slug },
+      data: { name: data.name, slug: data.slug },
     });
 
     return NextResponse.json({ success: true, category });

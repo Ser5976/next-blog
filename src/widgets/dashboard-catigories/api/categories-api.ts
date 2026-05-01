@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { Category } from '@/entities/dashboard-get-categories';
-import { CategoryFormValues } from '../model';
+import { CategoryFormValues } from '@/shared/schemas';
 
 export async function getCategory(id: string): Promise<Category> {
   try {
@@ -26,7 +26,7 @@ export async function createCategory(
     return response.data.category;
   } catch (error) {
     console.error('createCategory: error:', error);
-    throw new Error('Failed to create category');
+    throw error;
   }
 }
 
@@ -42,7 +42,7 @@ export async function updateCategory(
     return response.data.category;
   } catch (error) {
     console.error('updateCategory: error:', error);
-    throw new Error('Failed to update category');
+    throw error;
   }
 }
 

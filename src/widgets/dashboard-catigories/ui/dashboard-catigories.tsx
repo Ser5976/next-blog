@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChartColumnStacked, Loader2, Plus, RefreshCw } from 'lucide-react';
 
 import { useCategories } from '@/entities/dashboard-get-categories';
+import { CategoryFormValues } from '@/shared/schemas';
 import { ConfirmDialog, UniversalEmpty, UniversalError } from '@/shared/ui';
 import { Button } from '@/shared/ui/button';
 import {
@@ -14,21 +15,14 @@ import {
   CardTitle,
 } from '@/shared/ui/card';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/shared/ui/sheet';
-import {
   useCategory,
   useCreateCategory,
   useDeleteCategory,
   useUpdateCategory,
 } from '../hooks';
-import { CategoryFormValues } from '../model';
 import { CategoryForm } from './category-form';
 import { CategoryRow } from './category-row';
+import { SheetForm } from './sheet-form';
 
 const DASHBOARD_CATEGORIES_CONFIG = {
   title: 'Categories Management',
@@ -46,6 +40,7 @@ export const DashboardCategories = () => {
     categoryId: string | null;
     categoryName: string | null;
   }>({ open: false, categoryId: null, categoryName: null });
+  const [slugError, setSlugError] = useState<string | null>(null);
 
   const {
     data: categories,
@@ -56,7 +51,12 @@ export const DashboardCategories = () => {
     isFetching,
   } = useCategories();
 
-  const { data: category } = useCategory(editDialog.categoryId);
+  const {
+    data: category,
+    isLoading: isLoadingCategory,
+    error: categoryError,
+    refetch: refetchCategory,
+  } = useCategory(editDialog.categoryId);
   const createCategoryMutation = useCreateCategory();
   const updateCategoryMutation = useUpdateCategory();
   const deleteCategoryMutation = useDeleteCategory();
@@ -112,8 +112,12 @@ export const DashboardCategories = () => {
       }
       handleCloseEdit();
       refetch();
-    } catch (error) {
-      console.error('Error saving category:', error);
+    } catch (error: any) {
+      console.error('Error saving article:', error);
+      // Обработка ошибки slug
+      if (error?.response?.data?.error === 'SLUG_ALREADY_EXISTS') {
+        setSlugError(error.response.data.message);
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -134,6 +138,7 @@ export const DashboardCategories = () => {
         title="Error loading categories"
         icon={<ChartColumnStacked className="h-12 w-12 mx-auto" />}
         data-testid="categories-error-state"
+        aria-live="polite"
       />
     );
   }
@@ -142,10 +147,16 @@ export const DashboardCategories = () => {
     <div
       className="min-h-screen bg-background p-4 md:p-6"
       data-testid="dashboard-categories"
+      role="main"
+      aria-label="Categories management dashboard"
     >
       <div className="max-w-5xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
+          role="region"
+          aria-label="Page header"
+        >
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
               {DASHBOARD_CATEGORIES_CONFIG.title}
@@ -161,13 +172,21 @@ export const DashboardCategories = () => {
               variant="outline"
               size="sm"
               disabled={isLoading || isFetching}
-              className="gap-2"
+              className="gap-2 cursor-pointer"
               aria-label="Refresh categories list"
+              aria-busy={isLoading || isFetching}
+              data-testid="refresh-categories-button"
             >
               {isLoading || isFetching ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <>
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    aria-hidden="true"
+                  />
+                  <span className="sr-only">Refreshing...</span>
+                </>
               ) : (
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className="h-4 w-4" aria-hidden="true" />
               )}
               Refresh
             </Button>
@@ -175,10 +194,11 @@ export const DashboardCategories = () => {
             <Button
               onClick={handleCreateCategory}
               size="sm"
-              className="gap-2"
+              className="gap-2 cursor-pointer"
+              aria-label="Create new category"
               data-testid="create-category-button"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" aria-hidden="true" />
               New Category
             </Button>
           </div>
@@ -187,11 +207,14 @@ export const DashboardCategories = () => {
         {/* Main Content */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ChartColumnStacked className="h-5 w-5" />
+            <CardTitle
+              className="flex items-center gap-2"
+              id="categories-section-title"
+            >
+              <ChartColumnStacked className="h-5 w-5" aria-hidden="true" />
               Categories
             </CardTitle>
-            <CardDescription>
+            <CardDescription aria-live="polite">
               {isLoading
                 ? 'Loading categories...'
                 : `${categories?.length || 0} total categories`}
@@ -200,13 +223,21 @@ export const DashboardCategories = () => {
 
           <CardContent>
             {isLoading ? (
-              <div className="space-y-3">
+              <div
+                className="space-y-3"
+                aria-label="Loading categories"
+                aria-busy="true"
+                data-testid="categories-loading-state"
+              >
                 {[...Array(3)].map((_, i) => (
                   <div
                     key={i}
                     className="h-20 bg-muted animate-pulse rounded-lg"
+                    aria-hidden="true"
+                    data-testid={`skeleton-row-${i}`}
                   />
                 ))}
+                <span className="sr-only">Loading categories, please wait</span>
               </div>
             ) : categories?.length === 0 ? (
               <UniversalEmpty
@@ -214,21 +245,35 @@ export const DashboardCategories = () => {
                 title="No categories found"
                 description="Get started by creating your first category"
                 data-testid="categories-empty-state"
+                aria-live="polite"
               >
-                <Button onClick={handleCreateCategory} className="mt-4">
-                  <Plus className="h-4 w-4 mr-2" />
+                <Button
+                  onClick={handleCreateCategory}
+                  className="mt-4"
+                  aria-label="Create your first category"
+                >
+                  <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
                   Create Category
                 </Button>
               </UniversalEmpty>
             ) : (
-              <div className="space-y-3">
-                {categories?.map((category) => (
+              <div
+                className="space-y-3"
+                role="feed"
+                aria-label="Categories list"
+                aria-busy={deleteCategoryMutation.isPending}
+                data-testid="categories-list"
+                data-categories-count={categories?.length}
+              >
+                {categories?.map((category, index) => (
                   <CategoryRow
                     key={category.id}
                     category={category}
                     onEdit={handleEditCategory}
                     onDelete={handleDeleteClick}
                     isDeleting={isCategoryDeleting(category.id)}
+                    aria-posinset={index + 1}
+                    aria-setsize={categories.length}
                   />
                 ))}
               </div>
@@ -255,34 +300,32 @@ export const DashboardCategories = () => {
           deleteDialog.categoryId === deleteCategoryMutation.variables
         }
         data-testid="delete-category-dialog"
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
       />
 
       {/* Category Form Sheet */}
-      <Sheet open={editDialog.open} onOpenChange={handleCloseEdit}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-lg overflow-y-auto p-4"
-        >
-          <SheetHeader>
-            <SheetTitle>
-              {editDialog.categoryId ? 'Edit Category' : 'Create Category'}
-            </SheetTitle>
-            <SheetDescription>
-              {editDialog.categoryId
-                ? 'Make changes to your category'
-                : 'Create a new category for your blog posts'}
-            </SheetDescription>
-          </SheetHeader>
-
-          <div className="mt-6">
-            <CategoryForm
-              initialData={category}
-              onSubmit={handleSubmitCategory}
-              isSubmitting={isSubmitting}
-            />
-          </div>
-        </SheetContent>
-      </Sheet>
+      <SheetForm
+        open={editDialog.open}
+        onOpenChange={handleCloseEdit}
+        categoryId={editDialog.categoryId}
+        isLoading={isLoadingCategory}
+        error={categoryError}
+        slugError={slugError}
+        onRetry={() => refetchCategory()}
+        aria-label={
+          editDialog.categoryId ? 'Edit category form' : 'Create category form'
+        }
+        data-testid="category-form-sheet"
+        data-mode={editDialog.categoryId ? 'edit' : 'create'}
+        data-category-id={editDialog.categoryId || undefined}
+      >
+        <CategoryForm
+          initialData={category}
+          onSubmit={handleSubmitCategory}
+          isSubmitting={isSubmitting}
+        />
+      </SheetForm>
     </div>
   );
 };

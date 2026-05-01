@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api/prisma';
+import { categoryFormSchema } from '@/shared/schemas';
 
 export async function GET(
   request: NextRequest,
@@ -36,7 +37,7 @@ export async function GET(
   }
 }
 
-// PUT /api/dashboard/categories/[id] - обновление категории
+// PUT  - обновление категории
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -57,33 +58,50 @@ export async function PUT(
       );
     }
 
-    const { name, slug } = body;
+    // валидация body при помощи zod
+    const { data, success, error } = categoryFormSchema.safeParse(body);
 
-    if (!name || !slug) {
+    if (!success) {
       return NextResponse.json(
-        { error: 'Name and slug are required' },
+        {
+          success: false,
+          error: 'Validation failed',
+          details: error,
+        },
         { status: 400 }
       );
     }
 
-    // Проверка на уникальность slug (исключая текущую категорию)
-    const existingCategory = await prisma.category.findFirst({
-      where: {
-        slug,
-        NOT: { id },
+    // Получаем текущую категорию, чтобы проверить slug
+    const currentCategory = await prisma.category.findUnique({
+      where: { id },
+      select: {
+        slug: true,
       },
     });
 
-    if (existingCategory) {
-      return NextResponse.json(
-        { error: 'Category with this slug already exists' },
-        { status: 409 }
-      );
+    // Проверка на уникальность slug
+    if (currentCategory?.slug !== data.slug) {
+      const existingCategory = await prisma.category.findUnique({
+        where: { slug: data.slug },
+      });
+
+      if (existingCategory) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'SLUG_ALREADY_EXISTS',
+            message: `An article with the slug "${data.slug}" already exists. Please choose a different slug.`,
+            field: 'slug',
+          },
+          { status: 409 } // 409 Conflict
+        );
+      }
     }
 
     const category = await prisma.category.update({
       where: { id },
-      data: { name, slug },
+      data: { name: data.name, slug: data.slug },
     });
 
     return NextResponse.json({ success: true, category });

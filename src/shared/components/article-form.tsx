@@ -31,6 +31,9 @@ import { Textarea } from '@/shared/ui/textarea';
 import { articleFormSchema, ArticleFormValues } from '../schemas';
 import { ArticleFormProps } from '../types';
 
+// Иконка-плейсхолдер для резервирования места
+const IconPlaceholder = () => <span className="w-4 h-4" aria-hidden="true" />;
+
 export function ArticleForm({
   initialData,
   onSubmit,
@@ -72,9 +75,14 @@ export function ArticleForm({
   const handleSubmit = async (data: ArticleFormValues) => {
     await onSubmit({
       ...data,
+      categoryId: data.categoryId === 'none' ? null : data.categoryId,
       tags: selectedTags,
     });
   };
+
+  const isEditMode = !!initialData;
+  const buttonText = isEditMode ? 'Update Article' : 'Create Article';
+  const submittingText = isEditMode ? 'Updating...' : 'Creating...';
 
   return (
     <Form {...form}>
@@ -83,7 +91,7 @@ export function ArticleForm({
         className="space-y-8"
         noValidate
         data-testid="article-form"
-        aria-label="Article edit form"
+        aria-label={isEditMode ? 'Edit article form' : 'Create article form'}
       >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content - Left Column */}
@@ -96,24 +104,25 @@ export function ArticleForm({
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="title">Title</FormLabel>
+                      <FormLabel id="title-label">Title</FormLabel>
                       <FormControl>
                         <Input
                           id="title"
                           type="text"
                           placeholder="Enter article title"
-                          aria-label="Article title"
+                          aria-labelledby="title-label"
+                          aria-describedby="title-description title-error"
                           aria-required="true"
-                          aria-disabled={isSubmitting}
+                          aria-invalid={!!form.formState.errors.title}
                           data-testid="article-title-input"
                           {...field}
                           disabled={isSubmitting}
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription id="title-description">
                         A good title helps readers find your article
                       </FormDescription>
-                      <FormMessage data-testid="title-error" />
+                      <FormMessage id="title-error" data-testid="title-error" />
                     </FormItem>
                   )}
                 />
@@ -124,24 +133,25 @@ export function ArticleForm({
                   name="slug"
                   render={({ field }) => (
                     <FormItem className="mt-4">
-                      <FormLabel htmlFor="slug">Slug</FormLabel>
+                      <FormLabel id="slug-label">Slug</FormLabel>
                       <FormControl>
                         <Input
                           id="slug"
                           type="text"
                           placeholder="article-url-slug"
-                          aria-label="Article URL slug"
+                          aria-labelledby="slug-label"
+                          aria-describedby="slug-description slug-error"
                           aria-required="true"
-                          aria-disabled={isSubmitting}
+                          aria-invalid={!!form.formState.errors.slug}
                           data-testid="article-slug-input"
                           {...field}
                           disabled={isSubmitting}
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription id="slug-description">
                         URL-friendly version of the title
                       </FormDescription>
-                      <FormMessage data-testid="slug-error" />
+                      <FormMessage id="slug-error" data-testid="slug-error" />
                     </FormItem>
                   )}
                 />
@@ -152,15 +162,15 @@ export function ArticleForm({
                   name="excerpt"
                   render={({ field }) => (
                     <FormItem className="mt-4">
-                      <FormLabel htmlFor="excerpt">Excerpt</FormLabel>
+                      <FormLabel id="excerpt-label">Excerpt</FormLabel>
                       <FormControl>
                         <Textarea
                           id="excerpt"
                           placeholder="Brief summary of the article (optional)"
                           className="resize-none"
-                          aria-label="Article excerpt"
-                          aria-describedby="excerpt-description"
-                          aria-disabled={isSubmitting}
+                          aria-labelledby="excerpt-label"
+                          aria-describedby="excerpt-description excerpt-error"
+                          aria-invalid={!!form.formState.errors.excerpt}
                           data-testid="article-excerpt-input"
                           {...field}
                           value={field.value || ''}
@@ -170,7 +180,10 @@ export function ArticleForm({
                       <FormDescription id="excerpt-description">
                         Max 500 characters. Appears in article previews.
                       </FormDescription>
-                      <FormMessage data-testid="excerpt-error" />
+                      <FormMessage
+                        id="excerpt-error"
+                        data-testid="excerpt-error"
+                      />
                     </FormItem>
                   )}
                 />
@@ -185,11 +198,12 @@ export function ArticleForm({
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="content">Content</FormLabel>
+                      <FormLabel id="content-label">Content</FormLabel>
                       <FormControl>
                         <div
                           data-testid="rich-text-editor"
-                          aria-label="Article content editor"
+                          aria-labelledby="content-label"
+                          aria-describedby="content-error"
                         >
                           <RichTextEditor
                             content={field.value}
@@ -198,7 +212,10 @@ export function ArticleForm({
                           />
                         </div>
                       </FormControl>
-                      <FormMessage data-testid="content-error" />
+                      <FormMessage
+                        id="content-error"
+                        data-testid="content-error"
+                      />
                     </FormItem>
                   )}
                 />
@@ -216,19 +233,23 @@ export function ArticleForm({
                   name="coverImage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Cover Image</FormLabel>
+                      <FormLabel id="cover-image-label">Cover Image</FormLabel>
                       <FormControl>
                         <ImageUpload
                           value={field.value}
                           onChange={field.onChange}
                           onRemove={() => deleteImage(field)}
                           disabled={isSubmitting}
+                          aria-labelledby="cover-image-label"
                         />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription id="cover-image-description">
                         Featured image for the article
                       </FormDescription>
-                      <FormMessage data-testid="cover-image-error" />
+                      <FormMessage
+                        id="cover-image-error"
+                        data-testid="cover-image-error"
+                      />
                     </FormItem>
                   )}
                 />
@@ -243,7 +264,7 @@ export function ArticleForm({
                   name="categoryId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel htmlFor="category">Category</FormLabel>
+                      <FormLabel id="category-label">Category</FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         value={field.value || undefined}
@@ -252,7 +273,8 @@ export function ArticleForm({
                         <FormControl>
                           <SelectTrigger
                             id="category"
-                            aria-label="Select category"
+                            aria-labelledby="category-label"
+                            aria-describedby="category-error"
                             data-testid="category-select"
                           >
                             <SelectValue placeholder="Select a category" />
@@ -267,7 +289,10 @@ export function ArticleForm({
                           ))}
                         </SelectContent>
                       </Select>
-                      <FormMessage data-testid="category-error" />
+                      <FormMessage
+                        id="category-error"
+                        data-testid="category-error"
+                      />
                     </FormItem>
                   )}
                 />
@@ -304,7 +329,7 @@ export function ArticleForm({
                       </Button>
                     ))}
                   </div>
-                  <FormDescription>
+                  <FormDescription id="tags-description">
                     Select tags to categorize your article
                   </FormDescription>
                 </FormItem>
@@ -326,30 +351,63 @@ export function ArticleForm({
           >
             Cancel
           </Button>
+
           <Button
             type="submit"
-            aria-label={initialData ? 'Update article' : 'Create article'}
+            aria-label={buttonText}
             aria-disabled={isSubmitting}
             data-testid="submit-button"
             disabled={isSubmitting}
-            className="cursor-pointer min-w-[160px] relative"
+            className="cursor-pointer min-w-[180px] justify-center"
           >
-            {isSubmitting ? (
-              <>
-                <Loader2
-                  className="h-4 w-4 animate-spin absolute left-4"
-                  aria-hidden="true"
-                  data-testid="submit-spinner"
-                />
-                <span className="ml-6">
-                  {initialData ? 'Updating...' : 'Creating...'}
-                </span>
-              </>
-            ) : (
-              <span>{initialData ? 'Update Article' : 'Create Article'}</span>
-            )}
+            <span className="inline-flex items-center justify-center gap-2">
+              <span
+                className="w-4 h-4 flex items-center justify-center"
+                aria-hidden="true"
+              >
+                {isSubmitting ? (
+                  <Loader2
+                    className="h-4 w-4 animate-spin"
+                    aria-hidden="true"
+                    data-testid="submit-spinner"
+                  />
+                ) : (
+                  <IconPlaceholder />
+                )}
+              </span>
+              {isSubmitting ? submittingText : buttonText}
+            </span>
           </Button>
         </div>
+
+        {/* Скринридер сообщения о статусе */}
+        <div
+          className="sr-only"
+          role="status"
+          aria-live="polite"
+          data-testid="form-status"
+        >
+          {isSubmitting &&
+            (isEditMode
+              ? 'Updating article, please wait...'
+              : 'Creating article, please wait...')}
+        </div>
+
+        {/* Сообщение об ошибках формы */}
+        {form.formState.isSubmitted &&
+          Object.keys(form.formState.errors).length > 0 && (
+            <div
+              className="sr-only"
+              role="alert"
+              aria-live="assertive"
+              data-testid="form-errors-status"
+            >
+              Please fix the errors in the form before submitting.{' '}
+              {Object.values(form.formState.errors)
+                .map((err) => err?.message)
+                .join('. ')}
+            </div>
+          )}
       </form>
     </Form>
   );

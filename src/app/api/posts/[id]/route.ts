@@ -100,8 +100,8 @@ export async function PUT(
         slug: true,
       },
     });
-    // Проверка уникальности slug
 
+    // Проверка уникальности slug
     if (currentArticle?.slug !== data.slug) {
       const existingPost = await prisma.post.findUnique({
         where: { slug: data.slug },

@@ -3,13 +3,13 @@ import { toast } from 'sonner';
 
 import { Category } from '@/entities/dashboard-get-categories';
 import { categoriesQueryKeys } from '@/entities/dashboard-get-categories/hooks/use-catigories';
+import { CategoryFormValues } from '@/shared/schemas';
 import {
   createCategory,
   deleteCategory,
   getCategory,
   updateCategory,
 } from '../api';
-import { CategoryFormValues } from '../model';
 
 export function useCategory(id: string | null) {
   return useQuery<Category | null, Error>({
@@ -33,8 +33,16 @@ export function useCreateCategory() {
       toast.success('Category created successfully');
       queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.all });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to create category');
+    onError: (error: any) => {
+      // Проверяем на ошибку уникальности slug
+      if (error?.response?.data?.error === 'SLUG_ALREADY_EXISTS') {
+        toast.error(
+          error.response.data.message ||
+            'This slug is already taken. Please choose a different one.'
+        );
+      } else {
+        toast.error(error?.message || 'Failed to create article');
+      }
     },
   });
 }
@@ -49,8 +57,16 @@ export function useUpdateCategory() {
       toast.success('Category updated successfully');
       queryClient.invalidateQueries({ queryKey: categoriesQueryKeys.all });
     },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to update category');
+    onError: (error: any) => {
+      // Проверяем на ошибку уникальности slug
+      if (error?.response?.data?.error === 'SLUG_ALREADY_EXISTS') {
+        toast.error(
+          error.response.data.message ||
+            'This slug is already taken. Please choose a different one.'
+        );
+      } else {
+        toast.error(error?.message || 'Failed to create article');
+      }
     },
   });
 }
