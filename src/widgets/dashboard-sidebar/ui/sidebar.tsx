@@ -23,13 +23,13 @@ export const Sidebar = () => {
           <Button
             variant="outline"
             className="md:hidden m-4"
-            size="sm"
+            size="icon"
             aria-label="Open navigation menu"
             aria-expanded={isOpen}
             aria-controls="mobile-sidebar-content"
             aria-haspopup="dialog"
           >
-            <Menu className="h-4 w-4" aria-hidden="true" />
+            <Menu className="h-[1.2rem] w-[1.2rem]" aria-hidden="true" />
           </Button>
         </SheetTrigger>
         <SheetContent

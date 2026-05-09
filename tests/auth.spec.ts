@@ -79,8 +79,10 @@ test.describe('Authentication', () => {
     // Используем 'load' для более надежного ожидания редиректа
     await page.goto('/dashboard', { waitUntil: 'load', timeout: 30000 });
 
-    // Assert: Проверяем что пользователь перенаправлен на главную или sign-in
-    // В зависимости от настроек middleware может быть редирект на / или /sign-in
-    await expect(page).toHaveURL(/\/(sign-in)?$/, { timeout: 10000 });
+    // Assert: неавторизованный пользователь перенаправляется на вход с return URL
+    await expect(page).toHaveURL(/\/sign-in/, { timeout: 10000 });
+    await expect(page).toHaveURL(/redirect_url=%2Fdashboard/, {
+      timeout: 5000,
+    });
   });
 });

@@ -14,7 +14,11 @@ export default function ClientUserButton() {
   }
 
   return (
-    <div role="navigation" aria-label="User account menu">
+    <div
+      role="navigation"
+      className="flex items-center justify-center"
+      aria-label="User account menu"
+    >
       <UserButton />
     </div>
   );

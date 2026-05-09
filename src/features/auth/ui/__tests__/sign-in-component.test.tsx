@@ -10,8 +10,18 @@ jest.mock('../../model', () => ({
 
 // Мокируем Clerk компоненты
 jest.mock('@clerk/nextjs', () => ({
-  SignIn: ({ signUpForceRedirectUrl }: { signUpForceRedirectUrl: string }) => (
-    <div data-testid="clerk-signin" data-redirect-url={signUpForceRedirectUrl}>
+  SignIn: ({
+    signUpForceRedirectUrl,
+    forceRedirectUrl,
+  }: {
+    signUpForceRedirectUrl?: string;
+    forceRedirectUrl?: string;
+  }) => (
+    <div
+      data-testid="clerk-signin"
+      data-redirect-url={forceRedirectUrl || ''}
+      data-signup-redirect-url={signUpForceRedirectUrl || ''}
+    >
       Sign In Component
     </div>
   ),
@@ -21,15 +31,6 @@ jest.mock('@clerk/nextjs', () => ({
 jest.mock('../client-only', () => ({
   ClientOnly: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="client-only">{children}</div>
-  ),
-}));
-
-// Мокируем HomeLink
-jest.mock('../home-link', () => ({
-  HomeLink: ({ className }: { className: string }) => (
-    <div data-testid="home-link" className={className}>
-      Home Link
-    </div>
   ),
 }));
 
@@ -52,12 +53,17 @@ describe('SignInComponent', () => {
     // Act
     render(<SignInComponent />);
 
-    // Assert
-    expect(screen.getByTestId('home-link')).toBeInTheDocument();
+    // Assert - проверяем что ссылка на главную существует (она встроена, не отдельный компонент)
+    const homeLink = screen.getByRole('link', {
+      name: /VitaFlow Blog - Home page/i,
+    });
+    expect(homeLink).toBeInTheDocument();
+    expect(homeLink).toHaveAttribute('href', '/');
+
     expect(screen.getByTestId('client-only')).toBeInTheDocument();
     expect(screen.getByTestId('clerk-signin')).toBeInTheDocument();
     expect(screen.getByTestId('clerk-signin')).toHaveAttribute(
-      'data-redirect-url',
+      'data-signup-redirect-url',
       '/api/sync-user?redirect_url=%2F'
     );
   });
@@ -76,7 +82,7 @@ describe('SignInComponent', () => {
     // Assert
     expect(mockGet).toHaveBeenCalledWith('redirect_url');
     expect(screen.getByTestId('clerk-signin')).toHaveAttribute(
-      'data-redirect-url',
+      'data-signup-redirect-url',
       '/api/sync-user?redirect_url=%2Fdashboard'
     );
   });
@@ -93,7 +99,7 @@ describe('SignInComponent', () => {
 
     // Assert
     const mainElement = screen.getByRole('main');
-    expect(mainElement).toHaveAttribute('aria-label', 'Registration page');
+    expect(mainElement).toHaveAttribute('aria-label', 'Sign in page');
   });
 
   it('should pass correct props to Clerk SignIn', () => {
@@ -110,7 +116,7 @@ describe('SignInComponent', () => {
     // Assert
     const clerkSignIn = screen.getByTestId('clerk-signin');
     expect(clerkSignIn).toHaveAttribute(
-      'data-redirect-url',
+      'data-signup-redirect-url',
       '/api/sync-user?redirect_url=%2Fprofile'
     );
   });
@@ -128,7 +134,7 @@ describe('SignInComponent', () => {
 
     // Assert
     expect(screen.getByTestId('clerk-signin')).toHaveAttribute(
-      'data-redirect-url',
+      'data-signup-redirect-url',
       '/api/sync-user?redirect_url=%2F'
     );
   });
@@ -148,7 +154,7 @@ describe('SignInComponent', () => {
 
     // Assert
     expect(screen.getByTestId('clerk-signin')).toHaveAttribute(
-      'data-redirect-url',
+      'data-signup-redirect-url',
       '/api/sync-user?redirect_url=%2Fdashboard%3Ftab%3Dsettings%26view%3Dlist'
     );
   });

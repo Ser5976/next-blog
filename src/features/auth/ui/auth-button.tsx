@@ -10,20 +10,20 @@ export const AuthButton = () => {
       <SignedOut>
         <SignInButton>
           <Button
-            variant="secondary"
+            variant="outline"
             size="icon"
             aria-label="User account"
             className="cursor-pointer"
           >
-            <User className="h-5 w-5" aria-hidden="true" />
+            <User className="h-[1.2rem] w-[1.2rem] " aria-hidden="true" />
           </Button>
         </SignInButton>
       </SignedOut>
       <SignedIn>
         <Button
-          variant="ghost"
-          size="icon"
           aria-label="User account"
+          variant="outline"
+          size="icon"
           className="cursor-pointer"
         >
           <ClientUserButton />

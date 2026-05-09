@@ -2,7 +2,7 @@ import { Suspense } from 'react';
 import Link from 'next/link';
 
 import { Category } from '@/entities/category';
-import { AuthButton } from '@/features/auth';
+import { AuthButton, DashboardLink } from '@/features/auth';
 import { CategoriesMenu } from '@/features/categories-menu';
 import { SearchForm } from '@/features/search';
 import { ThemeToggle } from '@/features/theme-toggle';
@@ -57,7 +57,10 @@ export const Header = ({ categories }: HeaderProps) => {
 
           {/* Avatar / user icon */}
 
-          <div className="hidden sm:flex items-center justify-between">
+          <div className="hidden sm:flex items-center gap-2 justify-between">
+            <Suspense fallback={null}>
+              <DashboardLink />
+            </Suspense>
             <Suspense
               fallback={
                 <div

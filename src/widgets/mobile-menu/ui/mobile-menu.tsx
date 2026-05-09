@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import Link from 'next/link';
 import { Menu } from 'lucide-react';
 
 import { Category, CategoryLink } from '@/entities/category';
-import { UserProfile } from '@/features/auth';
+import { DashboardLink, UserProfile } from '@/features/auth';
 import { SearchForm } from '@/features/search';
 import {
   Button,
@@ -26,14 +26,14 @@ export const MobileMenu = ({ categories }: MobileMenuProps) => {
     <Sheet modal={false} open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           className="md:hidden"
           aria-label="Open mobile menu"
           aria-haspopup="dialog"
           aria-expanded={open}
         >
-          <Menu className="h-6 w-6" aria-hidden="true" />
+          <Menu className="h-[1.2rem] w-[1.2rem] " aria-hidden="true" />
         </Button>
       </SheetTrigger>
       <SheetContent
@@ -97,8 +97,14 @@ export const MobileMenu = ({ categories }: MobileMenuProps) => {
             )}
           </ul>
         </nav>
-        <div className="mt-auto">
+        <div className="mt-auto  border-t flex justify-between items-center">
           <UserProfile />
+          <Suspense fallback={null}>
+            <DashboardLink
+              className=" m-4 "
+              onNavigate={() => setOpen(false)}
+            />
+          </Suspense>
         </div>
       </SheetContent>
     </Sheet>

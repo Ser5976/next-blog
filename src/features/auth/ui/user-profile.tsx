@@ -45,7 +45,7 @@ export function UserProfile() {
 
   return (
     <div
-      className="p-4 border-t"
+      className=""
       role="region"
       aria-label="User profile"
       data-testid="user-profile"
