@@ -4,7 +4,7 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 import { prisma } from '@/shared/api/prisma';
 
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
@@ -17,8 +17,13 @@ export async function GET(
       throw new Error('Not authorized');
     }
 
-    if (sessionClaims?.metadata?.role !== 'admin') {
+    const role = sessionClaims?.metadata?.role as string | undefined;
+    if (role !== 'admin' && role !== 'author') {
       throw new Error('Insufficient rights to view users');
+    }
+
+    if (role === 'author' && currentUserId !== userId) {
+      throw new Error('You can view only your own content');
     }
 
     // Проверяем существование пользователя

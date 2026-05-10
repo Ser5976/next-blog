@@ -3,4 +3,5 @@ export type {
   DeleteCommentResponse,
   ICommentsStats,
   CommentsStatsProps,
+  UpdateCommentResponse,
 } from './types';

@@ -4,12 +4,18 @@ import { useCallback, useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 
 import {
+  Button,
   ConfirmDialog,
   ListSkeleton,
+  Textarea,
   UniversalEmpty,
   UniversalError,
 } from '@/shared/ui';
-import { useUserCommentDelete, useUserComments } from '../hooks';
+import {
+  useUserCommentDelete,
+  useUserCommentUpdate,
+  useUserComments,
+} from '../hooks';
 import { CommentRow } from './comment-row';
 import { CommentsStats } from './comments-stats';
 
@@ -19,6 +25,8 @@ export function UserCommentsList({ userId }: { userId: string }) {
     commentId: string | null;
     content: string | null;
   }>({ open: false, commentId: null, content: null });
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editingContent, setEditingContent] = useState('');
 
   const {
     data: commentsData,
@@ -33,6 +41,7 @@ export function UserCommentsList({ userId }: { userId: string }) {
   };
 
   const deleteUserCommentMutation = useUserCommentDelete(userId);
+  const updateUserCommentMutation = useUserCommentUpdate(userId);
 
   const handleDeleteClick = useCallback(
     (commentId: string, content: string) => {
@@ -61,6 +70,34 @@ export function UserCommentsList({ userId }: { userId: string }) {
   const handleCancelDelete = useCallback(() => {
     setDeleteDialog({ open: false, commentId: null, content: null });
   }, []);
+
+  const handleStartEdit = useCallback((commentId: string, content: string) => {
+    setEditingCommentId(commentId);
+    setEditingContent(content);
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingCommentId(null);
+    setEditingContent('');
+  }, []);
+
+  const handleSaveEdit = useCallback(() => {
+    if (!editingCommentId || !editingContent.trim()) return;
+
+    updateUserCommentMutation.mutate(
+      { commentId: editingCommentId, content: editingContent.trim() },
+      {
+        onSuccess: () => {
+          handleCancelEdit();
+        },
+      }
+    );
+  }, [
+    editingCommentId,
+    editingContent,
+    updateUserCommentMutation,
+    handleCancelEdit,
+  ]);
 
   if (isLoading) {
     return <ListSkeleton count={4} />;
@@ -100,15 +137,51 @@ export function UserCommentsList({ userId }: { userId: string }) {
       <CommentsStats stats={stats} />
 
       {/* Список комментариев */}
+      {editingCommentId && (
+        <div className="border rounded-lg p-4 space-y-3 bg-card">
+          <p className="font-medium">Edit comment</p>
+          <Textarea
+            value={editingContent}
+            onChange={(event) => setEditingContent(event.target.value)}
+            rows={4}
+            placeholder="Update your comment content"
+          />
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              onClick={handleSaveEdit}
+              disabled={
+                updateUserCommentMutation.isPending || !editingContent.trim()
+              }
+            >
+              Save
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCancelEdit}
+              disabled={updateUserCommentMutation.isPending}
+            >
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-3" role="list" aria-label="User comments list">
         {comments.map((comment) => (
           <CommentRow
             key={comment.id}
             comment={comment}
             onDelete={() => handleDeleteClick(comment.id, comment.content)}
+            onEdit={handleStartEdit}
             isDeleting={
               deleteUserCommentMutation.isPending &&
               deleteDialog.commentId === comment.id
+            }
+            isEditing={
+              updateUserCommentMutation.isPending &&
+              updateUserCommentMutation.variables?.commentId === comment.id
             }
           />
         ))}

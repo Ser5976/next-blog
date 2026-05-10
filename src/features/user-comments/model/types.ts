@@ -17,7 +17,9 @@ export interface Comment {
 export interface CommentRowProps {
   comment: Comment;
   onDelete: (commentId: string, content: string) => void;
+  onEdit: (commentId: string, content: string) => void;
   isDeleting?: boolean;
+  isEditing?: boolean;
 }
 
 export interface UserCommentsResponse {
@@ -30,6 +32,15 @@ export interface UserCommentsResponse {
 export interface DeleteCommentResponse {
   success: boolean;
   message: string;
+}
+
+export interface UpdateCommentResponse {
+  success: boolean;
+  message: string;
+  comment: {
+    id: string;
+    content: string;
+  };
 }
 export interface ICommentsStats {
   totalComments: number;

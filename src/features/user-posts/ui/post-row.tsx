@@ -89,7 +89,7 @@ const PostRowComponent = ({
               data-testid="edit-post-link"
             >
               <Link
-                href={`/dashboard/users`}
+                href={`/edit-article/${post.id}`}
                 className="cursor-pointer flex items-center gap-2 w-full"
                 aria-label={`Edit post: ${post.title}`}
               >

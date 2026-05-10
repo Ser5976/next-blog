@@ -25,14 +25,20 @@ import { CommentRowProps } from '../model/types';
 const CommentRowComponent = ({
   comment,
   onDelete,
+  onEdit,
   isDeleting = false,
+  isEditing = false,
 }: CommentRowProps) => {
   const handleDelete = () => {
     if (isDeleting) return;
     onDelete(comment.id, comment.content.substring(0, 50) + '...');
   };
+  const handleEdit = () => {
+    if (isEditing) return;
+    onEdit(comment.id, comment.content);
+  };
 
-  const isDisabled = isDeleting;
+  const isDisabled = isDeleting || isEditing;
 
   // Обрезаем контент для отображения
   const displayContent =
@@ -191,6 +197,17 @@ const CommentRowComponent = ({
               >
                 <span className="flex items-center gap-2">View Post</span>
               </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem
+              onClick={handleEdit}
+              disabled={isDisabled}
+              className="cursor-pointer"
+              data-testid="edit-comment-button"
+            >
+              <span className="flex items-center gap-2">
+                {isEditing ? 'Saving...' : 'Edit Comment'}
+              </span>
             </DropdownMenuItem>
 
             <DropdownMenuItem

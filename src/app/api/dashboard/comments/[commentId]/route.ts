@@ -3,15 +3,13 @@ import { auth } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api/prisma';
 
-/* export async function PATCH(
+export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ commentId: string }> }
 ) {
   try {
     const { commentId } = await params;
-    const body = await request.json();
-
-    const { content } = body;
+    const { content } = (await request.json()) as { content?: string };
 
     if (!content || typeof content !== 'string') {
       return NextResponse.json(
@@ -23,18 +21,60 @@ import { prisma } from '@/shared/api/prisma';
       );
     }
 
-    const updateParams: UpdateCommentParams = {
-      commentId,
-      content,
-    };
+    const { userId: currentUserId, sessionClaims } = await auth();
+    const role = sessionClaims?.metadata?.role as string | undefined;
 
-    const result = await updateCommentAction(updateParams);
-
-    if (!result.success) {
-      return NextResponse.json({ error: result.message }, { status: 400 });
+    if (!currentUserId) {
+      return NextResponse.json(
+        { success: false, message: 'Not authorized' },
+        { status: 401 }
+      );
     }
 
-    return NextResponse.json(result);
+    if (role !== 'admin' && role !== 'author') {
+      return NextResponse.json(
+        { success: false, message: 'Insufficient rights to update comments' },
+        { status: 403 }
+      );
+    }
+
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { id: true, authorId: true },
+    });
+
+    if (!comment) {
+      return NextResponse.json(
+        { success: false, message: 'Comment not found' },
+        { status: 404 }
+      );
+    }
+
+    if (role === 'author') {
+      const dbUser = await prisma.user.findUnique({
+        where: { clerkId: currentUserId },
+        select: { id: true },
+      });
+
+      if (!dbUser || dbUser.id !== comment.authorId) {
+        return NextResponse.json(
+          { success: false, message: 'You can edit only your own comments' },
+          { status: 403 }
+        );
+      }
+    }
+
+    const updatedComment = await prisma.comment.update({
+      where: { id: commentId },
+      data: { content: content.trim() },
+      select: { id: true, content: true },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Comment updated successfully',
+      comment: updatedComment,
+    });
   } catch (error) {
     console.error('Error updating comment:', error);
     return NextResponse.json(
@@ -46,7 +86,7 @@ import { prisma } from '@/shared/api/prisma';
       { status: 500 }
     );
   }
-} */
+}
 
 export async function DELETE(
   request: NextRequest,
@@ -57,16 +97,40 @@ export async function DELETE(
 
     // Проверяем авторизацию и роль
     const { userId: currentUserId, sessionClaims } = await auth();
+    const role = sessionClaims?.metadata?.role as string | undefined;
 
     if (!currentUserId) {
       throw new Error('Not authorized');
     }
 
-    if (
-      sessionClaims?.metadata?.role !== 'admin' &&
-      sessionClaims?.metadata?.role !== 'author'
-    ) {
+    if (role !== 'admin' && role !== 'author') {
       throw new Error('Insufficient rights to delete comments');
+    }
+
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+      select: { authorId: true },
+    });
+
+    if (!comment) {
+      return NextResponse.json(
+        { success: false, message: 'Comment not found' },
+        { status: 404 }
+      );
+    }
+
+    if (role === 'author') {
+      const dbUser = await prisma.user.findUnique({
+        where: { clerkId: currentUserId },
+        select: { id: true },
+      });
+
+      if (!dbUser || dbUser.id !== comment.authorId) {
+        return NextResponse.json(
+          { success: false, message: 'You can delete only your own comments' },
+          { status: 403 }
+        );
+      }
     }
 
     // Удаляем комментарий (каскадное удаление лайков и ответов)

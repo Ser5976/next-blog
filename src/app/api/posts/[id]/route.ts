@@ -58,9 +58,7 @@ export async function GET(
 }
 
 /**
- * PUT /api/posts/[id]
  * Обновление существующей статьи
- * Требует прав администратора
  */
 export async function PUT(
   request: NextRequest,
@@ -76,7 +74,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
     }
 
-    // Только администратор может обновлять статьи
+    // Обновлять статьи может админ, автор - только свои
     if (
       sessionClaims?.metadata?.role !== 'admin' &&
       sessionClaims?.metadata?.role !== 'author'
@@ -85,6 +83,33 @@ export async function PUT(
         { error: 'Insufficient rights to update articles' },
         { status: 403 }
       );
+    }
+
+    const role = sessionClaims?.metadata?.role as string | undefined;
+    if (role === 'author') {
+      const dbUser = await prisma.user.findUnique({
+        where: { clerkId: currentUserId },
+        select: { id: true },
+      });
+
+      if (!dbUser) {
+        return NextResponse.json(
+          { error: 'Author not found in database' },
+          { status: 404 }
+        );
+      }
+
+      const ownedPost = await prisma.post.findFirst({
+        where: { id, authorId: dbUser.id },
+        select: { id: true },
+      });
+
+      if (!ownedPost) {
+        return NextResponse.json(
+          { error: 'You can edit only your own articles' },
+          { status: 403 }
+        );
+      }
     }
 
     // валидация body при помощи zod
@@ -190,7 +215,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
     }
 
-    // Только администратор может удалять статьи
+    // Удалять статьи может админ, автор - только свои
     if (
       sessionClaims?.metadata?.role !== 'admin' &&
       sessionClaims?.metadata?.role !== 'author'
@@ -199,6 +224,33 @@ export async function DELETE(
         { error: 'Insufficient rights to delete articles' },
         { status: 403 }
       );
+    }
+
+    const role = sessionClaims?.metadata?.role as string | undefined;
+    if (role === 'author') {
+      const dbUser = await prisma.user.findUnique({
+        where: { clerkId: currentUserId },
+        select: { id: true },
+      });
+
+      if (!dbUser) {
+        return NextResponse.json(
+          { error: 'Author not found in database' },
+          { status: 404 }
+        );
+      }
+
+      const ownedPost = await prisma.post.findFirst({
+        where: { id, authorId: dbUser.id },
+        select: { id: true },
+      });
+
+      if (!ownedPost) {
+        return NextResponse.json(
+          { error: 'You can delete only your own articles' },
+          { status: 403 }
+        );
+      }
     }
 
     // Сначала получаем статью, чтобы удалить обложку из ImageKit

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
-import { ShieldUser } from 'lucide-react';
+import { ShieldUser, SquarePen } from 'lucide-react';
 
 import { cn } from '@/shared/lib';
 import { Button } from '@/shared/ui';
@@ -19,9 +19,12 @@ export const DashboardLink = ({
   const { isLoaded, sessionClaims } = useAuth();
   const role = sessionClaims?.metadata?.role as string | undefined;
 
-  if (!isLoaded || role !== 'admin') {
+  if (!isLoaded || (role !== 'admin' && role !== 'author')) {
     return null;
   }
+
+  const href = role === 'admin' ? '/dashboard' : '/author';
+  const label = role === 'admin' ? 'Control Panel' : 'Author Panel';
 
   return (
     <Button
@@ -29,8 +32,12 @@ export const DashboardLink = ({
       size="icon"
       className={cn(' cursor-pointer', className)}
     >
-      <Link href="/dashboard" aria-label="Control Panel" onClick={onNavigate}>
-        <ShieldUser className="h-[1.2rem] w-[1.2rem] " aria-hidden="true" />
+      <Link href={href} aria-label={label} onClick={onNavigate}>
+        {role === 'admin' ? (
+          <ShieldUser className="h-[1.2rem] w-[1.2rem]" aria-hidden="true" />
+        ) : (
+          <SquarePen className="h-[1.2rem] w-[1.2rem]" aria-hidden="true" />
+        )}
       </Link>
     </Button>
   );

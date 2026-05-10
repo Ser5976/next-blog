@@ -1,0 +1,1 @@
+export { AuthorComments } from './ui';

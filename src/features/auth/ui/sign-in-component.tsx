@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { SignIn } from '@clerk/nextjs';
 
-import { LoadingScreen } from '@/shared/ui/loading-screen';
 import { useClientSearchParams } from '../model';
 import { ClientOnly } from './client-only';
 
@@ -11,8 +10,6 @@ export const SignInComponent = () => {
   const { get } = useClientSearchParams();
   const redirectUrl = get('redirect_url') || '/';
   const syncUrl = `/api/sync-user?redirect_url=${encodeURIComponent(redirectUrl)}`;
-
-  const isDashboardLogin = redirectUrl.startsWith('/dashboard');
 
   return (
     <div
