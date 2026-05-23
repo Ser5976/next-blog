@@ -68,7 +68,7 @@ const UserRowComponent = ({
 
   return (
     <div
-      className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors group"
+      className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 sm:p-4 border rounded-lg hover:bg-accent/50 transition-colors group"
       role="row"
       aria-label={ariaLabel}
       aria-busy={ariaBusy}
@@ -156,7 +156,7 @@ const UserRowComponent = ({
       </div>
 
       {/* Правая часть: управление */}
-      <div className="flex items-center gap-3 flex-shrink-0">
+      <div className="flex justify-between  items-center gap-3 flex-shrink-0">
         {/* Выбор роли */}
         <div className="relative">
           <Select
