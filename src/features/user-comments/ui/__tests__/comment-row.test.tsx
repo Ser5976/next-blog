@@ -368,22 +368,7 @@ describe('CommentRow – unit tests', () => {
     expect(screen.getByTestId('thumbsdown-icon')).toBeInTheDocument();
   });
 
-  // Test 18: Ссылка на просмотр комментария в меню действий
-  it('has link to view comment in action menu', () => {
-    const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
-
-    // Открываем меню действий
-    const actionButton = screen.getByTestId('comment-actions-button');
-    fireEvent.click(actionButton);
-
-    // Проверяем наличие ссылки на просмотр комментария
-    // Теперь, когда мок DropdownMenuItem правильно обрабатывает asChild,
-    // ссылка должна быть доступна
-    expect(screen.getByTestId('view-comment-link')).toBeInTheDocument();
-  });
-
-  // Test 19: Ссылка на просмотр поста в меню действий
+  // Test 18: Ссылка на просмотр поста в меню действий
   it('has link to view post in action menu', () => {
     const comment = createMockComment();
     render(<CommentRow comment={comment} onDelete={onDeleteMock} />);

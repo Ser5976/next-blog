@@ -4,13 +4,32 @@ import userEvent from '@testing-library/user-event';
 
 import '@testing-library/jest-dom';
 
-import { useUserCommentDelete, useUserComments } from '../../hooks';
+import {
+  useUserCommentDelete,
+  useUserComments,
+  useUserCommentUpdate,
+} from '../../hooks';
 import { UserCommentsList } from '../user-comments-list';
 
 // Мокаем хуки
 jest.mock('../../hooks', () => ({
   useUserComments: jest.fn(),
   useUserCommentDelete: jest.fn(),
+  useUserCommentUpdate: jest.fn(),
+}));
+
+jest.mock('@/shared/components', () => ({
+  SheetForm: ({
+    children,
+    open,
+  }: {
+    children: React.ReactNode;
+    open: boolean;
+  }) => (open ? <div data-testid="comment-form-sheet">{children}</div> : null),
+}));
+
+jest.mock('@/shared/components/commet-form', () => ({
+  CommentForm: () => <div data-testid="comment-form" />,
 }));
 
 // Мокаем компоненты
@@ -170,6 +189,16 @@ const defaultUseUserCommentDeleteMock = {
   variables: null as { commentId: string } | null,
 };
 
+const defaultUseUserCommentUpdateMock = {
+  mutate: jest.fn(),
+  mutateAsync: jest.fn(),
+  isPending: false,
+  isSuccess: false,
+  isError: false,
+  error: null as Error | null,
+  variables: null as { commentId: string } | null,
+};
+
 const mockUseUserComments = (
   overrides: Partial<typeof defaultUseUserCommentsMock> = {}
 ) => {
@@ -188,6 +217,15 @@ const mockUseUserCommentDelete = (
   });
 };
 
+const mockUseUserCommentUpdate = (
+  overrides: Partial<typeof defaultUseUserCommentUpdateMock> = {}
+) => {
+  (useUserCommentUpdate as jest.Mock).mockReturnValue({
+    ...defaultUseUserCommentUpdateMock,
+    ...overrides,
+  });
+};
+
 describe('UserCommentsList – unit tests', () => {
   const userId = 'user-123';
 
@@ -195,6 +233,7 @@ describe('UserCommentsList – unit tests', () => {
     jest.clearAllMocks();
     mockUseUserComments();
     mockUseUserCommentDelete();
+    mockUseUserCommentUpdate();
   });
 
   // 1. Рендеринг компонента
