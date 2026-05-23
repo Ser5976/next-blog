@@ -1,10 +1,11 @@
 import axios from 'axios';
 
+import { CommentFormValues } from '@/shared/schemas/comment-form-schemas';
 import { UpdateCommentResponse } from '../model';
 
 export async function updateUserComment(
   commentId: string,
-  content: string
+  content: CommentFormValues
 ): Promise<UpdateCommentResponse> {
   try {
     const { data } = await axios.patch<UpdateCommentResponse>(

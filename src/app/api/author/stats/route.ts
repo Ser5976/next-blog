@@ -41,7 +41,11 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const timeRange = searchParams.get('timeRange');
+    const timeRange = searchParams.get('timeRange') as
+      | 'week'
+      | 'month'
+      | 'year'
+      | null;
 
     const [current, previous] = await Promise.all([
       getAuthorStats(user.id, timeRange, false),

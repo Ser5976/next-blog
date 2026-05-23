@@ -3,6 +3,7 @@ import {
   FileText,
   LayoutDashboard,
   MessageCircle,
+  SquarePen,
   Tags,
   Users,
 } from 'lucide-react';
@@ -43,6 +44,12 @@ export const NAV_ITEMS = [
     href: '/dashboard/categories',
     label: 'Categories',
     icon: ChartColumnStacked,
+    exact: false,
+  },
+  {
+    href: '/author',
+    label: 'Author',
+    icon: SquarePen,
     exact: false,
   },
 ] as const;

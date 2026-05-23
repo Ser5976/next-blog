@@ -26,6 +26,7 @@ const CommentRowComponent = ({
   comment,
   onDelete,
   onEdit,
+  isSheetForm,
   isDeleting = false,
   isEditing = false,
 }: CommentRowProps) => {
@@ -172,21 +173,6 @@ const CommentRowComponent = ({
             <DropdownMenuItem
               asChild
               className="cursor-pointer"
-              data-testid="view-comment-link"
-            >
-              <Link
-                href={`/posts/${comment.post.slug}#comment-${comment.id}`}
-                target="_blank"
-                className="cursor-pointer"
-                aria-label={`View comment on post: ${comment.post.title}`}
-              >
-                <span className="flex items-center gap-2">View Comment</span>
-              </Link>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              asChild
-              className="cursor-pointer"
               data-testid="view-post-link"
             >
               <Link
@@ -199,16 +185,18 @@ const CommentRowComponent = ({
               </Link>
             </DropdownMenuItem>
 
-            <DropdownMenuItem
-              onClick={handleEdit}
-              disabled={isDisabled}
-              className="cursor-pointer"
-              data-testid="edit-comment-button"
-            >
-              <span className="flex items-center gap-2">
-                {isEditing ? 'Saving...' : 'Edit Comment'}
-              </span>
-            </DropdownMenuItem>
+            {isSheetForm ? (
+              <DropdownMenuItem
+                onClick={handleEdit}
+                disabled={isDisabled}
+                className="cursor-pointer"
+                data-testid="edit-comment-button"
+              >
+                <span className="flex items-center gap-2">
+                  {isEditing ? 'Saving...' : 'Edit Comment'}
+                </span>
+              </DropdownMenuItem>
+            ) : null}
 
             <DropdownMenuItem
               onClick={handleDelete}

@@ -145,7 +145,7 @@ export async function PUT(
       );
     }
 
-    // Если если изменилась и старая существовала - удаляем старую из ImageKit
+    // Если  изменилась и старая существовала - удаляем старую из ImageKit
     if (
       currentArticle?.coverImage &&
       currentArticle.coverImage !== data.coverImage

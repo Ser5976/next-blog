@@ -3,30 +3,40 @@
 import { useCallback, useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 
+import { SheetForm } from '@/shared/components';
+import { CommentForm } from '@/shared/components/commet-form';
+import { CommentFormValues } from '@/shared/schemas/comment-form-schemas';
 import {
-  Button,
   ConfirmDialog,
   ListSkeleton,
-  Textarea,
   UniversalEmpty,
   UniversalError,
 } from '@/shared/ui';
 import {
   useUserCommentDelete,
-  useUserCommentUpdate,
   useUserComments,
+  useUserCommentUpdate,
 } from '../hooks';
 import { CommentRow } from './comment-row';
 import { CommentsStats } from './comments-stats';
 
-export function UserCommentsList({ userId }: { userId: string }) {
+export function UserCommentsList({
+  userId,
+  isSheetForm = true,
+}: {
+  userId: string;
+  isSheetForm?: boolean;
+}) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editDialog, setEditDialog] = useState<{
+    open: boolean;
+    commentId: string | null;
+  }>({ open: false, commentId: null });
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     commentId: string | null;
     content: string | null;
   }>({ open: false, commentId: null, content: null });
-  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
-  const [editingContent, setEditingContent] = useState('');
 
   const {
     data: commentsData,
@@ -71,33 +81,30 @@ export function UserCommentsList({ userId }: { userId: string }) {
     setDeleteDialog({ open: false, commentId: null, content: null });
   }, []);
 
-  const handleStartEdit = useCallback((commentId: string, content: string) => {
-    setEditingCommentId(commentId);
-    setEditingContent(content);
-  }, []);
+  const handleEditComment = (id: string) => {
+    setEditDialog({ open: true, commentId: id });
+  };
+  const handleCloseEdit = () => {
+    setEditDialog({ open: false, commentId: null });
+  };
+  const handleSubmitComment = async (data: CommentFormValues) => {
+    setIsSubmitting(true);
+    try {
+      if (editDialog.commentId) {
+        await updateUserCommentMutation.mutateAsync({
+          commentId: editDialog.commentId,
+          content: data,
+        });
 
-  const handleCancelEdit = useCallback(() => {
-    setEditingCommentId(null);
-    setEditingContent('');
-  }, []);
-
-  const handleSaveEdit = useCallback(() => {
-    if (!editingCommentId || !editingContent.trim()) return;
-
-    updateUserCommentMutation.mutate(
-      { commentId: editingCommentId, content: editingContent.trim() },
-      {
-        onSuccess: () => {
-          handleCancelEdit();
-        },
+        handleCloseEdit();
+        refetch();
       }
-    );
-  }, [
-    editingCommentId,
-    editingContent,
-    updateUserCommentMutation,
-    handleCancelEdit,
-  ]);
+    } catch (error: any) {
+      console.error('Error saving article:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (isLoading) {
     return <ListSkeleton count={4} />;
@@ -136,45 +143,13 @@ export function UserCommentsList({ userId }: { userId: string }) {
       {/* Статистика */}
       <CommentsStats stats={stats} />
 
-      {/* Список комментариев */}
-      {editingCommentId && (
-        <div className="border rounded-lg p-4 space-y-3 bg-card">
-          <p className="font-medium">Edit comment</p>
-          <Textarea
-            value={editingContent}
-            onChange={(event) => setEditingContent(event.target.value)}
-            rows={4}
-            placeholder="Update your comment content"
-          />
-          <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={handleSaveEdit}
-              disabled={
-                updateUserCommentMutation.isPending || !editingContent.trim()
-              }
-            >
-              Save
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCancelEdit}
-              disabled={updateUserCommentMutation.isPending}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      )}
-
       <div className="space-y-3" role="list" aria-label="User comments list">
         {comments.map((comment) => (
           <CommentRow
             key={comment.id}
             comment={comment}
             onDelete={() => handleDeleteClick(comment.id, comment.content)}
-            onEdit={handleStartEdit}
+            onEdit={handleEditComment}
             isDeleting={
               deleteUserCommentMutation.isPending &&
               deleteDialog.commentId === comment.id
@@ -183,6 +158,7 @@ export function UserCommentsList({ userId }: { userId: string }) {
               updateUserCommentMutation.isPending &&
               updateUserCommentMutation.variables?.commentId === comment.id
             }
+            isSheetForm={isSheetForm}
           />
         ))}
       </div>
@@ -208,6 +184,26 @@ export function UserCommentsList({ userId }: { userId: string }) {
         data-testid="delete-comment-dialog"
         aria-label="Confirm comment deletion"
       />
+      {/* Comment Form Sheet */}
+      <SheetForm
+        open={editDialog.open}
+        onOpenChange={handleCloseEdit}
+        id={editDialog.commentId}
+        isLoading={isLoading}
+        error={error}
+        entityType="comment"
+        data-testid="comment-form-sheet"
+        data-mode={'edit'}
+        data-comment-id={editDialog.commentId || undefined}
+      >
+        <CommentForm
+          initialData={comments.find(
+            (comment) => comment.id === editDialog.commentId
+          )}
+          onSubmit={handleSubmitComment}
+          isSubmitting={isSubmitting}
+        />
+      </SheetForm>
     </div>
   );
 }

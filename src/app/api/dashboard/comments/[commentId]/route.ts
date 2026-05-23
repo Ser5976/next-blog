@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api/prisma';
+import { commentFormSchema } from '@/shared/schemas/comment-form-schemas';
 
 export async function PATCH(
   request: NextRequest,
@@ -9,13 +10,17 @@ export async function PATCH(
 ) {
   try {
     const { commentId } = await params;
-    const { content } = (await request.json()) as { content?: string };
+    const body = await request.json();
 
-    if (!content || typeof content !== 'string') {
+    // валидация body при помощи zod
+    const { data, success, error } = commentFormSchema.safeParse(body.content);
+
+    if (!success) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Content is required',
+          error: 'Validation failed',
+          details: error,
         },
         { status: 400 }
       );
@@ -50,7 +55,7 @@ export async function PATCH(
       );
     }
 
-    if (role === 'author') {
+    if (role === 'author' || role === 'admin') {
       const dbUser = await prisma.user.findUnique({
         where: { clerkId: currentUserId },
         select: { id: true },
@@ -66,7 +71,7 @@ export async function PATCH(
 
     const updatedComment = await prisma.comment.update({
       where: { id: commentId },
-      data: { content: content.trim() },
+      data: { content: data.content },
       select: { id: true, content: true },
     });
 

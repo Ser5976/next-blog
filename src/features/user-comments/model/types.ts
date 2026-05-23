@@ -1,18 +1,5 @@
-export interface Comment {
-  id: string;
-  content: string;
-  createdAt: Date | string;
-  post: {
-    id: string;
-    title: string;
-    slug: string;
-    published: boolean;
-  };
-  stats: {
-    likesCount: number;
-    dislikesCount: number;
-  };
-}
+import { Comment } from '@/shared/types';
+
 // Пропсы для компонентов
 export interface CommentRowProps {
   comment: Comment;
@@ -20,6 +7,7 @@ export interface CommentRowProps {
   onEdit: (commentId: string, content: string) => void;
   isDeleting?: boolean;
   isEditing?: boolean;
+  isSheetForm: boolean;
 }
 
 export interface UserCommentsResponse {

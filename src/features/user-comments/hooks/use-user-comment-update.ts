@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { CommentFormValues } from '@/shared/schemas/comment-form-schemas';
 import { updateUserComment } from '../api';
 import { userCommentsQueryKeys } from './use-user-comments';
 
@@ -13,7 +14,7 @@ export function useUserCommentUpdate(userId: string) {
       content,
     }: {
       commentId: string;
-      content: string;
+      content: CommentFormValues;
     }) => updateUserComment(commentId, content),
     onError: (error) => {
       toast.error(error.message || 'Failed to update comment');

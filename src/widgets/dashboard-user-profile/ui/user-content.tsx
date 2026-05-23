@@ -48,7 +48,7 @@ export function UserContent({ userId }: { userId: string }) {
             </TabsContent>
 
             <TabsContent value="comments" className="mt-6">
-              <UserCommentsList userId={userId} />
+              <UserCommentsList userId={userId} isSheetForm={false} />
             </TabsContent>
           </Tabs>
         </CardContent>

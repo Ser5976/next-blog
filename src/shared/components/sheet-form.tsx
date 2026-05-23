@@ -19,7 +19,7 @@ interface SheetFormProps {
   isLoading: boolean;
   error: Error | null;
   slugError?: string | null;
-  onRetry: () => void;
+  onRetry?: () => void;
   children: ReactNode;
   title?: {
     create: string;
@@ -29,7 +29,7 @@ interface SheetFormProps {
     create: string;
     edit: string;
   };
-  entityType?: 'category' | 'tag';
+  entityType?: 'category' | 'tag' | 'comment';
 }
 
 const DEFAULT_TITLES = {
@@ -41,6 +41,10 @@ const DEFAULT_TITLES = {
     create: 'Create Tag',
     edit: 'Edit Tag',
   },
+  comment: {
+    create: 'Create Comment',
+    edit: 'Edit Comment',
+  },
 } as const;
 
 const DEFAULT_DESCRIPTIONS = {
@@ -51,6 +55,10 @@ const DEFAULT_DESCRIPTIONS = {
   tag: {
     create: 'Create a new tag for your blog posts',
     edit: 'Make changes to your tag',
+  },
+  comment: {
+    create: 'Create a new comment for your blog posts',
+    edit: 'Make changes to your comment',
   },
 } as const;
 
@@ -89,12 +97,17 @@ export const SheetForm = ({
     if (entityType === 'tag') {
       return isEditing ? 'Edit tag form' : 'Create tag form';
     }
+    if (entityType === 'comment')
+      return isEditing ? 'Edit comment form' : 'Create comment form';
     return isEditing ? 'Edit category form' : 'Create category form';
   };
 
   const getTestId = () => {
     if (entityType === 'tag') {
       return 'tag-sheet-content';
+    }
+    if (entityType === 'comment') {
+      return 'comment-sheet-content';
     }
     return 'category-sheet-content';
   };
@@ -156,7 +169,7 @@ export const SheetForm = ({
             <UniversalError
               error={error}
               message={error.message}
-              title={`Failed to Load ${entityType === 'tag' ? 'Tag' : 'Category'}`}
+              title={`Failed to Load ${entityType === 'tag' ? 'Tag' : entityType === 'comment' ? 'Comment' : 'Category'}`}
               onRetry={onRetry}
               variant="card"
               data-testid="load-error"
@@ -165,7 +178,12 @@ export const SheetForm = ({
                 className="text-xs text-muted-foreground mt-4"
                 data-testid="error-id"
               >
-                {entityType === 'tag' ? 'Tag' : 'Category'} ID: {id}
+                {entityType === 'tag'
+                  ? 'Tag'
+                  : entityType === 'comment'
+                    ? 'Comment'
+                    : 'Category'}{' '}
+                ID: {id}
               </p>
             </UniversalError>
           </div>

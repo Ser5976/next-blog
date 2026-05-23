@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
+import { Comment } from '@/shared/types';
 import { deleteUserComment } from '../api';
-import { Comment } from '../model/types';
 import { userCommentsQueryKeys } from './use-user-comments';
 
 export function useUserCommentDelete(userId: string) {
