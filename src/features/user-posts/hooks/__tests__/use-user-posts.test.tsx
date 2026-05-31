@@ -44,43 +44,82 @@ describe('useUserPosts', () => {
         id: 'post-1',
         title: 'Test Post 1',
         slug: 'test-post-1',
+        content: 'Test content 1',
         excerpt: 'This is a test post',
         coverImage: 'https://example.com/image.jpg',
         published: true,
-        viewCount: 100,
-        averageRating: 4.5,
-        ratingCount: 10,
-        createdAt: new Date().toISOString(),
-        publishedAt: new Date().toISOString(),
+        authorId: 'user-123',
+        author: {
+          id: 'user-123',
+          email: 'test@example.com',
+          firstName: 'Test',
+          lastName: 'User',
+          role: 'author',
+          imageUrl: 'https://example.com/avatar.jpg',
+          createdAt: Date.now(),
+          lastSignInAt: Date.now(),
+        },
+        categoryId: 'cat-1',
         category: {
           id: 'cat-1',
           name: 'Technology',
+          slug: 'technology',
         },
         tags: [
-          { id: 'tag-1', name: 'React' },
-          { id: 'tag-2', name: 'TypeScript' },
+          { id: 'tag-1', name: 'React', slug: 'react' },
+          { id: 'tag-2', name: 'TypeScript', slug: 'typescript' },
         ],
-        stats: {
-          commentsCount: 5,
-        },
+        comments: [
+          {
+            id: 'comment-1',
+            content: 'Great post!',
+            likes: 10,
+            dislikes: 0,
+          },
+        ],
+        viewCount: 100,
+        averageRating: 4.5,
+        ratingCount: 10,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        publishedAt: Date.now(),
       },
       {
         id: 'post-2',
         title: 'Test Post 2',
         slug: 'test-post-2',
+        content: 'Test content 2',
         excerpt: 'Another test post',
         coverImage: null,
         published: false,
+        authorId: 'user-123',
+        author: {
+          id: 'user-123',
+          email: 'test@example.com',
+          firstName: 'Test',
+          lastName: 'User',
+          role: 'author',
+          imageUrl: 'https://example.com/avatar.jpg',
+          createdAt: Date.now(),
+          lastSignInAt: Date.now(),
+        },
+        categoryId: null,
+        category: null,
+        tags: [{ id: 'tag-3', name: 'JavaScript', slug: 'javascript' }],
+        comments: [
+          {
+            id: 'comment-2',
+            content: 'Nice article!',
+            likes: 5,
+            dislikes: 1,
+          },
+        ],
         viewCount: 50,
         averageRating: 3.8,
         ratingCount: 5,
-        createdAt: new Date().toISOString(),
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
         publishedAt: null,
-        category: null,
-        tags: [{ id: 'tag-3', name: 'JavaScript' }],
-        stats: {
-          commentsCount: 2,
-        },
       },
     ],
     stats: {
@@ -250,15 +289,47 @@ describe('useUserPosts', () => {
     expect(result.current.data).toHaveProperty('stats');
     expect(Array.isArray(result.current.data?.posts)).toBe(true);
 
-    // Проверяем структуру отдельного поста
+    // Проверяем структуру отдельного поста согласно типу Article
     if (result.current.data?.posts?.[0]) {
       const post = result.current.data.posts[0];
       expect(post).toHaveProperty('id');
       expect(post).toHaveProperty('title');
       expect(post).toHaveProperty('slug');
+      expect(post).toHaveProperty('content');
       expect(post).toHaveProperty('published');
-      expect(post).toHaveProperty('stats');
-      expect(post.stats).toHaveProperty('commentsCount');
+      expect(post).toHaveProperty('authorId');
+      expect(post).toHaveProperty('category');
+      expect(post).toHaveProperty('tags');
+      expect(post).toHaveProperty('comments');
+      expect(post).toHaveProperty('viewCount');
+      expect(post).toHaveProperty('averageRating');
+      expect(post).toHaveProperty('ratingCount');
+      expect(post).toHaveProperty('createdAt');
+      expect(post).toHaveProperty('updatedAt');
+      expect(post).toHaveProperty('publishedAt');
+
+      // Проверяем структуру автора (UserClerk)
+      if (post.author) {
+        expect(post.author).toHaveProperty('id');
+        expect(post.author).toHaveProperty('email');
+        expect(post.author).toHaveProperty('firstName');
+        expect(post.author).toHaveProperty('lastName');
+        expect(post.author).toHaveProperty('role');
+        expect(post.author).toHaveProperty('imageUrl');
+        expect(post.author).toHaveProperty('createdAt');
+        expect(post.author).toHaveProperty('lastSignInAt');
+      }
+
+      // Проверяем вложенные структуры
+      expect(Array.isArray(post.tags)).toBe(true);
+      expect(Array.isArray(post.comments)).toBe(true);
+
+      if (post.comments[0]) {
+        expect(post.comments[0]).toHaveProperty('id');
+        expect(post.comments[0]).toHaveProperty('content');
+        expect(post.comments[0]).toHaveProperty('likes');
+        expect(post.comments[0]).toHaveProperty('dislikes');
+      }
     }
   });
 });

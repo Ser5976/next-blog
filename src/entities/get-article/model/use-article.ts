@@ -4,11 +4,11 @@ import { articlesQueryKeys } from '@/shared/api';
 import { Article } from '@/shared/types';
 import { getArticle } from '../api';
 
-export function useArticle(articleId: string | null) {
+export function useArticle(slug: string | null) {
   return useQuery<Article | null, Error>({
-    queryKey: articlesQueryKeys.detail(articleId || ''),
-    queryFn: () => getArticle(articleId),
-    enabled: !!articleId,
+    queryKey: articlesQueryKeys.detail(slug || ''),
+    queryFn: () => getArticle(slug),
+    enabled: !!slug,
     staleTime: 1000 * 30,
     gcTime: 1000 * 60 * 5,
     retry: 1,

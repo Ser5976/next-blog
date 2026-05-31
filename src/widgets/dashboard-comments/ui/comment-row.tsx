@@ -134,7 +134,7 @@ const CommentRowComponent = ({
             <div className="flex items-center gap-2">
               <FileText className="h-3 w-3 flex-shrink-0" aria-hidden="true" />
               <Link
-                href={`/posts/${comment.post.slug}`}
+                href={`/article/${comment.post.slug}`}
                 className="hover:underline truncate max-w-[200px]"
                 target="_blank"
                 aria-label={`View post: ${comment.post.title}`}

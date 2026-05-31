@@ -306,7 +306,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'The article has been created successfully',
-      data: newPost,
+      article: newPost,
     });
   } catch (error) {
     console.error('Error creating article:', error);

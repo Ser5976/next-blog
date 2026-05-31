@@ -1,8 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 
-import { getFullName } from '@/features/user-profile-info';
-import { formatDate } from '@/shared/lib';
+import { formatDate, getFullName } from '@/shared/lib';
 import { CommentRow } from '../comment-row';
 
 // Мок для функции cn
@@ -10,9 +9,8 @@ jest.mock('@/shared/lib', () => ({
   ...jest.requireActual('@/shared/lib'),
   cn: jest.fn((...inputs) => inputs.filter(Boolean).join(' ')),
   formatDate: jest.fn(),
+  getFullName: jest.fn(),
 }));
-
-jest.mock('@/features/user-profile-info', () => ({ getFullName: jest.fn() }));
 
 // Мок для DropdownMenu компонентов
 jest.mock('@/shared/ui/dropdown-menu', () => ({
@@ -104,7 +102,7 @@ describe('CommentRow', () => {
     // Ищем ссылку на пост по тексту, а не по data-testid
     const postLink = screen.getByRole('link', { name: mockComment.post.title });
     expect(postLink).toBeInTheDocument();
-    expect(postLink).toHaveAttribute('href', '/posts/test-post');
+    expect(postLink).toHaveAttribute('href', '/article/test-post');
   });
 
   it('renders avatar placeholder when image is missing', () => {

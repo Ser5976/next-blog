@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import '@testing-library/jest-dom';
 
-import { Comment } from '../../model/types';
+import { Comment } from '@/shared/types';
 import { CommentRow } from '../comment-row';
 
 // Мокаем зависимости
@@ -79,7 +79,6 @@ jest.mock('@/shared/ui', () => ({
     ...props
   }: any) => {
     if (asChild) {
-      // Когда asChild=true, рендерим children как есть
       const child = React.Children.only(children) as React.ReactElement;
       return React.cloneElement(child, {
         className,
@@ -110,8 +109,13 @@ jest.mock('lucide-react', () => ({
   FileText: ({ className, ...props }: any) => (
     <svg className={className} {...props} data-testid="filetext-icon" />
   ),
-  Loader2: ({ className, ...props }: any) => (
-    <svg className={className} {...props} data-testid="loader2-icon" />
+  Loader2: ({ className, 'aria-label': ariaLabel, ...props }: any) => (
+    <svg
+      className={className}
+      {...props}
+      data-testid="loader2-icon"
+      aria-label={ariaLabel}
+    />
   ),
   MoreVertical: ({ className, ...props }: any) => (
     <svg className={className} {...props} data-testid="morevertical-icon" />
@@ -145,6 +149,12 @@ const createMockComment = (overrides?: Partial<Comment>): Comment => ({
 
 describe('CommentRow – unit tests', () => {
   const onDeleteMock = jest.fn();
+  const onEditMock = jest.fn();
+  const defaultProps = {
+    onDelete: onDeleteMock,
+    onEdit: onEditMock,
+    isSheetForm: true,
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -153,9 +163,8 @@ describe('CommentRow – unit tests', () => {
   // Test 1: Базовый рендеринг компонента
   it('renders comment row with all required information', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
-    // Проверяем наличие основных элементов
     expect(screen.getByTestId(`comment-row-${comment.id}`)).toBeInTheDocument();
     expect(screen.getByTestId('comment-content')).toBeInTheDocument();
     expect(screen.getByTestId('comment-post-link')).toBeInTheDocument();
@@ -172,7 +181,7 @@ describe('CommentRow – unit tests', () => {
         published: true,
       },
     });
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     const statusBadge = screen.getByTestId('comment-post-status');
     expect(statusBadge).toBeInTheDocument();
@@ -189,7 +198,7 @@ describe('CommentRow – unit tests', () => {
         published: false,
       },
     });
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     const statusBadge = screen.getByTestId('comment-post-status');
     expect(statusBadge).toBeInTheDocument();
@@ -199,7 +208,7 @@ describe('CommentRow – unit tests', () => {
   // Test 4: Отображение статистики комментария
   it('displays comment statistics correctly', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     const likesElement = screen.getByTestId('comment-likes');
     const dislikesElement = screen.getByTestId('comment-dislikes');
@@ -213,7 +222,7 @@ describe('CommentRow – unit tests', () => {
   // Test 5: Отображение контента комментария
   it('displays comment content correctly', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     const contentElement = screen.getByTestId('comment-content');
     expect(contentElement).toBeInTheDocument();
@@ -224,9 +233,9 @@ describe('CommentRow – unit tests', () => {
 
   // Test 6: Обрезка длинного контента
   it('truncates long comment content', () => {
-    const longContent = 'A'.repeat(200); // Создаем очень длинный контент
+    const longContent = 'A'.repeat(200);
     const comment = createMockComment({ content: longContent });
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     const contentElement = screen.getByTestId('comment-content');
     expect(contentElement.textContent).toContain('...');
@@ -235,7 +244,7 @@ describe('CommentRow – unit tests', () => {
   // Test 7: Отображение даты комментария
   it('displays formatted date correctly', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     expect(screen.getByTestId('comment-date')).toBeInTheDocument();
   });
@@ -243,7 +252,7 @@ describe('CommentRow – unit tests', () => {
   // Test 8: Кнопки действий открываются
   it('renders action menu button', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     expect(screen.getByTestId('comment-actions-button')).toBeInTheDocument();
   });
@@ -251,61 +260,136 @@ describe('CommentRow – unit tests', () => {
   // Test 9: Вызов onDelete при клике на Delete
   it('calls onDelete when delete menu item is clicked', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
-    // Находим кнопку действий и кликаем для открытия меню
     const actionButton = screen.getByTestId('comment-actions-button');
     fireEvent.click(actionButton);
 
-    // Находим кнопку удаления в меню
     const deleteButton = screen.getByTestId('delete-comment-button');
     fireEvent.click(deleteButton);
 
     expect(onDeleteMock).toHaveBeenCalledTimes(1);
     expect(onDeleteMock).toHaveBeenCalledWith(
       comment.id,
-      expect.stringContaining('...') // Проверяем что второй аргумент содержит троеточие
+      expect.stringContaining('...')
     );
   });
 
-  // Test 10: Отключение кнопок при isDeleting
+  // Test 10: Вызов onEdit при клике на Edit
+  it('calls onEdit with comment id and content when edit clicked', () => {
+    const comment = createMockComment();
+    render(<CommentRow comment={comment} {...defaultProps} />);
+
+    const actionButton = screen.getByTestId('comment-actions-button');
+    fireEvent.click(actionButton);
+
+    const editButton = screen.getByTestId('edit-comment-button');
+    fireEvent.click(editButton);
+
+    expect(onEditMock).toHaveBeenCalledTimes(1);
+    expect(onEditMock).toHaveBeenCalledWith(comment.id, comment.content);
+  });
+
+  // Test 11: Отключение кнопок при isDeleting
   it('disables action button when isDeleting is true', () => {
     const comment = createMockComment();
     render(
-      <CommentRow comment={comment} onDelete={onDeleteMock} isDeleting={true} />
+      <CommentRow comment={comment} {...defaultProps} isDeleting={true} />
     );
 
     const actionButton = screen.getByTestId('comment-actions-button');
     expect(actionButton).toBeDisabled();
   });
 
-  // Test 11: Отображение индикатора загрузки при удалении
-  it('shows loading spinner when isDeleting is true', () => {
+  // Test 12: Отключение кнопок при isEditing
+  it('disables action button when isEditing is true', () => {
+    const comment = createMockComment();
+    render(<CommentRow comment={comment} {...defaultProps} isEditing={true} />);
+
+    const actionButton = screen.getByTestId('comment-actions-button');
+    expect(actionButton).toBeDisabled();
+  });
+
+  // Test 13: Отображение индикатора загрузки в кнопке при удалении
+  it('shows loading spinner in action button when isDeleting is true', () => {
     const comment = createMockComment();
     render(
-      <CommentRow comment={comment} onDelete={onDeleteMock} isDeleting={true} />
+      <CommentRow comment={comment} {...defaultProps} isDeleting={true} />
     );
 
-    // В нашем моке Loader2 рендерится как иконка
-    expect(screen.getByTestId('comment-actions-button')).toBeDisabled();
+    const actionButton = screen.getByTestId('comment-actions-button');
+    expect(actionButton).toBeDisabled();
+    // Ищем лоадер внутри кнопки действий
+    const loaderInButton = actionButton.querySelector(
+      '[data-testid="loader2-icon"]'
+    );
+    expect(loaderInButton).toBeInTheDocument();
+    expect(loaderInButton).toHaveAttribute('aria-label', 'Deleting comment...');
   });
 
-  // Test 12: Ссылки на просмотр комментария и поста
-  it('contains links to view comment and post', () => {
+  // Test 14: Отображение текста "Saving..." при редактировании
+  it('shows saving text in edit menu item when isEditing is true', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} isEditing={true} />);
 
-    expect(screen.getByTestId('comment-post-link')).toBeInTheDocument();
-    expect(screen.getByTestId('comment-post-link')).toHaveAttribute(
-      'href',
-      `/posts/${comment.post.slug}`
-    );
+    const actionButton = screen.getByTestId('comment-actions-button');
+    fireEvent.click(actionButton);
+
+    const editButton = screen.getByTestId('edit-comment-button');
+    expect(editButton).toHaveTextContent('Saving...');
   });
 
-  // Test 13: Accessibility атрибуты
+  // Test 15: Скрытие кнопки Edit когда isSheetForm=false
+  it('does not show edit option when isSheetForm is false', () => {
+    const comment = createMockComment();
+    render(
+      <CommentRow
+        comment={comment}
+        onDelete={onDeleteMock}
+        onEdit={onEditMock}
+        isSheetForm={false}
+      />
+    );
+
+    const actionButton = screen.getByTestId('comment-actions-button');
+    fireEvent.click(actionButton);
+
+    expect(screen.queryByTestId('edit-comment-button')).not.toBeInTheDocument();
+  });
+
+  // Test 16: Ссылки на просмотр поста
+  it('contains link to view post in comment header', () => {
+    const comment = createMockComment();
+    render(<CommentRow comment={comment} {...defaultProps} />);
+
+    const postLink = screen.getByTestId('comment-post-link');
+    expect(postLink).toBeInTheDocument();
+    expect(postLink).toHaveAttribute('href', `/article/${comment.post.slug}`);
+    expect(postLink).toHaveAttribute('target', '_blank');
+  });
+
+  // Test 17: Ссылка на просмотр поста в меню действий
+  it('has link to view post in action menu', () => {
+    const comment = createMockComment();
+    render(<CommentRow comment={comment} {...defaultProps} />);
+
+    const actionButton = screen.getByTestId('comment-actions-button');
+    fireEvent.click(actionButton);
+
+    // Находим ссылку напрямую по data-testid
+    const viewPostLink = screen.getByTestId('view-post-link');
+    // Поскольку DropdownMenuItem с asChild рендерит ссылку, проверяем её напрямую
+    expect(viewPostLink).toHaveAttribute(
+      'href',
+      `/posts/slug/${comment.post.slug}`
+    );
+    expect(viewPostLink).toHaveAttribute('target', '_blank');
+  });
+
+  // Test 18: Accessibility атрибуты
   it('has proper accessibility attributes', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     const row = screen.getByTestId(`comment-row-${comment.id}`);
     expect(row).toHaveAttribute('role', 'row');
@@ -318,7 +402,7 @@ describe('CommentRow – unit tests', () => {
     expect(content).toHaveAttribute('aria-label', 'Comment content');
   });
 
-  // Test 14: Проверка форматирования чисел
+  // Test 19: Проверка форматирования чисел
   it('displays correct number formatting', () => {
     const comment = createMockComment({
       stats: {
@@ -326,7 +410,7 @@ describe('CommentRow – unit tests', () => {
         dislikesCount: 100,
       },
     });
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     const likesElement = screen.getByTestId('comment-likes');
     const dislikesElement = screen.getByTestId('comment-dislikes');
@@ -335,32 +419,32 @@ describe('CommentRow – unit tests', () => {
     expect(dislikesElement).toHaveTextContent('100');
   });
 
-  // Test 15: Короткий контент не обрезается
+  // Test 20: Короткий контент не обрезается
   it('does not truncate short comment content', () => {
     const shortContent = 'Short comment';
     const comment = createMockComment({ content: shortContent });
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     const contentElement = screen.getByTestId('comment-content');
     expect(contentElement.textContent).not.toContain('...');
+    expect(contentElement.textContent).toBe(shortContent);
   });
 
-  // Test 16: Проверка memo обертки
+  // Test 21: Проверка memo обертки
   it('is memoized to prevent unnecessary re-renders', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
-    // Проверяем что компонент имеет displayName
     const CommentRowMemo = CommentRow as any;
     if (CommentRowMemo.displayName) {
       expect(CommentRowMemo.displayName).toBe('CommentRow');
     }
   });
 
-  // Test 17: Отображение метаданных (иконки)
+  // Test 22: Отображение метаданных (иконки)
   it('displays metadata icons correctly', () => {
     const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
+    render(<CommentRow comment={comment} {...defaultProps} />);
 
     expect(screen.getByTestId('calendar-icon')).toBeInTheDocument();
     expect(screen.getByTestId('filetext-icon')).toBeInTheDocument();
@@ -368,31 +452,63 @@ describe('CommentRow – unit tests', () => {
     expect(screen.getByTestId('thumbsdown-icon')).toBeInTheDocument();
   });
 
-  // Test 18: Ссылка на просмотр поста в меню действий
-  it('has link to view post in action menu', () => {
-    const comment = createMockComment();
-    render(<CommentRow comment={comment} onDelete={onDeleteMock} />);
-
-    // Открываем меню действий
-    const actionButton = screen.getByTestId('comment-actions-button');
-    fireEvent.click(actionButton);
-
-    // Проверяем наличие ссылки на просмотр поста
-    expect(screen.getByTestId('view-post-link')).toBeInTheDocument();
-  });
-
-  // Test 20: Предотвращение удаления при isDeleting
+  // Test 23: Предотвращение удаления при isDeleting
   it('prevents delete when isDeleting is true', () => {
     const comment = createMockComment();
     render(
-      <CommentRow comment={comment} onDelete={onDeleteMock} isDeleting={true} />
+      <CommentRow comment={comment} {...defaultProps} isDeleting={true} />
     );
 
-    // Пытаемся вызвать handleDelete напрямую
     const actionButton = screen.getByTestId('comment-actions-button');
     fireEvent.click(actionButton);
 
-    // Проверяем что onDelete не был вызван
+    const deleteButton = screen.getByTestId('delete-comment-button');
+    fireEvent.click(deleteButton);
+
     expect(onDeleteMock).not.toHaveBeenCalled();
+  });
+
+  // Test 24: Предотвращение редактирования при isEditing
+  it('prevents edit when isEditing is true', () => {
+    const comment = createMockComment();
+    render(<CommentRow comment={comment} {...defaultProps} isEditing={true} />);
+
+    const actionButton = screen.getByTestId('comment-actions-button');
+    fireEvent.click(actionButton);
+
+    const editButton = screen.getByTestId('edit-comment-button');
+    fireEvent.click(editButton);
+
+    expect(onEditMock).not.toHaveBeenCalled();
+  });
+
+  // Test 25: Отображение текста "Deleting..." и лоадера в меню
+  it('shows deleting text and loader in delete menu item when isDeleting is true', () => {
+    const comment = createMockComment();
+    render(
+      <CommentRow comment={comment} {...defaultProps} isDeleting={true} />
+    );
+
+    const actionButton = screen.getByTestId('comment-actions-button');
+    fireEvent.click(actionButton);
+
+    const deleteButton = screen.getByTestId('delete-comment-button');
+    expect(deleteButton).toHaveTextContent('Deleting...');
+
+    // Ищем лоадер внутри кнопки удаления
+    const loaderInDeleteButton = deleteButton.querySelector(
+      '[data-testid="loader2-icon"]'
+    );
+    expect(loaderInDeleteButton).toBeInTheDocument();
+  });
+
+  // Test 26: Навигация по ссылке на пост с клавиатуры
+  it('navigates to post link via keyboard', () => {
+    const comment = createMockComment();
+    render(<CommentRow comment={comment} {...defaultProps} />);
+
+    const postLink = screen.getByTestId('comment-post-link');
+    expect(postLink).toHaveAttribute('href', `/article/${comment.post.slug}`);
+    expect(postLink).toHaveAttribute('target', '_blank');
   });
 });

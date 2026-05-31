@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { articlesQueryKeys } from '@/shared/api';
+import { userPostsQueryKeys } from '@/shared/api/user';
 import { createArticle } from '../api';
 
 /**
@@ -20,14 +21,19 @@ export function useCreateArticle() {
 
     onSuccess: () => {
       toast.success('The article has been successfully created.');
-      queryClient.invalidateQueries({ queryKey: articlesQueryKeys.all });
+      if (userId) {
+        queryClient.invalidateQueries({
+          queryKey: userPostsQueryKeys.list(userId),
+        });
+      }
+      queryClient.invalidateQueries({ queryKey: articlesQueryKeys.lists() });
 
       const role = sessionClaims?.metadata?.role as string;
 
       if (role === 'admin') {
         router.push('/dashboard/articles');
       } else if (role === 'author') {
-        router.push(`/profile/${userId}`);
+        router.replace(`/author/articles`);
       } else {
         router.push('/');
       }

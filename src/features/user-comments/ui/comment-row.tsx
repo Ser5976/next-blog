@@ -63,7 +63,7 @@ const CommentRowComponent = ({
             aria-hidden="true"
           />
           <Link
-            href={`/posts/${comment.post.slug}`}
+            href={`/article/${comment.post.slug}`}
             className="font-medium text-sm hover:underline truncate"
             target="_blank"
             aria-label={`View post: ${comment.post.title}`}
@@ -176,7 +176,7 @@ const CommentRowComponent = ({
               data-testid="view-post-link"
             >
               <Link
-                href={`/posts/${comment.post.slug}`}
+                href={`/posts/slug/${comment.post.slug}`}
                 target="_blank"
                 className="cursor-pointer"
                 aria-label={`View post: ${comment.post.title}`}

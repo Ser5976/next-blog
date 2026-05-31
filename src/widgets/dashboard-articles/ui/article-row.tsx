@@ -1,7 +1,14 @@
 'use client';
 
 import { memo, useCallback } from 'react';
-import { Loader2, MoreVertical, Pencil, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import {
+  Loader2,
+  MoreVertical,
+  NotepadText,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 
 import { ArticleRowDashboard } from '@/shared/components';
 import { Button } from '@/shared/ui/button';
@@ -30,8 +37,8 @@ const ArticleRowComponent = ({
 
   const handleEdit = useCallback(() => {
     if (isEditing || isDeleting) return;
-    onEdit(article.id);
-  }, [article.id, isEditing, isDeleting, onEdit]);
+    onEdit(article.slug);
+  }, [article.slug, isEditing, isDeleting, onEdit]);
 
   const handleTogglePublish = useCallback(() => {
     if (isToggling) return;
@@ -87,6 +94,21 @@ const ArticleRowComponent = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem
+              asChild
+              className="cursor-pointer"
+              data-testid="view-post-link"
+            >
+              <Link
+                href={`/article/${article.slug}`}
+                target="_blank"
+                className="cursor-pointer flex items-center gap-2 w-full"
+                aria-label={`View post: ${article.title}`}
+              >
+                <NotepadText className="h-4 w-4 mr-2" />
+                View Post
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={handleEdit}
               disabled={isDisabled}

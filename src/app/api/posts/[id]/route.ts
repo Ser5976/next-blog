@@ -6,58 +6,6 @@ import { prisma } from '@/shared/api/prisma';
 import { articleFormSchema } from '@/shared/schemas';
 
 /**
- * GET /api/posts/[id]
- * Получение конкретной статьи по ID
- */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-
-    // Ищем статью с включением связанных данных
-    const post = await prisma.post.findUnique({
-      where: { id },
-      include: {
-        author: {
-          select: {
-            id: true,
-            clerkId: true,
-          },
-        },
-        category: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-        tags: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-      },
-    });
-
-    if (!post) {
-      return NextResponse.json({ error: 'Статья не найдена' }, { status: 404 });
-    }
-
-    return NextResponse.json(post);
-  } catch (error) {
-    console.error('Ошибка при получении статьи:', error);
-    return NextResponse.json(
-      { error: 'Не удалось загрузить статью' },
-      { status: 500 }
-    );
-  }
-}
-
-/**
  * Обновление существующей статьи
  */
 export async function PUT(
@@ -154,7 +102,7 @@ export async function PUT(
     }
 
     // Обновляем статью
-    await prisma.post.update({
+    const article = await prisma.post.update({
       where: { id },
       data: {
         title: data.title,
@@ -174,6 +122,7 @@ export async function PUT(
     return NextResponse.json({
       success: true,
       message: 'The article has been updated successfully.',
+      article,
     });
   } catch (error) {
     console.error('Error updating article:', error);

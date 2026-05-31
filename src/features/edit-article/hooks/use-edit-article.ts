@@ -4,34 +4,33 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import { articlesQueryKeys } from '@/shared/api';
+import { userPostsQueryKeys } from '@/shared/api/user';
 import { ArticleFormValues } from '@/shared/schemas';
 import { updateArticle } from '../api';
 
 export function useUpdateArticle() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { userId, sessionClaims } = useAuth(); // Получаем  пользователя
+  const { userId } = useAuth(); // Получаем  пользователя
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: ArticleFormValues }) =>
       updateArticle(id, data),
 
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success('Article updated successfully');
+      if (userId) {
+        queryClient.invalidateQueries({
+          queryKey: userPostsQueryKeys.list(userId),
+        });
+      }
+
       queryClient.invalidateQueries({
-        queryKey: articlesQueryKeys.all,
+        queryKey: articlesQueryKeys.lists(),
       });
-      // Получение роли из sessionClaims (если настроено в Clerk)
-      const role = sessionClaims?.metadata?.role as string;
 
       // Перенаправление в зависимости от роли
-      if (role === 'admin') {
-        router.push('/dashboard/articles'); // Страница статей в дашборде
-      } else if (role === 'author') {
-        router.push(`/profile/${userId}`); // Профиль пользователя
-      } else {
-        router.push('/'); // Дефолтное перенаправление
-      }
+      router.replace(`/article/${data.article.slug}`);
     },
 
     onError: (error: any) => {

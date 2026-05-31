@@ -11,7 +11,7 @@ import { UniversalError } from '@/shared/ui';
 import { LoadingScreen } from '@/shared/ui/loading-screen';
 import { useUpdateArticle } from '../hooks';
 
-export const EditArticle = ({ articleId }: { articleId: string }) => {
+export const EditArticle = ({ slug }: { slug: string }) => {
   const [slugError, setSlugError] = useState<string | null>(null);
 
   const {
@@ -19,7 +19,7 @@ export const EditArticle = ({ articleId }: { articleId: string }) => {
     isLoading: isLoadingArticle,
     error: articleError,
     refetch: refetchArticle,
-  } = useArticle(articleId);
+  } = useArticle(slug);
 
   const {
     data: categories,
@@ -33,10 +33,11 @@ export const EditArticle = ({ articleId }: { articleId: string }) => {
 
   const handleSubmitArticle = async (updateData: ArticleFormValues) => {
     try {
-      await updateArticleMutation.mutateAsync({
-        id: articleId,
-        data: updateData,
-      });
+      if (article)
+        await updateArticleMutation.mutateAsync({
+          id: article.id,
+          data: updateData,
+        });
     } catch (error: any) {
       console.error('Error saving article:', error);
       // Обработка ошибки slug
@@ -95,7 +96,7 @@ export const EditArticle = ({ articleId }: { articleId: string }) => {
             className="text-xs text-muted-foreground mt-4"
             data-testid="error-article-id"
           >
-            Article ID: {articleId}
+            Article: {slug}
           </p>
         </UniversalError>
       </div>
@@ -114,7 +115,7 @@ export const EditArticle = ({ articleId }: { articleId: string }) => {
       >
         <UniversalError
           title="Article Not Found"
-          message={`No article found with ID: ${articleId}`}
+          message={`No article found with: ${slug}`}
           variant="card"
           onRetry={() => refetchArticle()}
           data-testid="not-found-error"

@@ -61,8 +61,8 @@ export const DashboardArticles = () => {
     router.push('/create-article');
   };
 
-  const handleEditArticle = (id: string) => {
-    router.push(`/edit-article/${id}`);
+  const handleEditArticle = (slug: string) => {
+    router.push(`/edit-article/${slug}`);
   };
 
   if (isError) {

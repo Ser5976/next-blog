@@ -75,7 +75,8 @@ const PostRowComponent = ({
               data-testid="view-post-link"
             >
               <Link
-                href={`/posts/${post.id}`}
+                href={`/article/${post.slug}`}
+                target="_blank"
                 className="cursor-pointer flex items-center gap-2 w-full"
                 aria-label={`View post: ${post.title}`}
               >
@@ -89,7 +90,7 @@ const PostRowComponent = ({
               data-testid="edit-post-link"
             >
               <Link
-                href={`/edit-article/${post.id}`}
+                href={`/edit-article/${post.slug}`}
                 className="cursor-pointer flex items-center gap-2 w-full"
                 aria-label={`Edit post: ${post.title}`}
               >

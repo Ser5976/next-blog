@@ -45,4 +45,5 @@ export interface ArticleFormProps {
 export interface ApiResponse {
   success: boolean;
   message?: string;
+  article: Article;
 }

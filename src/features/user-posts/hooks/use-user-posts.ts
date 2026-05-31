@@ -1,16 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { userPostsQueryKeys } from '@/shared/api/user';
 import { getUserPosts } from '../api';
 import { UserPostsResponse } from '../model';
-
-// Ключи для кэширования
-export const userPostsQueryKeys = {
-  all: ['user-posts'] as const,
-  list: (userId: string) =>
-    [...userPostsQueryKeys.all, 'list', userId] as const,
-  stats: (userId: string) =>
-    [...userPostsQueryKeys.all, 'stats', userId] as const,
-} as const;
 
 // Хук для получения постов пользователя
 export function useUserPosts(userId: string) {
