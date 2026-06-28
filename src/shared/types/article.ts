@@ -24,9 +24,6 @@ export interface Article {
   }[];
   comments: {
     id: string;
-    content: string;
-    likes: number;
-    dislikes: number;
   }[];
   viewCount: number;
   averageRating: number | null;

@@ -49,3 +49,4 @@ export {
 export { Separator } from './separator';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { Badge, badgeVariants } from './badge';
+export { CardSkeleton } from './card-skeleton';
