@@ -125,7 +125,7 @@ export function CommentForm({
               variant="ghost"
               onClick={handleCancel}
               disabled={isSubmitting}
-              className="rounded-full"
+              className="rounded-full cursor-pointer"
             >
               Cancel
             </Button>
@@ -135,7 +135,7 @@ export function CommentForm({
               disabled={
                 isSubmitting || !content.trim() || content.trim().length < 2
               }
-              className="rounded-full bg-emerald-600 hover:bg-emerald-700"
+              className="rounded-full bg-emerald-600 hover:bg-emerald-700 cursor-pointer"
             >
               {isSubmitting ? 'Posting...' : 'Comment'}
             </Button>

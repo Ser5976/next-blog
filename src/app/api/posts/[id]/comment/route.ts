@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 
 import { prisma } from '@/shared/api/prisma';
 import { commentFormSchema } from '@/shared/schemas/comment-form-schemas';
+import { UserClerk } from '@/shared/types';
 
 /**
  * Создание нового комментария к статье
@@ -20,7 +21,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    console.log('body create comment:', body);
+
     // валидация body при помощи zod
     const { data, success, error } = commentFormSchema.safeParse(body);
 
@@ -38,7 +39,7 @@ export async function POST(
     // Находим пользователя в базе данных
     const dbUser = await prisma.user.findUnique({
       where: { clerkId: currentUserId },
-      select: { id: true },
+      select: { id: true, clerkId: true },
     });
 
     if (!dbUser) {
@@ -62,6 +63,32 @@ export async function POST(
       );
     }
 
+    // Получаем автора, если он существует в clerk
+    let clerkUser: UserClerk | null = null;
+    const clerkId = dbUser.clerkId;
+
+    if (clerkId) {
+      try {
+        const client = await clerkClient();
+        const user = await client.users.getUser(clerkId);
+
+        clerkUser = {
+          id: user.id,
+          email: user.emailAddresses[0]?.emailAddress || '',
+          firstName: user.firstName || null,
+          lastName: user.lastName || null,
+          role: (user.publicMetadata?.role as string) || 'user',
+          imageUrl: user.imageUrl,
+          createdAt: user.createdAt,
+          lastSignInAt: user.lastSignInAt,
+        };
+      } catch (error) {
+        // Если пользователь не найден в Clerk, просто оставляем author = null
+        console.warn(`User with clerkId ${clerkId} not found in Clerk:`, error);
+        clerkUser = null;
+      }
+    }
+
     // Создаем комментарий
     const comment = await prisma.comment.create({
       data: {
@@ -76,6 +103,16 @@ export async function POST(
             clerkId: true,
           },
         },
+        ...(dbUser && {
+          likes: {
+            where: { userId: dbUser.id },
+            select: { userId: true },
+          },
+          dislikes: {
+            where: { userId: dbUser.id },
+            select: { userId: true },
+          },
+        }),
         _count: {
           select: {
             likes: true,
@@ -91,8 +128,29 @@ export async function POST(
       content: comment.content,
       likes: comment._count.likes,
       dislikes: comment._count.dislikes,
-      author: comment.author,
+      author: clerkUser
+        ? {
+            id: clerkUser.id,
+            name:
+              [clerkUser.firstName, clerkUser.lastName]
+                .filter(Boolean)
+                .join(' ') || clerkUser.email.split('@')[0],
+            imageUrl: clerkUser.imageUrl,
+          }
+        : {
+            id: null,
+            name: 'Deleted User',
+            imageUrl: null,
+          },
       createdAt: comment.createdAt,
+      userReaction: dbUser
+        ? comment.likes?.length > 0
+          ? 'like'
+          : comment.dislikes?.length > 0
+            ? 'dislike'
+            : null
+        : null,
+      isAuthor: currentUserId === comment.author?.clerkId,
     };
 
     return NextResponse.json(formattedComment, { status: 201 });
