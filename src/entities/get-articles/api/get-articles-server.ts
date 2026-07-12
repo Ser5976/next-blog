@@ -16,6 +16,7 @@ export async function getArticlesServer(
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_DOMAIN}/api/posts?${params}`,
       {
+        cache: 'force-cache',
         next: { revalidate: 60 },
       }
     );

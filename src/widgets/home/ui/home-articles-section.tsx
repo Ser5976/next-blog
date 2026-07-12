@@ -1,7 +1,7 @@
 import { getArticlesServer } from '@/entities/get-articles/api';
+import { ArticleCardBig } from '@/shared/components';
 import { Subtitle, Title, UniversalEmpty, UniversalError } from '@/shared/ui';
 import { HomeArticlesSectionProps } from '../model';
-import { ArticleCardBig } from './article-card-big';
 
 export const HomeArticlesSection = async ({
   id,
