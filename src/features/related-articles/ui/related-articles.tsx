@@ -30,7 +30,7 @@ export const RelatedArticles = ({ slug }: { slug: string }) => {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       {relatedArticles.map((article) => (
-        <ArticleCard article={article} key={article.id} />
+        <ArticleCard article={article} key={article.id} role="listitem" />
       ))}
     </div>
   );

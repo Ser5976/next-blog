@@ -7,7 +7,7 @@ export async function getCategories(): Promise<Category[] | undefined> {
       {
         cache: 'force-cache',
         next: {
-          revalidate: 3600,
+          revalidate: 60,
         },
       }
     );
