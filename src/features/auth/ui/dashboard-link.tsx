@@ -19,7 +19,21 @@ export const DashboardLink = ({
   const { isLoaded, sessionClaims } = useAuth();
   const role = sessionClaims?.metadata?.role as string | undefined;
 
-  if (!isLoaded || (role !== 'admin' && role !== 'author')) {
+  //  Показываем скелетон, пока загружается
+  if (!isLoaded) {
+    return (
+      <Button
+        variant="outline"
+        className=" bg-gray-200  animate-pulse"
+        size="icon"
+        role="status"
+        aria-label="Loading user menu"
+        aria-live="polite"
+      ></Button>
+    );
+  }
+
+  if (role !== 'admin' && role !== 'author') {
     return null;
   }
 

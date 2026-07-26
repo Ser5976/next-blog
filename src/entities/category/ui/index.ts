@@ -1,1 +1,1 @@
-export { CategoryLink } from './cadegory-link';
+export { CategoryLink } from './category-link';

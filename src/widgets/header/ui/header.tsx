@@ -1,19 +1,16 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
 
-import { Category } from '@/entities/category';
 import { AuthButton, DashboardLink } from '@/features/auth';
 import { CategoriesMenu } from '@/features/categories-menu';
 import { SearchForm } from '@/features/search';
 import { ThemeToggle } from '@/features/theme-toggle';
 import { cn } from '@/shared/lib';
-import { MobileMenu } from '@/widgets/mobile-menu';
+import { CategoriesSkeleton } from '@/shared/ui';
+import { MobileCategoriesList } from '@/widgets/mobile-menu/ui/mobile-categories-list';
+import { MobileMenu } from '@/widgets/mobile-menu/ui/mobile-menu';
 
-interface HeaderProps {
-  categories: Category[] | undefined;
-}
-
-export const Header = ({ categories }: HeaderProps) => {
+export const Header = () => {
   return (
     <header
       className={cn(
@@ -45,7 +42,17 @@ export const Header = ({ categories }: HeaderProps) => {
         </Link>
 
         {/* Desktop navigation */}
-        <CategoriesMenu categories={categories} />
+        <Suspense
+          fallback={
+            <CategoriesSkeleton
+              direction="horizontal"
+              variant="shimmer"
+              count={5}
+            />
+          }
+        >
+          <CategoriesMenu />
+        </Suspense>
 
         {/* Actions */}
         <div className="flex items-center gap-2">
@@ -57,26 +64,29 @@ export const Header = ({ categories }: HeaderProps) => {
 
           {/* Avatar / user icon */}
 
-          <div className="hidden sm:flex items-center gap-2 justify-between">
-            <Suspense fallback={null}>
-              <DashboardLink />
-            </Suspense>
-            <Suspense
-              fallback={
-                <div
-                  className="w-8 h-8 bg-gray-200 rounded-full animate-pulse"
-                  role="status"
-                  aria-label="Loading user menu"
-                  aria-live="polite"
-                />
-              }
-            >
+          <div className="hidden sm:flex items-center gap-2 justify-between min-w-[80px]">
+            <div className="flex items-center gap-2">
               <AuthButton />
-            </Suspense>
+              <DashboardLink />
+            </div>
           </div>
 
           {/* Mobile menu */}
-          <MobileMenu categories={categories} />
+
+          <MobileMenu>
+            <Suspense
+              fallback={
+                <CategoriesSkeleton
+                  count={5}
+                  direction="vertical"
+                  variant="shimmer"
+                  showIcon={false}
+                />
+              }
+            >
+              <MobileCategoriesList />
+            </Suspense>
+          </MobileMenu>
         </div>
       </div>
     </header>

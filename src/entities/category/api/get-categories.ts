@@ -4,6 +4,7 @@ export async function getCategories(): Promise<Category[] | undefined> {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_DOMAIN}/api/categories`,
+
       {
         cache: 'force-cache',
         next: {

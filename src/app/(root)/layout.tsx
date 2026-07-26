@@ -11,7 +11,7 @@ export default async function MainLayout({
 
   return (
     <main>
-      <Header categories={categories} />
+      <Header />
       <div className=" grow  min-h-screen ">{children}</div>
       <Footer categories={categories} />
     </main>
