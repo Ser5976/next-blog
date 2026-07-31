@@ -1,14 +1,13 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 
-import { Category, CategoryLink } from '@/entities/category';
 import { cn } from '@/shared/lib';
+import { CategoriesSkeleton } from '@/shared/ui';
+import { FooterCopyright } from './footer-copyright';
+import { FooterNavigation } from './footer-navigation';
 
-interface FooterProps {
-  categories: Category[] | undefined;
-}
-
-export const Footer = ({ categories }: FooterProps) => {
+export const Footer = () => {
   return (
     <footer
       className={cn('border-t border-border bg-background/70 backdrop-blur')}
@@ -49,38 +48,17 @@ export const Footer = ({ categories }: FooterProps) => {
         </div>
 
         {/* Блок 2 — Навигация */}
-        <div aria-labelledby="sections-heading">
-          <h4 id="sections-heading" className="font-semibold mb-3">
-            Sections
-          </h4>
-          <nav aria-label="Категории блога">
-            <ul className="flex flex-col gap-2" role="list">
-              {!categories ? (
-                <li
-                  className="text-sm text-muted-foreground"
-                  aria-live="polite"
-                  aria-atomic="true"
-                >
-                  ⚠️ What went wrong
-                </li>
-              ) : categories.length === 0 ? (
-                <li
-                  className="text-sm text-muted-foreground"
-                  aria-live="polite"
-                  aria-atomic="true"
-                >
-                  No data available
-                </li>
-              ) : (
-                categories.map((category) => (
-                  <li key={category.id}>
-                    <CategoryLink category={category} />
-                  </li>
-                ))
-              )}
-            </ul>
-          </nav>
-        </div>
+        <Suspense
+          fallback={
+            <CategoriesSkeleton
+              direction="vertical"
+              variant="shimmer"
+              count={5}
+            />
+          }
+        >
+          <FooterNavigation />
+        </Suspense>
 
         {/* Блок 3 — Соцсети */}
         <div aria-labelledby="social-heading">
@@ -125,12 +103,7 @@ export const Footer = ({ categories }: FooterProps) => {
       </div>
 
       {/* Копирайт */}
-      <div
-        className="border-t border-border mt-6 py-4 text-center text-xs text-muted-foreground"
-        aria-label="Copyright information"
-      >
-        © {new Date().getFullYear()} Createx Blog. All rights reserved.
-      </div>
+      <FooterCopyright />
     </footer>
   );
 };
