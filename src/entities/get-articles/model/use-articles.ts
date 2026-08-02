@@ -4,7 +4,14 @@ import { ArticlesFilters, articlesQueryKeys } from '@/shared/api';
 import { getArticles } from '../api';
 import { ArticlesResponse } from './types';
 
-export function useArticles(filters: ArticlesFilters) {
+type UseArticlesOptions = {
+  enabled?: boolean;
+};
+
+export function useArticles(
+  filters: ArticlesFilters,
+  options?: UseArticlesOptions
+) {
   return useQuery<ArticlesResponse, Error>({
     queryKey: articlesQueryKeys.list(filters),
     queryFn: () => getArticles(filters),
@@ -14,6 +21,7 @@ export function useArticles(filters: ArticlesFilters) {
     retryDelay: 1000,
     refetchOnWindowFocus: false,
     placeholderData: undefined,
+    enabled: options?.enabled ?? true,
   });
 }
 export function usePrefetchArticles() {
