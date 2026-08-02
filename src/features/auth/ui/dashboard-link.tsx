@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
 import { ShieldUser, SquarePen } from 'lucide-react';
@@ -17,10 +18,15 @@ export const DashboardLink = ({
   onNavigate,
 }: DashboardLinkProps) => {
   const { isLoaded, sessionClaims } = useAuth();
+  const [isMounted, setIsMounted] = useState(false);
   const role = sessionClaims?.metadata?.role as string | undefined;
 
-  //  Показываем скелетон, пока загружается
-  if (!isLoaded) {
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // SSR и первый клиентский рендер совпадают — скелетон, чтобы не ломать гидрацию
+  if (!isMounted || !isLoaded) {
     return (
       <Button
         variant="outline"

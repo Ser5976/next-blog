@@ -71,7 +71,7 @@ export const CategoriesSkeleton = ({
       <ul
         className={cn(
           'flex',
-          direction === 'horizontal' ? 'gap-4' : 'flex-col gap-4'
+          direction === 'horizontal' ? 'gap-4 px-4' : 'flex-col gap-4'
         )}
         role="list"
       >
