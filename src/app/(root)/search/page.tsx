@@ -1,9 +1,17 @@
-export default async function SearchPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const { query } = await searchParams;
+import { Suspense } from 'react';
 
-  return <div>{query}</div>;
+import { SearchResults, SearchResultsSkeleton } from '@/widgets/search';
+
+export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto max-w-7xl px-4 py-16">
+          <SearchResultsSkeleton title="Search" subtitle="Loading search..." />
+        </div>
+      }
+    >
+      <SearchResults />
+    </Suspense>
+  );
 }

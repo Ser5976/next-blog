@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { PenLine, Search } from 'lucide-react';
+import { PenLine } from 'lucide-react';
 
+import { SearchForm } from '@/features/search';
 import { Button } from '@/shared/ui';
 
 interface CtaSectionProps {
@@ -55,31 +56,16 @@ export const CtaSection = ({
             </p>
 
             <div
-              className="flex flex-col items-center justify-center gap-4 sm:flex-row"
+              className="flex flex-col items-stretch justify-center gap-4 sm:flex-row sm:items-center"
               role="group"
               aria-label="Call to action buttons"
               data-testid={`${dataTestId}-actions`}
             >
+              <SearchForm variant="cta" />
               <Button
                 asChild
-                size="lg"
-                variant="secondary"
-                className="rounded-full px-8"
-                data-testid={`${dataTestId}-search-button`}
-              >
-                <Link
-                  href="/search"
-                  aria-label="Search articles in the library"
-                >
-                  <Search className="mr-2 h-4 w-4" aria-hidden="true" />
-                  Search Articles
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
                 variant="outline"
-                className="rounded-full border-white/40 bg-transparent px-8 text-white hover:bg-white/10 hover:text-white"
+                className="h-12 shrink-0 rounded-full border-white/40 bg-transparent px-8 text-base text-white hover:bg-white/10 hover:text-white sm:h-14"
                 data-testid={`${dataTestId}-write-button`}
               >
                 <Link
