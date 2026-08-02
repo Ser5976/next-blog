@@ -2,9 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Calendar, Eye, Star, User } from 'lucide-react';
+import { Eye, Star, User } from 'lucide-react';
 
-import { formatDate, getFullName } from '@/shared/lib';
+import { DateComponent } from '@/shared/components';
+import { getFullName } from '@/shared/lib';
 import { Article } from '@/shared/types';
 
 export const ArticleHeader = ({ article }: { article: Article }) => {
@@ -44,12 +45,7 @@ export const ArticleHeader = ({ article }: { article: Article }) => {
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4" />
-          <time dateTime={article.createdAt?.toString()}>
-            {formatDate(article.createdAt)}
-          </time>
-        </div>
+        <DateComponent date={article.createdAt} />
         <div className="flex items-center gap-2">
           <Eye className="h-4 w-4" />
           <span>{article.viewCount.toLocaleString()} views</span>

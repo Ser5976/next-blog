@@ -1,4 +1,4 @@
-import { getArticlesServer } from '@/entities/get-articles/api';
+import { getArticlesServer } from '@/entities/get-articles';
 import { StatsError } from './stats-error';
 
 interface ArticlesStatsProps {

@@ -2,10 +2,10 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Calendar, Eye, Star } from 'lucide-react';
+import { Eye, Star } from 'lucide-react';
 
-import { formatDate } from '@/shared/lib';
 import { Article } from '@/shared/types';
+import { DateComponent } from './date-component';
 
 interface ArticleCardProps {
   article: Article;
@@ -82,12 +82,7 @@ export const ArticleCard = ({
           className="flex items-center gap-3 text-xs text-gray-400"
           data-testid={`${testId}-meta`}
         >
-          <div className="flex items-center gap-1">
-            <Calendar className="h-3 w-3" aria-hidden="true" />
-            <span data-testid={`${testId}-date`}>
-              {formatDate(article.createdAt)}
-            </span>
-          </div>
+          <DateComponent date={article.createdAt} />
           <div className="flex items-center gap-1">
             <Eye className="h-3 w-3" aria-hidden="true" />
             <span data-testid={`${testId}-views`}>{article.viewCount}</span>

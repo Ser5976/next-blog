@@ -3,10 +3,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import parse from 'html-react-parser';
-import { CalendarDays } from 'lucide-react';
 
-import { cn, formatDate } from '@/shared/lib';
+import { cn } from '@/shared/lib';
 import { Article } from '@/shared/types';
+import { DateComponent } from './date-component';
 
 interface ArticleCardProps {
   article: Article;
@@ -69,12 +69,7 @@ export const ArticleCardBig = ({
 
           {/* Дата */}
 
-          <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-            <CalendarDays className="h-4 w-4" aria-hidden="true" />
-            <span data-testid={`${testId}-date`}>
-              {formatDate(article.createdAt)}
-            </span>
-          </div>
+          <DateComponent date={article.createdAt} />
 
           {/* Текст - 4 строки */}
           <div

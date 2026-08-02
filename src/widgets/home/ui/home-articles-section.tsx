@@ -1,4 +1,4 @@
-import { getArticlesServer } from '@/entities/get-articles/api';
+import { getArticlesServer } from '@/entities/get-articles';
 import { ArticleCardBig } from '@/shared/components';
 import { Subtitle, Title, UniversalEmpty, UniversalError } from '@/shared/ui';
 import { HomeArticlesSectionProps } from '../model';
