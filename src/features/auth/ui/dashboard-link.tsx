@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@clerk/nextjs';
 import { ShieldUser, SquarePen } from 'lucide-react';
@@ -16,15 +17,20 @@ export const DashboardLink = ({
   className,
   onNavigate,
 }: DashboardLinkProps) => {
+  const [isMounted, setIsMounted] = useState(false);
   const { isLoaded, sessionClaims } = useAuth();
   const role = sessionClaims?.metadata?.role as string | undefined;
 
-  //  Показываем скелетон, пока загружается
-  if (!isLoaded) {
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Показываем скелетон, пока загружается или до монтирования
+  if (!isLoaded || !isMounted) {
     return (
       <Button
         variant="outline"
-        className=" bg-gray-200  animate-pulse"
+        className="bg-gray-200 animate-pulse"
         size="icon"
         role="status"
         aria-label="Loading user menu"
@@ -44,7 +50,7 @@ export const DashboardLink = ({
     <Button
       variant="outline"
       size="icon"
-      className={cn(' cursor-pointer', className)}
+      className={cn('cursor-pointer', className)}
     >
       <Link href={href} aria-label={label} onClick={onNavigate}>
         {role === 'admin' ? (

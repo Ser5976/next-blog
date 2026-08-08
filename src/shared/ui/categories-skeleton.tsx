@@ -61,7 +61,9 @@ export const CategoriesSkeleton = ({
   return (
     <nav
       className={cn(
-        direction === 'horizontal' ? 'flex gap-6' : 'flex flex-col gap-4',
+        direction === 'horizontal'
+          ? 'hidden md:flex gap-6'
+          : 'flex flex-col gap-4',
         className
       )}
       role="status"
