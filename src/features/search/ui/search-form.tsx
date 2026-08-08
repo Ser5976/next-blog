@@ -61,7 +61,7 @@ const SearchFormInner = ({ variant = 'desktop', onClose }: Props) => {
           'focus-within:border-white/50 focus-within:bg-white/25',
           'focus-within:ring-2 focus-within:ring-white/25',
         ],
-        isDesktop && 'hidden px-1.5 py-0.5 md:flex',
+        isDesktop && 'hidden px-1.5 py-0.5 md:flex md:w-60',
         isMobile && 'flex w-full px-1.5 py-0.5',
         isPage && 'flex w-full px-2 py-1.5 sm:px-3 sm:py-2',
         isCta && 'flex px-2 sm:px-3'
@@ -80,7 +80,8 @@ const SearchFormInner = ({ variant = 'desktop', onClose }: Props) => {
             'hover:bg-emerald-500/10 hover:text-emerald-600',
             'dark:hover:bg-white/10 dark:hover:text-emerald-400',
           ],
-          isCta && 'h-9 w-9 text-white/80 hover:bg-white/15 hover:text-white sm:h-10 sm:w-10',
+          isCta &&
+            'h-9 w-9 text-white/80 hover:bg-white/15 hover:text-white sm:h-10 sm:w-10',
           isMobile && 'h-10 w-10',
           isPage && 'h-10 w-10 sm:h-11 sm:w-11'
         )}
