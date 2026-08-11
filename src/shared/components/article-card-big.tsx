@@ -22,18 +22,23 @@ export const ArticleCardBig = ({
   const cardId = `article-${article.id}`;
   const testId = dataTestId || cardId;
 
-  // Берем первые 4 строки текста (примерно 200 символов)
-  const content = article.content.slice(0, 200) + '...';
+  // Используем DOM-парсинг и удаляем ссылки
+  const processContent = (html: string) => {
+    // Удаляем все ссылки из контента
+    return html.replace(/<a\s+[^>]*>.*?<\/a>/gi, '');
+  };
+
+  const cleanContent = processContent(article.content);
 
   return (
     <Link
       href={`/article/${article.slug}`}
-      className="group block"
+      className="group block h-full"
       role={role || 'listitem'}
       data-testid={testId}
       aria-labelledby={`${cardId}-title`}
     >
-      <article className="flex flex-col">
+      <article className="flex flex-col h-full">
         {/* Изображение */}
         <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden  bg-gray-100 dark:bg-gray-800">
           {article.coverImage ? (
@@ -57,7 +62,7 @@ export const ArticleCardBig = ({
         </div>
 
         {/* Контент карточки */}
-        <div className="flex flex-col space-y-3">
+        <div className="flex flex-col flex-1 space-y-3">
           {/* Заголовок */}
           <h3
             id={`${cardId}-title`}
@@ -82,16 +87,17 @@ export const ArticleCardBig = ({
               'prose-img:rounded-xl prose-img:shadow-lg',
               'prose-pre:rounded-xl prose-pre:bg-gray-900',
               'prose-code:text-emerald-600 dark:prose-code:text-emerald-400',
-              'prose-blockquote:border-l-emerald-500 prose-blockquote:bg-gray-50 dark:prose-blockquote:bg-gray-800/50'
+              'prose-blockquote:border-l-emerald-500 prose-blockquote:bg-gray-50 dark:prose-blockquote:bg-gray-800/50',
+              'line-clamp-4'
             )}
             data-testid={`${testId}-content`}
           >
-            {parse(content)}
+            {parse(cleanContent)}
           </div>
 
           {/* Теги / метаданные */}
           <div
-            className="flex flex-wrap items-center gap-3 pt-2 text-sm text-gray-500 dark:text-gray-400"
+            className="flex flex-wrap items-center gap-3 pt-2 text-sm text-gray-500 dark:text-gray-400 min-h-[28px]"
             data-testid={`${testId}-meta`}
           >
             {article.tags && article.tags.length > 0 && (
