@@ -30,7 +30,7 @@ export const MobileMenu = ({ children }: { children: React.ReactNode }) => {
         <Button
           variant="outline"
           size="icon"
-          className="md:hidden"
+          className="lg:hidden"
           aria-label="Open mobile menu"
           aria-haspopup="dialog"
           aria-expanded={open}

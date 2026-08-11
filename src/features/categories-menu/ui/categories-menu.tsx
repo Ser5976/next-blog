@@ -3,7 +3,7 @@ import { CategoryLink, getCategories } from '@/entities/category';
 export const CategoriesMenu = async () => {
   const categories = await getCategories();
   return (
-    <nav aria-label="Main blog categories" className="hidden md:flex gap-6">
+    <nav aria-label="Main blog categories" className="hidden lg:flex gap-6">
       <ul className="flex gap-4 px-4" role="list" aria-label="Categories list">
         {!categories ? (
           <li
