@@ -62,7 +62,7 @@ export const ArticleHeader = ({ article }: { article: Article }) => {
       {/* Category */}
       {article.category && (
         <Link
-          href={`/category/${article.category.slug}`}
+          href={`/categories/${article.category.slug}`}
           className="inline-block"
         >
           <span className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 px-3 py-1 text-xs font-medium text-white transition-transform hover:scale-105">
@@ -75,7 +75,7 @@ export const ArticleHeader = ({ article }: { article: Article }) => {
       {article.tags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {article.tags.map((tag) => (
-            <Link key={tag.id} href={`/tag/${tag.slug}`}>
+            <Link key={tag.id} href={`/tags/${tag.slug}`}>
               <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700">
                 #{tag.name}
               </span>

@@ -31,8 +31,7 @@ export const ArticleCardBig = ({
   const cleanContent = processContent(article.content);
 
   return (
-    <Link
-      href={`/article/${article.slug}`}
+    <div
       className="group block h-full"
       role={role || 'listitem'}
       data-testid={testId}
@@ -40,7 +39,10 @@ export const ArticleCardBig = ({
     >
       <article className="flex flex-col h-full">
         {/* Изображение */}
-        <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden  bg-gray-100 dark:bg-gray-800">
+        <Link
+          href={`/article/${article.slug}`}
+          className="relative mb-5 aspect-[16/9] w-full overflow-hidden  bg-gray-100 dark:bg-gray-800"
+        >
           {article.coverImage ? (
             <Image
               src={article.coverImage}
@@ -59,25 +61,27 @@ export const ArticleCardBig = ({
               <span className="text-gray-400 dark:text-gray-500">No image</span>
             </div>
           )}
-        </div>
+        </Link>
 
         {/* Контент карточки */}
         <div className="flex flex-col flex-1 space-y-3">
           {/* Заголовок */}
-          <h3
+          <Link
+            href={`/article/${article.slug}`}
             id={`${cardId}-title`}
             className="mb-2 line-clamp-2 text-xl font-semibold leading-snug text-gray-900 transition-colors group-hover:text-emerald-600 dark:text-white dark:group-hover:text-emerald-400"
             data-testid={`${testId}-title`}
           >
             {article.title}
-          </h3>
+          </Link>
 
           {/* Дата */}
 
           <DateComponent date={article.createdAt} />
 
           {/* Текст - 4 строки */}
-          <div
+          <Link
+            href={`/article/${article.slug}`}
             className={cn(
               'prose prose-lg max-w-none dark:prose-invert',
               'prose-headings:scroll-mt-20 prose-headings:font-bold',
@@ -93,7 +97,7 @@ export const ArticleCardBig = ({
             data-testid={`${testId}-content`}
           >
             {parse(cleanContent)}
-          </div>
+          </Link>
 
           {/* Теги / метаданные */}
           <div
@@ -104,26 +108,22 @@ export const ArticleCardBig = ({
               <>
                 <span className="text-gray-300 dark:text-gray-600">·</span>
                 <div className="flex flex-wrap gap-2">
-                  {article.tags.slice(0, 3).map((tag) => (
-                    <span
+                  {article.tags.map((tag) => (
+                    <Link
+                      href={`/tags/${tag.slug}`}
                       key={tag.id}
                       className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                       data-testid={`${testId}-tag-${tag.id}`}
                     >
                       #{tag.name}
-                    </span>
+                    </Link>
                   ))}
-                  {article.tags.length > 3 && (
-                    <span className="text-xs text-gray-400 dark:text-gray-500">
-                      +{article.tags.length - 3}
-                    </span>
-                  )}
                 </div>
               </>
             )}
           </div>
         </div>
       </article>
-    </Link>
+    </div>
   );
 };
