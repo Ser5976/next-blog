@@ -1,10 +1,23 @@
 import { CategoryLink, getCategories } from '@/entities/category';
+import { CategoriesDropdown } from './categories-dropdown';
 
 export const CategoriesMenu = async () => {
   const categories = await getCategories();
+
+  const VISIBLE_COUNT = 5;
+  const visibleCategories = categories?.slice(0, VISIBLE_COUNT) ?? [];
+  const hiddenCategories = categories?.slice(VISIBLE_COUNT) ?? [];
+
   return (
-    <nav aria-label="Main blog categories" className="hidden lg:flex gap-6">
-      <ul className="flex gap-4 px-4" role="list" aria-label="Categories list">
+    <nav
+      aria-label="Main blog categories"
+      className="hidden lg:flex items-center"
+    >
+      <ul
+        className="flex gap-4 items-center"
+        role="list"
+        aria-label="Categories list"
+      >
         {!categories ? (
           <li
             className="text-sm text-muted-foreground"
@@ -22,11 +35,22 @@ export const CategoriesMenu = async () => {
             No data available
           </li>
         ) : (
-          categories.map((category) => (
-            <li key={category.id} role="listitem">
-              <CategoryLink category={category} />
-            </li>
-          ))
+          <>
+            {visibleCategories.map((category) => (
+              <li
+                key={category.id}
+                role="listitem"
+                className="flex items-center"
+              >
+                <CategoryLink category={category} />
+              </li>
+            ))}
+            {hiddenCategories.length > 0 && (
+              <li role="listitem" className="flex items-center">
+                <CategoriesDropdown categories={hiddenCategories} />
+              </li>
+            )}
+          </>
         )}
       </ul>
     </nav>
