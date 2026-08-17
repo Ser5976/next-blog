@@ -1,18 +1,14 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, X } from 'lucide-react';
 
 import { cn } from '@/shared/lib';
 import { Button, Input } from '@/shared/ui';
+import { SearchProps } from '../model';
 
-interface Props {
-  variant?: 'desktop' | 'mobile' | 'page' | 'cta';
-  onClose?: () => void;
-}
-
-const SearchFormInner = ({ variant = 'desktop', onClose }: Props) => {
+export const SearchForm = ({ variant = 'desktop', onClose }: SearchProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlQuery = searchParams.get('query') ?? '';
@@ -153,26 +149,3 @@ const SearchFormInner = ({ variant = 'desktop', onClose }: Props) => {
     </form>
   );
 };
-
-const SearchFormFallback = ({ variant = 'desktop' }: Props) => (
-  <div
-    className={cn(
-      'rounded-full',
-      variant === 'desktop' &&
-        'hidden h-9 w-56 border border-border/40 bg-muted/40 md:block dark:border-white/10 dark:bg-white/5',
-      variant === 'mobile' &&
-        'h-10 w-full border border-border/40 bg-muted/40 dark:border-white/10 dark:bg-white/5',
-      variant === 'page' &&
-        'h-12 w-full border border-border/40 bg-muted/40 sm:h-14 dark:border-white/10 dark:bg-white/5',
-      variant === 'cta' &&
-        'h-12 w-full max-w-md border border-white/30 bg-white/15 sm:h-14'
-    )}
-    aria-hidden="true"
-  />
-);
-
-export const SearchForm = (props: Props) => (
-  <Suspense fallback={<SearchFormFallback variant={props.variant} />}>
-    <SearchFormInner {...props} />
-  </Suspense>
-);

@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu } from 'lucide-react';
 
 import { DashboardLink, UserProfile } from '@/features/auth';
 import { SearchForm } from '@/features/search';
+import { SearchFormFallback } from '@/features/search/ui';
 import {
   Button,
   Sheet,
@@ -64,7 +65,11 @@ export const MobileMenu = ({ children }: { children: React.ReactNode }) => {
           className="mt-6 px-3 flex flex-col gap-4"
           aria-label="Mobile navigation"
         >
-          <SearchForm variant="mobile" onClose={() => setOpen(false)} />
+          {/* Search (tablet/desktop), Suspense из-за useSearchParams() */}
+          <Suspense fallback={<SearchFormFallback variant="mobile" />}>
+            <SearchForm variant="mobile" onClose={() => setOpen(false)} />
+          </Suspense>
+
           {children}
         </nav>
         <div className="mt-auto  border-t flex justify-between items-center">

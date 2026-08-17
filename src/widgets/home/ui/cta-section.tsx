@@ -1,7 +1,9 @@
+import { Suspense } from 'react';
 import Link from 'next/link';
 import { PenLine } from 'lucide-react';
 
 import { SearchForm } from '@/features/search';
+import { SearchFormFallback } from '@/features/search/ui';
 import { Button } from '@/shared/ui';
 
 interface CtaSectionProps {
@@ -61,7 +63,11 @@ export const CtaSection = ({
               aria-label="Call to action buttons"
               data-testid={`${dataTestId}-actions`}
             >
-              <SearchForm variant="cta" />
+              {/* Search (tablet/desktop), Suspense из-за useSearchParams() */}
+              <Suspense fallback={<SearchFormFallback />}>
+                <SearchForm variant="cta" />
+              </Suspense>
+
               <Button
                 asChild
                 variant="outline"

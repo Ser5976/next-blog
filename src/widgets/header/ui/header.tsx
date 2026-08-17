@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { AuthButton, DashboardLink } from '@/features/auth';
 import { CategoriesMenu } from '@/features/categories-menu';
 import { SearchForm } from '@/features/search';
+import { SearchFormFallback } from '@/features/search/ui';
 import { ThemeToggle } from '@/features/theme-toggle';
 import { cn } from '@/shared/lib';
 import { CategoriesSkeleton } from '@/shared/ui';
@@ -56,8 +57,10 @@ export const Header = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          {/* Search (tablet/desktop) */}
-          <SearchForm />
+          {/* Search (tablet/desktop), Suspense из-за useSearchParams() */}
+          <Suspense fallback={<SearchFormFallback />}>
+            <SearchForm />
+          </Suspense>
 
           {/* Theme toggle */}
           <ThemeToggle />
