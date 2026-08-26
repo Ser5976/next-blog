@@ -60,6 +60,7 @@ export const CategoriesSection = async () => {
           {categories.map((category, index) => {
             const { icon: Icon, color } =
               categoryIcons[index % categoryIcons.length];
+            const postCount = category._count?.posts ?? 0;
 
             return (
               <Link
@@ -88,6 +89,15 @@ export const CategoriesSection = async () => {
                     Read articles about {category.name.toLowerCase()}
                   </p>
                 </div>
+                <span
+                  className={cn(
+                    'ml-0.5 text-xs transition-colors',
+                    'text-gray-400 group-hover:text-emerald-500/70',
+                    'dark:text-gray-500 dark:group-hover:text-emerald-400/70'
+                  )}
+                >
+                  {postCount}
+                </span>
               </Link>
             );
           })}
