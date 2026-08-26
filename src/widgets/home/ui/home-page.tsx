@@ -6,6 +6,8 @@ import { CategoriesSkeleton } from './categories-skeleton';
 import { CtaSection } from './cta-section';
 import { HeroSection } from './hero-section';
 import { HomeArticlesSection } from './home-articles-section';
+import { TagsSection } from './tags-section';
+import { TagsSectionSkeleton } from './tags-skeleton';
 
 export const HomePage = async () => {
   return (
@@ -31,6 +33,9 @@ export const HomePage = async () => {
 
       <Suspense fallback={<CategoriesSkeleton />}>
         <CategoriesSection />
+      </Suspense>
+      <Suspense fallback={<TagsSectionSkeleton count={6} />}>
+        <TagsSection />
       </Suspense>
 
       <Suspense

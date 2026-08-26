@@ -1,7 +1,7 @@
 import { Tag } from '@/entities/dashboard-get-tags';
+import { defaultTagIcon, tagIcons } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 import { Subtitle, Title } from '@/shared/ui';
-import { defaultTagIcon, tagIcons } from '../constants';
 
 interface TagHeaderProps {
   tag: Tag;

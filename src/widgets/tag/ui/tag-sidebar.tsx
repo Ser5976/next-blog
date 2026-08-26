@@ -3,10 +3,10 @@ import { Clock, Eye, Hash, TrendingUp } from 'lucide-react';
 
 import { Tag } from '@/entities/dashboard-get-tags';
 import { DateComponent } from '@/shared/components';
+import { defaultTagIcon, tagIcons } from '@/shared/constants';
 import { cn } from '@/shared/lib';
 import { Article } from '@/shared/types';
 import { UniversalError } from '@/shared/ui';
-import { defaultTagIcon, tagIcons } from '../constants';
 
 interface TagSidebarProps {
   allTags: Tag[] | null;

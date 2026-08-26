@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { getTagBySlug, getTagsServer } from '@/entities/dashboard-get-tags';
 import { getArticlesServer } from '@/entities/get-articles';
-import { ARTICLES_PER_PAGE } from '../constants';
+import { ARTICLES_PER_PAGE } from '@/shared/constants';
 import { TagArticles } from './tag-articles';
 import { TagHeader } from './tag-header';
 import { TagSidebar } from './tag-sidebar';
