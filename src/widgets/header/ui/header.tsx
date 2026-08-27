@@ -75,21 +75,22 @@ export const Header = () => {
           </div>
 
           {/* Mobile menu */}
-
-          <MobileMenu>
-            <Suspense
-              fallback={
-                <CategoriesSkeleton
-                  count={5}
-                  direction="vertical"
-                  variant="shimmer"
-                  showIcon={false}
-                />
-              }
-            >
-              <MobileCategoriesList />
-            </Suspense>
-          </MobileMenu>
+          <div className=" sticky top-0">
+            <MobileMenu>
+              <Suspense
+                fallback={
+                  <CategoriesSkeleton
+                    count={5}
+                    direction="vertical"
+                    variant="shimmer"
+                    showIcon={false}
+                  />
+                }
+              >
+                <MobileCategoriesList />
+              </Suspense>
+            </MobileMenu>
+          </div>
         </div>
       </div>
     </header>

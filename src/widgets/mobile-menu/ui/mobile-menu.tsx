@@ -62,7 +62,7 @@ export const MobileMenu = ({ children }: { children: React.ReactNode }) => {
         </SheetTitle>
 
         <nav
-          className="mt-6 px-3 flex flex-col gap-4"
+          className="mt-6 px-3 flex flex-col gap-4 overflow-y-auto"
           aria-label="Mobile navigation"
         >
           {/* Search (tablet/desktop), Suspense из-за useSearchParams() */}
