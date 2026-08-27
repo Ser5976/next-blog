@@ -46,7 +46,7 @@ export const Sidebar = () => {
 
       {/* Desktop Sidebar */}
       <div
-        className="hidden md:block h-screen w-[250px] border-r bg-background sticky top-0"
+        className="hidden md:block  w-[250px] bg-background "
         id="desktop-sidebar"
         aria-label="Navigation menu"
         role="navigation"

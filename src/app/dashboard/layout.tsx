@@ -20,7 +20,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
             </div>
           </Link>
 
-          <div className=" flex  items-center">
+          <div className=" flex  items-center sticky top-0">
             <div className=" md:hidden">
               <ThemeToggle />
             </div>
@@ -28,7 +28,7 @@ const DashboardLayout = ({ children }: { children: ReactNode }) => {
           </div>
         </div>
 
-        <div className="flex-1">{children}</div>
+        <div className="flex-1 border-l">{children}</div>
       </div>
     </div>
   );

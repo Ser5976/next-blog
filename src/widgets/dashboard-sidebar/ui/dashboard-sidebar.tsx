@@ -8,26 +8,28 @@ import { NavButton } from './nav-button';
 
 export const DashboardSidebar = ({ closeSheet }: DashboardSidebarProps) => {
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="px-4 py-6 border-b flex gap-8">
-        <Link href="/" onClick={closeSheet}>
-          <div className="flex items-center gap-2 px-2">
-            <span className="font-semibold text-xl">
-              <span className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
-                VitaFlow
+      <div className="flex flex-col border-b flex-shrink-0">
+        <div className="px-4 py-6 flex gap-8">
+          <Link href="/" onClick={closeSheet}>
+            <div className="flex items-center gap-2 px-2">
+              <span className="font-semibold text-xl">
+                <span className="bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400 bg-clip-text text-transparent">
+                  VitaFlow
+                </span>
+                <span className="text-foreground">Blog</span>
               </span>
-              <span className="text-foreground">Blog</span>
-            </span>
+            </div>
+          </Link>
+          <div className="hidden md:block">
+            <ThemeToggle />
           </div>
-        </Link>
-        <div className="hidden md:block">
-          <ThemeToggle />
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-6 space-y-1">
+      {/* Navigation - теперь с overflow */}
+      <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
         {NAV_ITEMS.map((item) => (
           <NavButton
             key={item.href}
@@ -41,8 +43,10 @@ export const DashboardSidebar = ({ closeSheet }: DashboardSidebarProps) => {
         ))}
       </nav>
 
-      {/* User Section (можно добавить позже) */}
-      <UserProfile />
+      {/* User Section - всегда внизу */}
+      <div className="flex-shrink-0 border-t">
+        <UserProfile />
+      </div>
     </div>
   );
 };
