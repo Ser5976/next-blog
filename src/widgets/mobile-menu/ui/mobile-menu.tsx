@@ -72,7 +72,7 @@ export const MobileMenu = ({ children }: { children: React.ReactNode }) => {
 
           {children}
         </nav>
-        <div className="mt-auto  border-t flex justify-between items-center">
+        <div className="mt-auto  border-t flex justify-between items-center pr-2">
           <UserProfile />
           <DashboardLink />
         </div>
