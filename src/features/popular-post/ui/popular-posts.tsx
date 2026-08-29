@@ -68,7 +68,7 @@ export const PopularPosts = async ({ timeRange }: IPopularPostsProps) => {
                   <span className="flex items-center gap-1">
                     <Star className="h-3 w-3" aria-hidden="true" />
                     <span aria-label={`Rating: ${post.rating}`}>
-                      {post.rating}
+                      {post.rating.toFixed(2)}
                     </span>
                   </span>
                   <span className="flex items-center gap-1">
