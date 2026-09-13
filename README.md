@@ -56,7 +56,8 @@
    DATABASE_URL — строка подключения к облачной базе данных Prisma Postgres (содержит api_key)
    ```
 
-Clerk
+### Clerk
+
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY — публичный ключ Clerk
 
 CLERK_SECRET_KEY — секретный ключ Clerk
@@ -67,65 +68,65 @@ NEXT_PUBLIC_CLERK_SIGN_IN_URL / NEXT_PUBLIC_CLERK_SIGN_UP_URL — маршрут
 
 NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL / NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL — редирект после входа и регистрации
 
-E2E-тесты
-E2E_EMAIL / E2E_PASSWORD — учётные данные тестового пользователя для Playwright
+### ImageKit
 
-ImageKit
 NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY — публичный ключ ImageKit
 
 NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT — URL-эндпоинт ImageKit
 
 IMAGEKIT_PRIVATE_KEY — приватный ключ ImageKit
 
-Подключение Prisma:
+4. Подключение Prisma:
 
 npx prisma generate
 
 npx prisma migrate dev
 
-Запуск проекта
+## Запуск проекта
 
 npm run dev (разработка, с Turbopack)
 
 npm run build, npm run start (продакшен)
 
-Основной стек технологий
-Next.js 15 (App Router) — фреймворк для React с поддержкой SSR и маршрутизации, используется как для frontend, так и для backend-части проекта (API Routes)
+## Основной стек технологий
 
-TypeScript — статическая типизация
+1. Next.js 15 (App Router) — фреймворк для React с поддержкой SSR и маршрутизации, используется как для frontend, так и для backend-части проекта (API Routes)
 
-Prisma — ORM для работы с базой данных
+2. TypeScript — статическая типизация
 
-Prisma Postgres — облачная база данных PostgreSQL (хостинг prisma.io) с использованием Prisma Accelerate
+3. Prisma — ORM для работы с базой данных
 
-Clerk — аутентификация и управление пользователями (OAuth: Google, GitHub), разграничение ролей через publicMetadata
+4. Prisma Postgres — облачная база данных PostgreSQL (хостинг prisma.io) с использованием Prisma Accelerate
 
-TanStack Query + Axios — работа с API и кэшированием
+5. Clerk — аутентификация и управление пользователями (OAuth: Google, GitHub), разграничение ролей через publicMetadata
 
-React Hook Form + Zod — формы и валидация
+6. TanStack Query + Axios — работа с API и кэшированием
 
-Tailwind CSS 4 — утилитарный CSS-фреймворк
+7. React Hook Form + Zod — формы и валидация
 
-Shadcn/ui + Radix UI — UI-компоненты
+8. Tailwind CSS 4 — утилитарный CSS-фреймворк
 
-Tiptap — визуальный редактор для статей
+9. Shadcn/ui + Radix UI — UI-компоненты
 
-ImageKit — загрузка и оптимизация изображений
+10. Tiptap — визуальный редактор для статей
 
-Framer Motion — анимации
+11. ImageKit — загрузка и оптимизация изображений
 
-Sonner — библиотека уведомлений (toast)
+12. Framer Motion — анимации
 
-date-fns — работа с датами
+13. Sonner — библиотека уведомлений (toast)
 
-Jest + Testing Library + Supertest — unit/integration тестирование
+14. date-fns — работа с датами
 
-Playwright — e2e тестирование
+15. Jest + Testing Library + Supertest — unit/integration тестирование
 
-Архитектура проекта (FSD)
+16. Playwright — e2e тестирование
+
+## Архитектура проекта (FSD)
+
 Проект построен по методологии Feature-Sliced Design (FSD). Код в папке src разделён на слои:
 
-/app
+### /app
 
 маршрутизация Next.js (App Router): страницы, layouts, API Routes
 
@@ -139,7 +140,7 @@ Playwright — e2e тестирование
 
 служебные: create-article, edit-article/[slug], access-denied, sync-user-error
 
-/widgets
+### /widgets
 
 крупные самостоятельные блоки интерфейса:
 
@@ -150,9 +151,10 @@ category, tag, search, home, post
 header, footer, mobile-menu
 
 dashboard-articles, dashboard-catigories, dashboard-comments, dashboard-overview,
+
 dashboard-sidebar, dashboard-tags, dashboard-user-profile, dashboard-users
 
-/features
+### /features
 
 пользовательские сценарии:
 
@@ -167,14 +169,14 @@ categories-menu, search, welcome-banner
 аналитические фичи: comments-stats, posts-stats, rating-stats, users-stats, view-stats,
 efficiency, popular-categories, popular-post
 
-/entities
+### /entities
 
 бизнес-сущности (Post, Category, Comment, Tag, StatCard, TimeRange) с их UI и логикой
 
 category, coment-row, comments-stats, get-article, get-articles, post-row,
 posts-stats, stat-card, time-range, dashboard-get-categories, dashboard-get-tags
 
-/shared
+### /shared
 
 переиспользуемые ресурсы:
 
@@ -184,7 +186,8 @@ components, constants, hooks, lib, schemas, types, ui
 
 Каждый слой имеет строгие правила импортов: слои могут импортировать только из нижележащих слоёв. Почти каждая фича и сущность содержит собственные тесты (**tests**).
 
-Тестирование
+## Тестирование
+
 В проекте настроены unit/integration-тесты (Jest) и e2e-тесты (Playwright). Покрытие тестами распределено по фичам и виджетам:
 
 npm run test — запуск Jest-тестов
@@ -200,81 +203,83 @@ npm run test:e2e — e2e-тесты Playwright
 Конфигурационные файлы: jest.config.ts, jest.setup.ts, playwright.config.ts.
 Планы тестирования задокументированы в TESTING_PLAN_DASHBOARD_WIDGETS.md и DASHBOARD_COMMENTS_PLAN.md.
 
-API Routes
+## API Routes
+
 Backend-часть реализована через API Routes в src/app/api:
+
+### статистика по автору
 
 /api/author/stats
 
-статистика по автору
+### CRUD-операции с категориями и получение по slug
 
 /api/categories
 /api/categories/[id]
 /api/categories/slug/[slug]
 
-CRUD-операции с категориями и получение по slug
+### реакции на комментарии в dashboard
 
 /api/dashboard/comments/[commentId]/like
 /api/dashboard/comments/[commentId]/dislike
 /api/dashboard/comments/[commentId]/reaction
 
-реакции на комментарии в dashboard
+### аналитические эндпоинты для dashboard
 
 /api/dashboard/efficiency, popular-categories, popular-posts, posts-stats, ratings, total-views
 
-аналитические эндпоинты для dashboard
+### данные пользователя для dashboard
 
 /api/dashboard/users/[userId]/comments
 /api/dashboard/users/[userId]/posts
 
-данные пользователя для dashboard
+### данные пользователя Clerk
 
 /api/dashboard/users-clerk/[userId]
 
-данные пользователя Clerk
+### работа со статьями: комментарии, публикация, рейтинг, просмотры
 
 /api/posts/[id]/comment, comments, publish, rate, user-rating, view
 
-работа со статьями: комментарии, публикация, рейтинг, просмотры
+### связанные статьи
 
 /api/posts/slug/[slug]/related
 
-связанные статьи
+### синхронизация пользователя Clerk с базой данных
 
 /api/sync-user
 
-синхронизация пользователя Clerk с базой данных
+### CRUD-операции с тегами
 
 /api/tags, /api/tags/[id], /api/tags/slug/[slug]
 
-CRUD-операции с тегами
+### авторизация загрузки файлов в ImageKit
 
 /api/upload-auth
 
-авторизация загрузки файлов в ImageKit
+### вебхуки Clerk (создание/удаление пользователей), верификация через CLERK_WEBHOOK_SIGNING_SECRET
 
 /api/webhooks
 
-вебхуки Clerk (создание/удаление пользователей), верификация через CLERK_WEBHOOK_SIGNING_SECRET
+## Работа с данными
 
-Работа с данными
-Получение данных
-Получение редко обновляемых данных
-Для таких данных используется встроенный метод fetch() из Next.js в серверных компонентах с настройкой revalidate
+1. Получение данных
+   Получение редко обновляемых данных
+   Для таких данных используется встроенный метод fetch() из Next.js в серверных компонентах с настройкой revalidate
 
 Часто обновляемые данные — TanStack Query + Axios
 Для интерактивных данных (комментарии, лайки, рейтинги, статистика dashboard) используется TanStack Query в связке с Axios
 Функции запросов сосредоточены в shared/api (articles, comment, user) и в api-сегментах фич
 
-Изменение и удаление данных
-Для мутаций данных используются два подхода:
+2. Изменение и удаление данных
+   Для мутаций данных используются два подхода:
 
 TanStack Query Mutation (для клиентских интерактивных сценариев — комментарии, рейтинги, реакции)
 
 API Routes с прямым доступом к Prisma (создание, редактирование, публикация, удаление статей, категорий, тегов)
 
-Обработка ошибок
-При fetch() на серверной стороне ошибки обрабатываются вручную через проверку res.ok,
-либо возвращается null, либо выбрасывается throw new Error() с переходом на error.tsx
+3. Обработка ошибок
+   При fetch() на серверной стороне ошибки обрабатываются вручную через проверку res.ok,
+   либо возвращается null, либо выбрасывается throw new Error() с переходом на error.tsx
 
 При TanStack Query состояние ошибки доступно через переменную isError
 
@@ -282,14 +287,13 @@ API Routes с прямым доступом к Prisma (создание, ред�
 
 Для ошибок синхронизации пользователя предусмотрена отдельная страница /sync-user-error и модель FailedUserDeletion для отслеживания неудачных удалений
 
-Обработка состояния загрузки
-При fetch() на серверной стороне используется Suspense с кастомным fallback
+4. Обработка состояния загрузки
+   При fetch() на серверной стороне используется Suspense с кастомным fallback
 
 При TanStack Query состояние загрузки доступно через переменную isLoading
 
-При мутациях состояние загрузки контролируется вручную через useState
+## Аутентификация и авторизация
 
-Аутентификация и авторизация
 Аутентификация реализована через Clerk:
 
 Кастомные страницы входа и регистрации ((auth)/sign-in, (auth)/sign-up)
@@ -302,77 +306,83 @@ API Routes с прямым доступом к Prisma (создание, ред�
 
 Специальная модель FailedUserDeletion и страница /sync-user-error для отслеживания неудачных удалений пользователей
 
-Роли пользователей
+## Роли пользователей
+
 Разграничение ролей реализовано через Clerk metadata (publicMetadata) — роль пользователя хранится в publicMetadata.role и доступна как на клиенте, так и на сервере через Clerk session.
 
-User — чтение статей, комментарии, лайки/дизлайки, рейтинги
+1. User — чтение статей, комментарии, лайки/дизлайки, рейтинги
 
-Author — всё, что доступно User, плюс личный кабинет автора:
+2. Author — всё, что доступно User, плюс личный кабинет автора:
 
-author/articles — управление своими статьями
+   author/articles — управление своими статьями
 
-author/comments — управление своими комментариями
+   author/comments — управление своими комментариями
 
-создание и редактирование статей (create-article, edit-article/[slug])
+   создание и редактирование статей (create-article, edit-article/[slug])
 
-Admin — доступ к dashboard, управление всеми статьями, категориями, тегами, пользователями и комментариями
+3. Admin — доступ к dashboard, управление всеми статьями, категориями, тегами, пользователями и комментариями
 
-Защищённые маршруты
+## Защищённые маршруты
+
 Страницы dashboard доступны только пользователям с ролью Admin
 
 Страницы автора доступны только авторизованным пользователям с ролью Author
 
 Middleware Clerk проверяет publicMetadata.role и редиректит на /access-denied при отказе (см. fix dashboard-link access-denied fix middleware)
 
-Функционал пользователя
-Просмотр ленты последних статей
+## Функционал пользователя
 
-Поиск по библиотеке статей (по категориям, тегам, ключевым словам)
+1. Просмотр ленты последних статей
 
-Чтение статей по категориям: питание, фитнес, ментальное здоровье, баланс
+2. Поиск по библиотеке статей (по категориям, тегам, ключевым словам)
 
-Оставление комментариев
+3. Чтение статей по категориям: питание, фитнес, ментальное здоровье, баланс
 
-Лайки и дизлайки комментариев
+4. Оставление комментариев
 
-Постановка рейтинга статьям (влияет на средний рейтинг)
+5. Лайки и дизлайки комментариев
 
-Просмотр связанных статей (related articles)
+6. Постановка рейтинга статьям (влияет на средний рейтинг)
 
-Переключение светлой/тёмной темы
+7. Просмотр связанных статей (related articles)
 
-Личный кабинет автора
-Обзорная страница автора (author-overview) со статистикой
+8. Переключение светлой/тёмной темы
 
-Управление своими статьями (author-articles)
+## Личный кабинет автора
 
-Управление своими комментариями (author-comments)
+1. Обзорная страница автора (author-overview) со статистикой
 
-Боковая навигация (author-sidebar)
+2. Управление своими статьями (author-articles)
 
-Профиль автора (user-profile-info)
+3. Управление своими комментариями (author-comments)
 
-Панель администратора (Dashboard)
-Обзорная страница (dashboard-overview) с ключевыми метриками: users-stats, posts-stats, comments-stats, rating-stats, view-stats, efficiency
+4. Боковая навигация (author-sidebar)
 
-Управление статьями (dashboard-articles: создание, редактирование, черновики, публикация)
+5. Профиль автора (user-profile-info)
 
-Визуальный редактор статей на Tiptap (заголовки, списки, изображения, ссылки, выравнивание)
+## Панель администратора (Dashboard)
 
-Управление категориями (dashboard-catigories)
+1. Обзорная страница (dashboard-overview) с ключевыми метриками: users-stats, posts-stats, comments-stats, rating-stats, view-stats, efficiency
 
-Управление тегами (dashboard-tags)
+2. Управление статьями (dashboard-articles: создание, редактирование, черновики, публикация)
 
-Управление пользователями (dashboard-users, dashboard-user-profile, dashboard/users/[userId])
+3. Визуальный редактор статей на Tiptap (заголовки, списки, изображения, ссылки, выравнивание)
 
-Управление комментариями (dashboard-comments: реакции, лайки, дизлайки)
+4. Управление категориями (dashboard-catigories)
 
-Популярные посты (popular-post) и популярные категории (popular-categories)
+5. Управление тегами (dashboard-tags)
 
-Переключение темы интерфейса (theme-toggle)
+6. Управление пользователями (dashboard-users, dashboard-user-profile, dashboard/users/[userId])
 
-Загрузка изображений
-Загрузка изображений реализована с помощью ImageKit
+7. Управление комментариями (dashboard-comments: реакции, лайки, дизлайки)
+
+8. Популярные посты (popular-post) и популярные категории (popular-categories)
+
+9. Переключение темы интерфейса (theme-toggle)
+
+10. Загрузка изображений
+
+## Загрузка изображений реализована с помощью ImageKit
 
 Авторизация загрузки происходит через эндпоинт /api/upload-auth
 
@@ -380,7 +390,8 @@ Middleware Clerk проверяет publicMetadata.role и редиректит 
 
 Загруженные файлы автоматически оптимизируются и возвращаются в виде URL, которые сохраняются в базе данных через Prisma
 
-Безопасность данных
+## Безопасность данных
+
 Взаимодействие с базой данных строго типизировано благодаря Prisma
 
 Все данные, приходящие от клиента, проходят валидацию через Zod-схемы (shared/schemas) до момента отправки в базу
@@ -393,45 +404,22 @@ Middleware Clerk проверяет publicMetadata.role и редиректит 
 
 Для отслеживания сбоев при удалении пользователей предусмотрена модель FailedUserDeletion со статусом resolved
 
-Структура проекта (по папкам)
-/prisma
+## Структура проекта (по папкам)
 
-схема базы данных и миграции
-
-/src
-
-исходный код приложения, организованный по FSD:
-
-/app — маршрутизация Next.js (App Router), включая API Routes
-
-/widgets — крупные блоки интерфейса (header, footer, article, dashboard-\*)
-
-/features — пользовательские сценарии (auth, create-article, comments-article и др.)
-
-/entities — бизнес-сущности (Post, Category, Comment, Tag, StatCard, TimeRange)
-
-/shared — переиспользуемые ресурсы (api, ui, hooks, lib, schemas, types, constants)
-
-/tests
-
-unit/integration и e2e тесты
-
-components.json
-
-конфигурация shadcn/ui
-
-jest.config.ts, jest.setup.ts
-
-настройка Jest
-
-playwright.config.ts
-
-настройка e2e-тестов
-
-DASHBOARD_COMMENTS_PLAN.md
-
-план разработки комментариев в dashboard
-
-TESTING_PLAN_DASHBOARD_WIDGETS.md
-
-план тестирования виджетов dashboard
+1. схема базы данных и миграции
+   /prisma
+2. исходный код приложения, организованный по FSD:
+   /src
+   /app — маршрутизация Next.js (App Router), включая API Routes
+   /widgets — крупные блоки интерфейса (header, footer, article, dashboard-\*)
+   /features — пользовательские сценарии (auth, create-article, comments-article и др.)
+   /entities — бизнес-сущности (Post, Category, Comment, Tag, StatCard, TimeRange)
+   /shared — переиспользуемые ресурсы (api, ui, hooks, lib, schemas, types, constants)
+   /tests
+   unit/integration и e2e тесты
+   components.json
+   конфигурация shadcn/ui
+   jest.config.ts, jest.setup.ts
+   настройка Jest
+   playwright.config.ts
+   настройка e2e-тестов
